@@ -1,9 +1,29 @@
 using MySqlConnector;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
+using System.Threading.RateLimiting;
+using Workoutly.Api.Auth;
 using Workoutly.Api.Data;
 
 var migrateOnly = args.Contains("--migrate");
 var builder = WebApplication.CreateBuilder(args.Where(argument => argument != "--migrate").ToArray());
 builder.Services.AddSingleton<MySqlDatabase>();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.Configure<PasswordHasherOptions>(options => options.IterationCount = 210_000);
+builder.Services.AddSingleton<IPasswordHasher<AccountProfile>, PasswordHasher<AccountProfile>>();
+builder.Services.AddSingleton<AuthService>();
+builder.Services.AddAuthentication("Session")
+    .AddScheme<AuthenticationSchemeOptions, SessionAuthenticationHandler>("Session", _ => { });
+builder.Services.AddAuthorization();
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("account", context => RateLimitPartition.GetFixedWindowLimiter(
+        context.Connection.RemoteIpAddress?.ToString() ?? "local", _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 20, Window = TimeSpan.FromMinutes(1), QueueLimit = 0
+        }));
+});
 var app = builder.Build();
 
 if (migrateOnly)
@@ -15,12 +35,40 @@ if (migrateOnly)
     }
     catch (Exception exception) when (exception is MySqlException or ArgumentException or InvalidOperationException)
     {
-        Console.Error.WriteLine("Não foi possível preparar o banco. Confira a configuração, as permissões e a disponibilidade do MySQL.");
+        var code = exception is MySqlException mysql ? $" (código MySQL {mysql.Number})" : string.Empty;
+        Console.Error.WriteLine($"Não foi possível preparar o banco{code}. Confira a configuração, as permissões e a disponibilidade do MySQL.");
+        if (exception.InnerException is System.Net.Sockets.SocketException socket)
+            Console.Error.WriteLine($"Falha de transporte: {socket.SocketErrorCode}.");
         Environment.ExitCode = 1;
     }
     await app.DisposeAsync();
     return;
 }
+
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path.StartsWithSegments("/auth"))
+    {
+        context.Response.Headers.CacheControl = "no-store";
+        if (!context.Request.IsHttps && !app.Environment.IsDevelopment())
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await context.Response.WriteAsJsonAsync(new { message = "Use HTTPS para acessar sua conta." });
+            return;
+        }
+    }
+    try { await next(context); }
+    catch (Exception exception) when (context.Request.Path.StartsWithSegments("/auth") &&
+        exception is MySqlException or InvalidOperationException or ArgumentException)
+    {
+        context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+        await context.Response.WriteAsJsonAsync(new { message = "Serviço indisponível. Tente novamente em instantes." });
+    }
+});
+app.UseRateLimiter();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapAccountEndpoints();
 
 // Liveness não depende do banco. Readiness comprova acesso ao esquema preparado.
 app.MapGet("/health", (MySqlDatabase database) => Results.Ok(new

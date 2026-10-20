@@ -5,7 +5,7 @@ namespace Workoutly.Api.Data;
 /// <summary>Acesso ao banco somente na API. Abrir a API não executa DDL.</summary>
 public sealed class MySqlDatabase(IConfiguration configuration)
 {
-    public const int CurrentSchemaVersion = 1;
+    public const int CurrentSchemaVersion = 2;
 
     private string? ConnectionString => configuration.GetConnectionString("Workoutly");
     public bool IsConfigured => !string.IsNullOrWhiteSpace(ConnectionString);
@@ -53,16 +53,34 @@ public sealed class MySqlDatabase(IConfiguration configuration)
         await using var connection = CreateConnection();
         await connection.OpenAsync(cancellationToken);
 
-        // Script idempotente, embutido no assembly para funcionar após publicar a API.
+        // Scripts idempotentes e ordenados, disponíveis também no assembly publicado.
         var assembly = typeof(MySqlDatabase).Assembly;
-        await using var stream = assembly.GetManifestResourceStream(
-            "Workoutly.Api.Data.Migrations.001_bootstrap.sql")
-            ?? throw new InvalidOperationException("Migração inicial não encontrada.");
-        using var reader = new StreamReader(stream);
-        var sql = await reader.ReadToEndAsync(cancellationToken);
-        await using var command = connection.CreateCommand();
-        command.CommandText = sql;
-        await command.ExecuteNonQueryAsync(cancellationToken);
+        var migrations = assembly.GetManifestResourceNames()
+            .Where(name => name.StartsWith("Workoutly.Api.Data.Migrations.") && name.EndsWith(".sql"))
+            .Order(StringComparer.Ordinal);
+        foreach (var migration in migrations)
+        {
+            await using var stream = assembly.GetManifestResourceStream(migration)!;
+            using var reader = new StreamReader(stream);
+            await using var command = connection.CreateCommand();
+            command.CommandText = await reader.ReadToEndAsync(cancellationToken);
+            await command.ExecuteNonQueryAsync(cancellationToken);
+        }
+    }
+
+    public async Task<MySqlConnection> OpenConnectionAsync(CancellationToken cancellationToken)
+    {
+        var connection = CreateConnection();
+        try
+        {
+            await connection.OpenAsync(cancellationToken);
+            return connection;
+        }
+        catch
+        {
+            await connection.DisposeAsync();
+            throw;
+        }
     }
 
     private MySqlConnection CreateConnection()

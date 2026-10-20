@@ -39,7 +39,7 @@ public sealed class MySqlBootstrapTests : IClassFixture<MySqlFixture>
         Assert.NotNull(body);
         Assert.Equal("ready", body.Status);
         Assert.Equal("ready", body.Database);
-        Assert.Equal(1, body.SchemaVersion);
+        Assert.Equal(2, body.SchemaVersion);
     }
 
     private sealed record ReadinessBody(string Status, string Database, int? SchemaVersion);
@@ -60,6 +60,8 @@ public sealed class MySqlFixture : IAsyncLifetime
     private readonly string _databaseName = $"workoutly_test_{Guid.NewGuid():N}";
     private string? _adminConnection;
     private bool _created;
+    private readonly string _user = $"wly_{Guid.NewGuid():N}"[..28];
+    private bool _userCreated;
     public string ConnectionString { get; private set; } = string.Empty;
 
     public async Task InitializeAsync()
@@ -80,7 +82,16 @@ public sealed class MySqlFixture : IAsyncLifetime
         command.CommandText = $"CREATE DATABASE `{_databaseName}` CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci";
         await command.ExecuteNonQueryAsync();
         _created = true;
+        var password = Guid.NewGuid().ToString("N");
+        command.CommandText = $"CREATE USER '{_user}'@'%' IDENTIFIED BY '{password}'";
+        await command.ExecuteNonQueryAsync();
+        _userCreated = true;
+        command.CommandText = $"GRANT ALL PRIVILEGES ON `{_databaseName}`.* TO '{_user}'@'%'";
+        await command.ExecuteNonQueryAsync();
         options.Database = _databaseName;
+        options.UserID = _user;
+        options.Password = password;
+        options.SslMode = MySqlSslMode.Required;
         ConnectionString = options.ConnectionString;
     }
 
@@ -93,5 +104,10 @@ public sealed class MySqlFixture : IAsyncLifetime
         await using var command = connection.CreateCommand();
         command.CommandText = $"DROP DATABASE `{_databaseName}`";
         await command.ExecuteNonQueryAsync();
+        if (_userCreated)
+        {
+            command.CommandText = $"DROP USER '{_user}'@'%'";
+            await command.ExecuteNonQueryAsync();
+        }
     }
 }

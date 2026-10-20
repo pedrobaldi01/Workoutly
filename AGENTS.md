@@ -4,9 +4,10 @@
 - Responda em português e explique o conceito, a decisão e a verificação ao concluir cada incremento.
 - Implementação nova: não reutilizar o aplicativo antigo. Documentos acadêmicos na pasta superior são fontes de requisitos e não devem ser editados sem pedido específico.
 - Stack: .NET 10, MAUI com XAML e code-behind, API ASP.NET Core e MySQL somente no servidor.
-- MySQL está integrado somente na API; autenticação e comunicação do app com a API ainda não existem. Não apresentar planejamento como resultado.
+- Cadastro, login, perfil e logout estão integrados ao MySQL pela API; o app usa SecureStorage para a sessão. Exercícios, fichas e treinos ainda não existem. Não apresentar planejamento como resultado.
 - Implementar o menor incremento completo pedido; evitar abstrações antecipadas, serviços vazios e recursos fora do MVP.
 - Funcionalidades finais online; preservar formulário em falhas de rede. Não implementar sincronização offline.
+- Autenticação usa PasswordHasher do ASP.NET Core Identity e tokens opacos revogáveis, guardados somente como hash no servidor. Não substituir por hash simples de senha ou sessão em Preferences.
 - Não embutir credenciais ou dados pessoais. Somente dados fictícios nos testes automatizados.
 - Ler docs/backlog.md e docs/arquitetura.md antes de alterar o escopo. Usar GLOSSARY.md para os termos.
 - Não adicionar integrações sociais, wearables, prescrição clínica ou AI Coach ao MVP.

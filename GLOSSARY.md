@@ -13,3 +13,5 @@
 | Evolução | Comparação dos registros do próprio usuário ao longo do tempo; não é avaliação clínica. |
 | MVP | Menor versão que atende ao escopo acadêmico e pode ser avaliada. |
 | Evidência | Registro verificável vinculado à versão, ambiente e procedimento. |
+| Sessão de acesso | Token que autentica a conta por até sete dias; diferente de uma sessão de treino. |
+| Logout | Revogação da sessão de acesso atual no MySQL e remoção do token do aparelho. |

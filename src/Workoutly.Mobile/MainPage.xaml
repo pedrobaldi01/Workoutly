@@ -4,23 +4,52 @@
              x:Class="Workoutly.Mobile.MainPage"
              Title="Workoutly" BackgroundColor="#111827">
     <ScrollView>
-        <VerticalStackLayout Padding="28,40" Spacing="24" MaximumWidthRequest="560">
-            <Label Text="WORKOUTLY" TextColor="#A78BFA" FontSize="14"
-                   CharacterSpacing="3" FontAttributes="Bold" />
-            <Label Text="Seu treino, no seu ritmo." TextColor="#F9FAFB"
-                   FontSize="34" FontAttributes="Bold" SemanticProperties.HeadingLevel="Level1" />
-            <Label Text="Organize seus treinos e acompanhe sua evolução."
-                   TextColor="#CBD5E1" FontSize="18" />
-            <Border BackgroundColor="#1F2937" StrokeThickness="0" Padding="24">
-                <Border.StrokeShape><RoundRectangle CornerRadius="20" /></Border.StrokeShape>
-                <VerticalStackLayout Spacing="16">
-                    <Label Text="Uma rotina que faz sentido para você" TextColor="#F9FAFB"
-                           FontSize="22" FontAttributes="Bold" />
-                    <Label Text="Planeje suas fichas" TextColor="#C4B5FD" FontSize="18" />
-                    <Label Text="Registre cada sessão" TextColor="#C4B5FD" FontSize="18" />
-                    <Label Text="Enxergue sua evolução" TextColor="#C4B5FD" FontSize="18" />
+        <VerticalStackLayout Padding="28,28" Spacing="18" MaximumWidthRequest="560">
+            <Label Text="WORKOUTLY" TextColor="#A78BFA" FontSize="14" CharacterSpacing="3" FontAttributes="Bold" />
+            <Label x:Name="Heading" Text="Seu treino, no seu ritmo." TextColor="#F9FAFB"
+                   FontSize="30" FontAttributes="Bold" SemanticProperties.HeadingLevel="Level1" />
+            <Label x:Name="Subtitle" Text="Entre na sua conta para começar." TextColor="#CBD5E1" FontSize="16" />
+            <ActivityIndicator x:Name="Loading" Color="#A78BFA" IsVisible="False" />
+            <Label x:Name="ErrorText" TextColor="#FDA4AF" FontSize="14" IsVisible="False"
+                   AutomationId="account_error" />
+            <VerticalStackLayout x:Name="AuthPanel" Spacing="14">
+                <VerticalStackLayout x:Name="NamePanel" Spacing="4" IsVisible="False">
+                    <Label Text="Nome" TextColor="#CBD5E1" />
+                    <Entry x:Name="NameEntry" Placeholder="Como você se chama?" TextColor="#F9FAFB"
+                           PlaceholderColor="#94A3B8" BackgroundColor="#1F2937" MaxLength="120" AutomationId="account_name" />
                 </VerticalStackLayout>
-            </Border>
+                <Label Text="E-mail" TextColor="#CBD5E1" />
+                <Entry x:Name="EmailEntry" Placeholder="voce@exemplo.com" Keyboard="Email" TextColor="#F9FAFB"
+                       PlaceholderColor="#94A3B8" BackgroundColor="#1F2937" MaxLength="254" AutomationId="account_email" />
+                <Label Text="Senha" TextColor="#CBD5E1" />
+                <Entry x:Name="PasswordEntry" Placeholder="Sua senha" IsPassword="True" TextColor="#F9FAFB"
+                       PlaceholderColor="#94A3B8" BackgroundColor="#1F2937" MaxLength="128" AutomationId="account_password" />
+                <VerticalStackLayout x:Name="ConfirmPanel" Spacing="4" IsVisible="False">
+                    <Label Text="Confirme a senha" TextColor="#CBD5E1" />
+                    <Entry x:Name="ConfirmEntry" Placeholder="Repita sua senha" IsPassword="True" TextColor="#F9FAFB"
+                           PlaceholderColor="#94A3B8" BackgroundColor="#1F2937" MaxLength="128" AutomationId="account_confirm" />
+                    <Label Text="Use entre 10 e 128 caracteres." TextColor="#94A3B8" FontSize="12" />
+                </VerticalStackLayout>
+                <Button x:Name="SubmitButton" Text="Entrar" Clicked="OnSubmit" BackgroundColor="#A78BFA" TextColor="#111827" AutomationId="account_submit" />
+                <Button x:Name="ToggleButton" Text="Criar uma conta" Clicked="OnToggle" BackgroundColor="Transparent" TextColor="#C4B5FD" />
+                <Button Text="Conexão" Clicked="OnConnection" BackgroundColor="Transparent" TextColor="#94A3B8" />
+                <VerticalStackLayout x:Name="ConnectionPanel" Spacing="6" IsVisible="False">
+                    <Label Text="Endereço do serviço" TextColor="#CBD5E1" />
+                    <Entry x:Name="AddressEntry" Placeholder="https://seu-servidor" Keyboard="Url" TextColor="#F9FAFB"
+                           PlaceholderColor="#94A3B8" BackgroundColor="#1F2937" AutomationId="account_server" />
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+            <VerticalStackLayout x:Name="AccountPanel" Spacing="20" IsVisible="False">
+                <Border BackgroundColor="#1F2937" StrokeThickness="0" Padding="24">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="20" /></Border.StrokeShape>
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Sua conta" TextColor="#A78BFA" FontSize="14" />
+                        <Label x:Name="AccountName" TextColor="#F9FAFB" FontSize="24" FontAttributes="Bold" />
+                        <Label x:Name="AccountEmail" TextColor="#CBD5E1" FontSize="16" />
+                    </VerticalStackLayout>
+                </Border>
+                <Button x:Name="LogoutButton" Text="Sair da conta" Clicked="OnLogout" BackgroundColor="#374151" TextColor="#F9FAFB" />
+            </VerticalStackLayout>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

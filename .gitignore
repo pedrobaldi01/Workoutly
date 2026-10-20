@@ -16,3 +16,4 @@
 **/*.db
 artifacts/
 .scratch/
+.local/

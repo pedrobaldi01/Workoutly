@@ -4,7 +4,7 @@ Aplicativo acadêmico de acompanhamento de treinos, criado do zero para o Projet
 
 ## Situação atual
 
-Esta entrega é a **fundação técnica**, não o MVP funcional. O app MAUI tem uma tela inicial; a API responde em `/health` e `/health/ready`, conecta ao MySQL e possui preparação explícita do esquema. Cadastro, autenticação, fichas, exercícios, sessões e indicadores ainda serão implementados. O app ainda não chama a API.
+O app já permite **cadastro, login, recuperação de sessão e logout**, integrado à API e ao MySQL. A sessão fica no armazenamento seguro do aparelho e é revogada no servidor ao sair. Fichas, exercícios, sessões de treino e indicadores ainda serão implementados; o MVP completo permanece pendente.
 
 Nenhum código do aplicativo anterior foi reutilizado. Os roteiros enviados ao professor permanecem na pasta superior, sem alterações.
 
@@ -13,7 +13,7 @@ Nenhum código do aplicativo anterior foi reutilizado. Os roteiros enviados ao p
 | Local | Responsabilidade |
 | --- | --- |
 | `src/Workoutly.Mobile` | Interface mobile nativa em C# e XAML para Android e iOS. |
-| `src/Workoutly.Api` | Serviço HTTP ASP.NET Core. Conexão MySQL e prontidão implementadas. Autenticação e regras do domínio entram depois. |
+| `src/Workoutly.Api` | Serviço HTTP ASP.NET Core. MySQL, autenticação por sessão revogável, autorização da conta e prontidão. |
 | `tests/Workoutly.Api.Tests` | Testes HTTP e teste MySQL real em base aleatória. Testes de dispositivo continuam separados. |
 | `docs` | Requisitos, backlog, decisões e evidências. |
 | `.agents/skills` | Procedimentos de apoio ao Codex, não dependências do app. |
@@ -27,6 +27,18 @@ Nenhum código do aplicativo anterior foi reutilizado. Os roteiros enviados ao p
 - Para instalar em iPhone físico: assinatura e provisionamento Apple.
 
 Neste Mac o SDK utilizado está em `/Users/pedrobaldi/.dotnet/dotnet`. Se o comando `dotnet --version` mostrar outro SDK, use esse executável ou ajuste o PATH do terminal/IDE.
+
+## Testar cadastro e login neste Mac
+
+Dê dois cliques em `Executar-local.command`, ou execute:
+
+```sh
+python3 scripts/dev-native.py
+```
+
+Esse helper usa o MySQL nativo instalado, em uma instância exclusiva do projeto, e inicia a API em localhost. Os dados ficam em `.local/`, ignorado pelo Git, e sobrevivem ao reinício. Use **Ctrl+C** no terminal para encerrar os serviços sem apagar as contas. O Docker não é necessário nesse caminho. Não execute uma segunda instância enquanto a primeira estiver aberta.
+
+Em seguida, execute o projeto MAUI no simulador pela IDE, toque em **Criar uma conta** e cadastre dados fictícios de teste. Os detalhes do contrato, da sessão e dos cenários validados estão em [Conta e acesso](docs/autenticacao.md).
 
 ## Abrir e executar
 
@@ -48,7 +60,7 @@ Abra http://localhost:5080/health. Resposta esperada:
 
 Sem conexão configurada, `/health` continua respondendo 200 com `databaseConfigured=false`, e `/health/ready` retorna 503. Para preparar o MySQL e executar os testes reais, leia [MySQL no Workoutly](docs/mysql.md).
 
-A API de desenvolvimento escuta somente no computador local. Não está exposta à rede e o aplicativo ainda não se comunica com ela. HTTPS e acesso por dispositivos serão configurados no incremento de integração.
+A API de desenvolvimento escuta somente no computador local. O simulador de iPhone usa http://localhost:5080/ e o emulador Android usa http://10.0.2.2:5080/. Em builds Release, o app exige um endereço HTTPS. Telefones físicos precisam de um serviço HTTPS acessível; não usam o localhost do Mac.
 
 ```sh
 dotnet build src/Workoutly.Api/Workoutly.Api.csproj
@@ -85,7 +97,7 @@ A solução inclui o projeto mobile: compilar a solução inteira exige os workl
 
 ## Como vamos desenvolver
 
-Leia `docs/backlog.md` para a sequência e critérios de aceite, `docs/arquitetura.md` para a separação de responsabilidades e `docs/skills.md` para usar as skills instaladas. A persistência MySQL foi implementada na API. Prepare e verifique seu ambiente seguindo `docs/mysql.md`. O próximo incremento é conta e acesso; depois vêm fichas, sessões e indicadores, em fluxos completos entre app, API e banco.
+Leia `docs/backlog.md` para a sequência e critérios de aceite, `docs/arquitetura.md` para a separação de responsabilidades e `docs/skills.md` para usar as skills instaladas. A persistência MySQL foi implementada na API. Prepare e verifique seu ambiente seguindo `docs/mysql.md`. Conta e acesso estão implementados; o próximo incremento é catálogo de exercícios e fichas, incluindo autorização dos recursos por usuário.
 
 Ao concluir cada incremento serão registrados o conceito, a decisão, onde aparece no código e a forma de testar. Slides e avaliação com participantes permanecem para as etapas correspondentes.
 

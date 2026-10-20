@@ -23,7 +23,7 @@ def main():
             "MYSQL_PORT=3307\nMYSQL_DATABASE=workoutly\nMYSQL_USER=workoutly\n"
             f"MYSQL_PASSWORD={password}\nMYSQL_ROOT_PASSWORD={root_password}\n"
             "ConnectionStrings__Workoutly=Server=127.0.0.1;Port=3307;Database=workoutly;"
-            f"User ID=workoutly;Password={password};SslMode=Disabled\n"
+            f"User ID=workoutly;Password={password};SslMode=Required\n"
         )
         try:
             descriptor = os.open(ROOT / ".env", os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
@@ -43,6 +43,7 @@ def main():
                 key, value = line.split("=", 1)
                 values[key.strip()] = value.strip()
     environment = os.environ.copy()
+    environment.setdefault("ASPNETCORE_ENVIRONMENT", "Development")
     connection = environment.get("ConnectionStrings__Workoutly") or values.get("ConnectionStrings__Workoutly")
     if connection:
         environment["ConnectionStrings__Workoutly"] = connection
@@ -66,7 +67,7 @@ def main():
                 return 1
             port = values.get("MYSQL_PORT", "3307")
             environment["WORKOUTLY_TEST_ADMIN_CONNECTION"] = (
-                f"Server=127.0.0.1;Port={port};User ID=root;Password={password};SslMode=Disabled"
+                f"Server=127.0.0.1;Port={port};User ID=root;Password={password};SslMode=Required"
             )
         arguments = ["test", TESTS, "--logger", "console;verbosity=minimal"]
     return subprocess.call([dotnet, *arguments], cwd=ROOT, env=environment)

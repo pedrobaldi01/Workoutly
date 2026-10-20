@@ -2,9 +2,9 @@
 
 ## O que este incremento entrega
 
-A API conecta ao MySQL com MySqlConnector 2.6.2. A preparação explícita do banco grava a versão 1 em `schema_migrations`. Essa tabela registra quais alterações foram aplicadas; as tabelas de usuários, fichas e sessões entram junto com seus incrementos. Não há cadastro de usuário nem registro de treino nesta etapa.
+A API conecta ao MySQL com MySqlConnector 2.6.2. A preparação explícita aplica as versões 1 (bootstrap) e 2 (users e user_sessions) em `schema_migrations`. Essa tabela registra quais alterações foram aplicadas; users e user_sessions já sustentam cadastro e acesso; as tabelas de fichas e sessões de treino continuam pendentes.
 
-O aplicativo MAUI não foi alterado, não conhece a conexão e ainda não chama a API.
+O aplicativo MAUI já chama a API para conta e acesso; não conhece credenciais MySQL.
 
 ## Ambiente local reproduzível
 
@@ -40,7 +40,7 @@ Há uma alternativa para validar a integração com o MySQL nativo instalado, se
 python3 scripts/test-native-mysql.py
 ```
 
-O script cria um diretório temporário e inicia `mysqld --no-defaults --skip-networking`, acessível somente por socket Unix. Não usa arquivos de configuração do usuário e não abre uma porta TCP. Executa os cinco testes e uma verificação HTTP com Kestrel, aplica a migração e verifica nova leitura depois de reiniciar a API. Ao terminar, encerra os processos e remove o diretório que criou. Esse caminho é para macOS/Linux com `mysqld` e `mysql` no PATH; não deixa um servidor de desenvolvimento permanente rodando.
+O script cria um diretório temporário e inicia `mysqld --no-defaults --skip-networking`, acessível somente por socket Unix. Não usa arquivos de configuração do usuário e não abre uma porta TCP. Executa a suíte de testes e uma verificação HTTP com Kestrel, aplica a migração e verifica nova leitura depois de reiniciar a API. Ao terminar, encerra os processos e remove o diretório que criou. Esse caminho é para macOS/Linux com `mysqld` e `mysql` no PATH; não deixa um servidor de desenvolvimento permanente rodando.
 
 ## Configuração sem o helper
 
@@ -50,7 +50,7 @@ O script cria um diretório temporário e inicia `mysqld --no-defaults --skip-ne
 Server=HOST;Port=PORTA;Database=BANCO;User ID=USUARIO;Password=SENHA
 ```
 
-O `.env` não é carregado automaticamente por `dotnet run`: use o helper ou configure a variável explicitamente. O helper preserva uma conexão já definida no ambiente em vez de sobrescrevê-la. `SslMode=Disabled` aparece apenas no ambiente Docker local; para servidor remoto, configure TLS e validação de certificado conforme a infraestrutura, sem copiar essa opção local.
+O `.env` não é carregado automaticamente por `dotnet run`: use o helper ou configure a variável explicitamente. O helper preserva uma conexão já definida no ambiente em vez de sobrescrevê-la. `SslMode=Required` exige TLS no ambiente local; para servidor remoto, configure TLS e validação de certificado conforme a infraestrutura, usando VerifyFull e os certificados apropriados.
 
 ```sh
 dotnet run --project src/Workoutly.Api --no-launch-profile -- --migrate
@@ -64,12 +64,12 @@ O banco e o usuário devem existir antes da migração; no caminho local o Compo
 | Rota | Significado | Resposta |
 | --- | --- | --- |
 | GET /health | Processo da API atende HTTP, mesmo sem banco. | 200; `databaseConfigured` indica somente a presença da configuração. |
-| GET /health/ready | Conexão ao banco escolhido e leitura da versão do esquema. | 200 se versão 1; 503 se não pronto. |
+| GET /health/ready | Conexão ao banco escolhido e leitura da versão do esquema. | 200 se versão 2; 503 se não pronto. |
 
 Exemplo de prontidão:
 
 ```json
-{"status":"ready","database":"ready","schemaVersion":1}
+{"status":"ready","database":"ready","schemaVersion":2}
 ```
 
 Estados sem prontidão: `not_configured`, `invalid_configuration`, `unreachable` ou `schema_pending`. A sondagem tem limite de 3 segundos. A resposta não revela conexão, usuário, senha ou detalhes do driver. Ela não executa DDL e não comprova requisitos futuros de autenticação ou treino.
