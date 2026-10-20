@@ -8,6 +8,8 @@ O app já permite **cadastro, login, recuperação de sessão, logout e catálog
 
 Nenhum código do aplicativo anterior foi reutilizado. Os roteiros enviados ao professor permanecem na pasta superior, sem alterações.
 
+A interface segue a identidade visual do Figma do grupo: fundo escuro, verde-lima, detalhes turquesa, fonte Inter, marca e cartões arredondados. A aplicação às telas atuais e as referências estão em [Identidade visual](docs/identidade-visual.md).
+
 ## Componentes
 
 | Local | Responsabilidade |

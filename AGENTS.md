@@ -6,6 +6,7 @@
 - Stack: .NET 10, MAUI com XAML e code-behind, API ASP.NET Core e MySQL somente no servidor.
 - Cadastro, login, perfil, logout e catálogo de exercícios estão integrados ao MySQL pela API; o app usa SecureStorage para a sessão. Exercícios iniciais são compartilhados e cadastros próprios são privados. Fichas e treinos ainda não existem. Não apresentar planejamento como resultado.
 - Implementar o menor incremento completo pedido; evitar abstrações antecipadas, serviços vazios e recursos fora do MVP.
+- Identidade visual: seguir o Figma fornecido e docs/identidade-visual.md. Usar cores e estilos em Resources/Styles, fonte Inter e recursos locais originais; não voltar ao tema roxo padrão. Dados exemplificativos do protótipo não são registros reais.
 - Funcionalidades finais online; preservar formulário em falhas de rede. Não implementar sincronização offline.
 - Autenticação usa PasswordHasher do ASP.NET Core Identity e tokens opacos revogáveis, guardados somente como hash no servidor. Não substituir por hash simples de senha ou sessão em Preferences.
 - Não embutir credenciais ou dados pessoais. Somente dados fictícios nos testes automatizados.

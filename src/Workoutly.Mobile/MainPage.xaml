@@ -1,56 +1,99 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Workoutly.Mobile.MainPage"
-             Title="Workoutly" BackgroundColor="#111827">
-    <ScrollView>
-        <VerticalStackLayout Padding="28,28" Spacing="18" MaximumWidthRequest="560">
-            <Label Text="WORKOUTLY" TextColor="#A78BFA" FontSize="14" CharacterSpacing="3" FontAttributes="Bold" />
-            <Label x:Name="Heading" Text="Seu treino, no seu ritmo." TextColor="#F9FAFB"
-                   FontSize="30" FontAttributes="Bold" SemanticProperties.HeadingLevel="Level1" />
-            <Label x:Name="Subtitle" Text="Entre na sua conta para começar." TextColor="#CBD5E1" FontSize="16" />
-            <ActivityIndicator x:Name="Loading" Color="#A78BFA" IsVisible="False" />
-            <Label x:Name="ErrorText" TextColor="#FDA4AF" FontSize="14" IsVisible="False"
-                   AutomationId="account_error" />
-            <VerticalStackLayout x:Name="AuthPanel" Spacing="14">
-                <VerticalStackLayout x:Name="NamePanel" Spacing="4" IsVisible="False">
-                    <Label Text="Nome" TextColor="#CBD5E1" />
-                    <Entry x:Name="NameEntry" Placeholder="Como você se chama?" TextColor="#F9FAFB"
-                           PlaceholderColor="#94A3B8" BackgroundColor="#1F2937" MaxLength="120" AutomationId="account_name" />
-                </VerticalStackLayout>
-                <Label Text="E-mail" TextColor="#CBD5E1" />
-                <Entry x:Name="EmailEntry" Placeholder="voce@exemplo.com" Keyboard="Email" TextColor="#F9FAFB"
-                       PlaceholderColor="#94A3B8" BackgroundColor="#1F2937" MaxLength="254" AutomationId="account_email" />
-                <Label Text="Senha" TextColor="#CBD5E1" />
-                <Entry x:Name="PasswordEntry" Placeholder="Sua senha" IsPassword="True" TextColor="#F9FAFB"
-                       PlaceholderColor="#94A3B8" BackgroundColor="#1F2937" MaxLength="128" AutomationId="account_password" />
-                <VerticalStackLayout x:Name="ConfirmPanel" Spacing="4" IsVisible="False">
-                    <Label Text="Confirme a senha" TextColor="#CBD5E1" />
-                    <Entry x:Name="ConfirmEntry" Placeholder="Repita sua senha" IsPassword="True" TextColor="#F9FAFB"
-                           PlaceholderColor="#94A3B8" BackgroundColor="#1F2937" MaxLength="128" AutomationId="account_confirm" />
-                    <Label Text="Use entre 10 e 128 caracteres." TextColor="#94A3B8" FontSize="12" />
-                </VerticalStackLayout>
-                <Button x:Name="SubmitButton" Text="Entrar" Clicked="OnSubmit" BackgroundColor="#A78BFA" TextColor="#111827" AutomationId="account_submit" />
-                <Button x:Name="ToggleButton" Text="Criar uma conta" Clicked="OnToggle" BackgroundColor="Transparent" TextColor="#C4B5FD" />
-                <Button Text="Conexão" Clicked="OnConnection" BackgroundColor="Transparent" TextColor="#94A3B8" />
-                <VerticalStackLayout x:Name="ConnectionPanel" Spacing="6" IsVisible="False">
-                    <Label Text="Endereço do serviço" TextColor="#CBD5E1" />
-                    <Entry x:Name="AddressEntry" Placeholder="https://seu-servidor" Keyboard="Url" TextColor="#F9FAFB"
-                           PlaceholderColor="#94A3B8" BackgroundColor="#1F2937" AutomationId="account_server" />
-                </VerticalStackLayout>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Workoutly.Mobile.MainPage" Title="Workoutly" Shell.NavBarIsVisible="False">
+    <ScrollView x:Name="PageScroll">
+        <Grid Padding="24,24" RowDefinitions="Auto,*,Auto" RowSpacing="18" MaximumWidthRequest="560"
+              MinimumHeightRequest="{Binding Height, Source={x:Reference PageScroll}}">
+            <VerticalStackLayout x:Name="Intro" Spacing="18">
+                <Grid ColumnDefinitions="*,Auto">
+                    <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+                        <Image Source="workoutly_logo.png" WidthRequest="42" HeightRequest="42" Aspect="AspectFit" SemanticProperties.Description="Marca Workoutly" />
+                        <Label Text="WORKOUTLY" FontFamily="InterBold" FontSize="16" CharacterSpacing="2" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                    <Button Grid.Column="1" x:Name="ConnectionButton" Text="Conexão" Clicked="OnConnection" Style="{StaticResource TextButton}" FontSize="11" Padding="4,0" />
+                </Grid>
+                <Label x:Name="Heading" Text="Treinos claros.&#10;Progresso visível." FontFamily="InterBold" FontSize="34"
+                       LineHeight="1.15" SemanticProperties.HeadingLevel="Level1" />
+                <Label x:Name="Subtitle" Text="Organize suas fichas e acompanhe sua evolução em um só lugar." FontSize="15"
+                       TextColor="{StaticResource TextSecondary}" LineHeight="1.4" />
             </VerticalStackLayout>
-            <VerticalStackLayout x:Name="AccountPanel" Spacing="20" IsVisible="False">
-                <Border BackgroundColor="#1F2937" StrokeThickness="0" Padding="24">
-                    <Border.StrokeShape><RoundRectangle CornerRadius="20" /></Border.StrokeShape>
-                    <VerticalStackLayout Spacing="12">
-                        <Label Text="Sua conta" TextColor="#A78BFA" FontSize="14" />
-                        <Label x:Name="AccountName" TextColor="#F9FAFB" FontSize="24" FontAttributes="Bold" />
-                        <Label x:Name="AccountEmail" TextColor="#CBD5E1" FontSize="16" />
+            <Grid x:Name="AuthPanel" Grid.Row="1" RowDefinitions="Auto,*,Auto" RowSpacing="18">
+                <VerticalStackLayout Spacing="18">
+                    <Border x:Name="NamePanel" Style="{StaticResource InputBorder}" IsVisible="False">
+                        <VerticalStackLayout Spacing="0">
+                            <Label Text="Nome" Style="{StaticResource FieldLabel}" />
+                            <Entry x:Name="NameEntry" Placeholder="Como você se chama?" MaxLength="120" AutomationId="account_name" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Style="{StaticResource InputBorder}">
+                        <VerticalStackLayout Spacing="0">
+                            <Label Text="E-mail" Style="{StaticResource FieldLabel}" />
+                            <Entry x:Name="EmailEntry" Placeholder="aluno@email.com" Keyboard="Email" MaxLength="254" AutomationId="account_email" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Style="{StaticResource InputBorder}">
+                        <VerticalStackLayout Spacing="0">
+                            <Label Text="Senha" Style="{StaticResource FieldLabel}" />
+                            <Entry x:Name="PasswordEntry" Placeholder="Sua senha" IsPassword="True" MaxLength="128" AutomationId="account_password" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <VerticalStackLayout x:Name="ConfirmPanel" Spacing="8" IsVisible="False">
+                        <Border Style="{StaticResource InputBorder}">
+                            <VerticalStackLayout Spacing="0">
+                                <Label Text="Confirme a senha" Style="{StaticResource FieldLabel}" />
+                                <Entry x:Name="ConfirmEntry" Placeholder="Repita sua senha" IsPassword="True" MaxLength="128" AutomationId="account_confirm" />
+                            </VerticalStackLayout>
+                        </Border>
+                        <Label Text="Use entre 10 e 128 caracteres." Style="{StaticResource SecondaryText}" />
+                    </VerticalStackLayout>
+                    <Border x:Name="ConnectionPanel" Style="{StaticResource InputBorder}" IsVisible="False">
+                        <VerticalStackLayout Spacing="0">
+                            <Label Text="Endereço do serviço" Style="{StaticResource FieldLabel}" />
+                            <Entry x:Name="AddressEntry" Placeholder="https://seu-servidor" Keyboard="Url" AutomationId="account_server" />
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Row="2" Spacing="8" Margin="0,16,0,0">
+                    <Button x:Name="SubmitButton" Text="Entrar" Clicked="OnSubmit" HeightRequest="54" FontSize="16" AutomationId="account_submit" />
+                    <Button x:Name="ToggleButton" Text="Ainda não tem conta?  Cadastre-se" Clicked="OnToggle" Style="{StaticResource TextButton}" HorizontalOptions="Start" Padding="0" />
+                </VerticalStackLayout>
+            </Grid>
+            <Grid x:Name="AccountPanel" Grid.RowSpan="2" RowDefinitions="Auto,Auto,Auto,Auto,*,Auto" RowSpacing="18" IsVisible="False">
+                <Grid ColumnDefinitions="*,46" ColumnSpacing="12" MinimumHeightRequest="62">
+                    <VerticalStackLayout Spacing="4" VerticalOptions="Center">
+                        <Label x:Name="Greeting" Style="{StaticResource SecondaryText}" FontSize="15" LineBreakMode="TailTruncation" />
+                        <Label Text="Pronto para treinar?" FontFamily="InterBold" FontSize="22" SemanticProperties.HeadingLevel="Level1" />
+                    </VerticalStackLayout>
+                    <Image Grid.Column="1" Source="figma_avatar.svg" WidthRequest="46" HeightRequest="46" Aspect="AspectFit" VerticalOptions="Center" />
+                </Grid>
+                <Border Grid.Row="1" Style="{StaticResource SurfaceCard}" Padding="20,22,20,20" MinimumHeightRequest="244">
+                    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="11">
+                        <Label Text="BIBLIOTECA DE EXERCÍCIOS" Style="{StaticResource Eyebrow}" FontSize="12" />
+                        <Label Grid.Row="1" Text="Explore os movimentos" FontFamily="InterBold" FontSize="26" />
+                        <Label Grid.Row="2" Text="Consulte o catálogo e adicione seus próprios exercícios." Style="{StaticResource SecondaryText}" FontSize="14" LineHeight="1.4" />
+                        <Button Grid.Row="4" x:Name="ExercisesButton" Text="Explorar exercícios" Clicked="OnExercises" HeightRequest="48" AutomationId="open_exercises" />
+                    </Grid>
+                </Border>
+                <Border Grid.Row="2" Style="{StaticResource SurfaceCard}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="SUA CONTA" Style="{StaticResource Eyebrow}" />
+                        <Label x:Name="AccountName" FontFamily="InterSemiBold" FontSize="19" />
+                        <Label x:Name="AccountEmail" Style="{StaticResource SecondaryText}" LineBreakMode="CharacterWrap" />
                     </VerticalStackLayout>
                 </Border>
-                <Button x:Name="ExercisesButton" Text="Explorar exercícios" Clicked="OnExercises" BackgroundColor="#A78BFA" TextColor="#111827" AutomationId="open_exercises" />
-                <Button x:Name="LogoutButton" Text="Sair da conta" Clicked="OnLogout" BackgroundColor="#374151" TextColor="#F9FAFB" />
+                <Border Grid.Row="3" Style="{StaticResource SurfaceCard}" BackgroundColor="{StaticResource SurfaceRaised}" Padding="16">
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Tudo no seu ritmo" FontFamily="InterSemiBold" TextColor="{StaticResource Mint}" FontSize="13" />
+                        <Label Text="Mantenha seus movimentos organizados em um só lugar." Style="{StaticResource SecondaryText}" />
+                    </VerticalStackLayout>
+                </Border>
+                <Button Grid.Row="5" x:Name="LogoutButton" Text="Sair da conta" Clicked="OnLogout" Style="{StaticResource SecondaryButton}" />
+            </Grid>
+            <VerticalStackLayout Grid.Row="2" Spacing="8">
+                <ActivityIndicator x:Name="Loading" IsVisible="False" />
+                <Label x:Name="ErrorText" IsVisible="False" TextColor="{StaticResource Error}" AutomationId="account_error"
+                       Padding="0,4" />
             </VerticalStackLayout>
-        </VerticalStackLayout>
+        </Grid>
     </ScrollView>
 </ContentPage>

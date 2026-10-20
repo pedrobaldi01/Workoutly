@@ -27,6 +27,8 @@ Fonte: Roteiro Workoutly e Roteiro Fase 2 na pasta superior. A Fase 2 descreve u
 
 ## Próximos incrementos
 
+**VISUAL-01 — concluído antes de FICHA-01:** identidade do Figma aplicada às telas existentes de acesso, cadastro, início, catálogo e formulário/detalhes de exercício. Tokens e Inter locais, marca e avatar originais; referências em docs/identidade-visual.md e verificação em docs/evidencias/identidade-visual.md. Não antecipa funções de fichas ou histórico.
+
 | ID | Dependência | Requisito | Critério de aceite |
 | --- | --- | --- | --- |
 | AUTH-02 | AUTH-01 | Autorização dos próximos recursos | Parcial: perfil e exercícios isolados. Aplicar filtragem e testes de propriedade a fichas e treinos. |
@@ -43,4 +45,4 @@ Os demais incrementos estão **pendentes**, começando por FICHA-01; AUTH-02 per
 
 ## Fora do MVP
 
-Sincronização offline, redes sociais, wearables, prescrição clínica, AI Coach, lembretes, metas e exportação. A apresentação será preparada depois. Figma e backend externo do grupo não foram fornecidos e não bloqueiam esta fundação.
+Sincronização offline, redes sociais, wearables, prescrição clínica, AI Coach, lembretes, metas e exportação. A apresentação será preparada depois. O Figma do grupo foi fornecido em 20/10/2026 e orienta a interface; backend externo do grupo não foi fornecido.

@@ -22,6 +22,7 @@ public partial class ExercisePage : ContentPage
         DescriptionEditor.Text = string.IsNullOrEmpty(exercise.Description) ? "Sem descrição." : exercise.Description;
         NameEntry.IsReadOnly = GroupEntry.IsReadOnly = EquipmentEntry.IsReadOnly = DescriptionEditor.IsReadOnly = true;
         SaveButton.IsVisible = false;
+        PrivacyNote.IsVisible = !exercise.IsShared;
     }
 
     private async void OnSave(object? sender, EventArgs args)

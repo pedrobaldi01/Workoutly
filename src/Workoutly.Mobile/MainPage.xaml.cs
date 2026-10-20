@@ -57,8 +57,7 @@ public partial class MainPage : ContentPage
         _registering = !_registering;
         NamePanel.IsVisible = ConfirmPanel.IsVisible = _registering;
         SubmitButton.Text = _registering ? "Criar conta" : "Entrar";
-        ToggleButton.Text = _registering ? "Já tenho conta" : "Criar uma conta";
-        Subtitle.Text = _registering ? "Crie sua conta para organizar sua rotina." : "Entre na sua conta para começar.";
+        UpdateAccessCopy();
         PasswordEntry.Text = ConfirmEntry.Text = string.Empty;
         ErrorText.IsVisible = false;
     }
@@ -83,10 +82,10 @@ public partial class MainPage : ContentPage
     {
         AccountName.Text = profile.Name;
         AccountEmail.Text = profile.Email;
+        Greeting.Text = $"Olá, {profile.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()}";
+        Intro.IsVisible = false;
         AuthPanel.IsVisible = false;
         AccountPanel.IsVisible = true;
-        Heading.Text = $"Olá, {profile.Name}!";
-        Subtitle.Text = "Sua conta está conectada.";
         ErrorText.IsVisible = false;
     }
 
@@ -100,8 +99,15 @@ public partial class MainPage : ContentPage
     {
         AccountPanel.IsVisible = false;
         AuthPanel.IsVisible = true;
-        Heading.Text = "Seu treino, no seu ritmo.";
-        Subtitle.Text = _registering ? "Crie sua conta para organizar sua rotina." : "Entre na sua conta para começar.";
+        Intro.IsVisible = true;
+        UpdateAccessCopy();
+    }
+
+    private void UpdateAccessCopy()
+    {
+        Heading.Text = _registering ? "Seu próximo treino\ncomeça aqui." : "Treinos claros.\nProgresso visível.";
+        Subtitle.Text = _registering ? "Crie sua conta para organizar suas fichas e acompanhar sua evolução." : "Organize suas fichas e acompanhe sua evolução em um só lugar.";
+        ToggleButton.Text = _registering ? "Já tem conta?  Entre" : "Ainda não tem conta?  Cadastre-se";
     }
 
     private void ShowError(string message)
@@ -117,5 +123,6 @@ public partial class MainPage : ContentPage
         AuthPanel.IsEnabled = !busy;
         LogoutButton.IsEnabled = !busy;
         ExercisesButton.IsEnabled = !busy;
+        ConnectionButton.IsEnabled = !busy;
     }
 }
