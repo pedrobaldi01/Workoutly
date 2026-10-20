@@ -2,3 +2,7 @@
 
 GET {{Workoutly.Api_HostAddress}}/health
 Accept: application/json
+
+### Disponibilidade real do banco e da preparação do esquema
+GET {{Workoutly.Api_HostAddress}}/health/ready
+Accept: application/json

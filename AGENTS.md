@@ -4,7 +4,7 @@
 - Responda em português e explique o conceito, a decisão e a verificação ao concluir cada incremento.
 - Implementação nova: não reutilizar o aplicativo antigo. Documentos acadêmicos na pasta superior são fontes de requisitos e não devem ser editados sem pedido específico.
 - Stack: .NET 10, MAUI com XAML e code-behind, API ASP.NET Core e MySQL somente no servidor.
-- Nesta fundação, MySQL, autenticação e comunicação do app com a API ainda não existem. Não apresentar planejamento como resultado.
+- MySQL está integrado somente na API; autenticação e comunicação do app com a API ainda não existem. Não apresentar planejamento como resultado.
 - Implementar o menor incremento completo pedido; evitar abstrações antecipadas, serviços vazios e recursos fora do MVP.
 - Funcionalidades finais online; preservar formulário em falhas de rede. Não implementar sincronização offline.
 - Não embutir credenciais ou dados pessoais. Somente dados fictícios nos testes automatizados.
@@ -14,6 +14,8 @@
 ## Verificações
 - API: `dotnet build src/Workoutly.Api/Workoutly.Api.csproj`.
 - Integração HTTP: `dotnet test tests/Workoutly.Api.Tests/Workoutly.Api.Tests.csproj`.
+- Persistência real: `python3 scripts/dev.py test-db` com o MySQL Compose disponível, ou `python3 scripts/test-native-mysql.py` neste Mac. Sem banco, o teste MySql é ignorado explicitamente.
+- Preparar esquema com `python3 scripts/dev.py migrate`; nunca executar DDL automaticamente no startup. Não imprimir conexões nem incluir credenciais no Git.
 - iOS no Mac: `dotnet build src/Workoutly.Mobile/Workoutly.Mobile.csproj -f net10.0-ios -p:RuntimeIdentifier=iossimulator-arm64`.
 - Android: `dotnet build src/Workoutly.Mobile/Workoutly.Mobile.csproj -f net10.0-android` (requer JDK 21 e Android SDK).
 - Compilação não prova execução. Registrar a plataforma e os limites da verificação em docs/evidencias/.

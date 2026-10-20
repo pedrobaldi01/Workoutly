@@ -11,11 +11,14 @@ Fonte: Roteiro Workoutly e Roteiro Fase 2 na pasta superior. A Fase 2 descreve u
 | BASE-03 | Contrato de saúde | GET /health retorna HTTP 200 e explicita ausência de banco; teste HTTP passa. | Concluído — evidências em docs/evidencias/fundacao.md |
 | BASE-04 | Ferramentas de apoio | Skills locais, recursos, licenças e revisões registradas. | Concluído — evidências em docs/evidencias/fundacao.md |
 
+## Incremento MySQL concluído
+
+**DB-01 — concluído:** conexão configurada somente na API, bootstrap reaplicável do histórico de migrações, rota de prontidão e teste em MySQL 9.6.0 real. Evidências em docs/evidencias/mysql.md. O ambiente Docker está preparado, mas não executado neste Mac por configuração inicial pendente do Docker Desktop. A validação real usou instância nativa isolada e temporária.
+
 ## Próximos incrementos
 
 | ID | Dependência | Requisito | Critério de aceite |
 | --- | --- | --- | --- |
-| DB-01 | BASE-02 | MySQL somente no servidor | Configuração fora do código, criação reproduzível do banco e teste real de persistência; aplicativo sem credenciais MySQL. |
 | AUTH-01 | DB-01 | Cadastro, login e logout | Credenciais válidas iniciam sessão, inválidas não; senha protegida e sessão no armazenamento seguro do aparelho. |
 | AUTH-02 | AUTH-01 | Autorização | Dois usuários não acessam nem alteram dados privados um do outro. |
 | EX-01 | AUTH-02 | Catálogo e exercícios próprios | Selecionar exercício inicial ou cadastrar exercício próprio; validar nome e campos. |

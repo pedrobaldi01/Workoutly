@@ -1,12 +1,12 @@
 # Arquitetura do Workoutly
 
-## O que existe nesta fundação
+## O que existe atualmente
 
 `Workoutly.Mobile` possui a tela `MainPage.xaml` e seu code-behind de inicialização. `AppShell` organiza a navegação inicial. C# e XAML são mantidos juntos, sem serviços ou camadas vazias.
 
-`Workoutly.Api` possui `GET /health`: retorna HTTP 200 e JSON com `service`, `status` e `databaseConfigured=false`. É uma indicação de que o processo atende HTTP, não de que o banco funciona. Não há autenticação ou acesso a dados nesta etapa. Não há rota de previsão do tempo do template.
+`Workoutly.Api` possui `GET /health` para verificar o processo e `GET /health/ready` para consultar a versão persistida no MySQL. A conexão é configurada por variável de ambiente, somente no servidor. O comando `--migrate` prepara o histórico de versões; abrir a API não modifica o banco. Ainda não há autenticação ou tabelas de treino. Detalhes e comandos em mysql.md.
 
-`Workoutly.Api.Tests` inicia a aplicação com WebApplicationFactory e realiza uma requisição HTTP de verdade no servidor de testes em memória. Isso verifica serialização, status e contrato sem precisar de uma porta TCP ou MySQL.
+`Workoutly.Api.Tests` inicia a aplicação com WebApplicationFactory e realiza uma requisição HTTP de verdade no servidor de testes em memória. Os testes HTTP sem banco verificam serialização, status e estados de falha. O teste Category=MySql verifica a migração e sua persistência em uma base MySQL real e aleatória, isolada dos dados da aplicação. O script nativo também verifica Kestrel por TCP local e reinício da API. Sem configuração de teste, o teste MySql é ignorado explicitamente, sem alegar validação real.
 
 ## Fluxo previsto
 

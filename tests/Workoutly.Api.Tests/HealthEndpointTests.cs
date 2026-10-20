@@ -1,22 +1,16 @@
 using System.Net;
 using System.Net.Http.Json;
-using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Workoutly.Api.Tests;
 
-public sealed class HealthEndpointTests : IClassFixture<WebApplicationFactory<Program>>
+public sealed class HealthEndpointTests
 {
-    private readonly HttpClient _client;
-
-    public HealthEndpointTests(WebApplicationFactory<Program> application)
-    {
-        _client = application.CreateClient();
-    }
-
     [Fact]
     public async Task Health_reports_api_available_without_claiming_database_connectivity()
     {
-        var response = await _client.GetAsync("/health");
+        await using var application = new DatabaseApplication(null);
+        using var client = application.CreateClient();
+        var response = await client.GetAsync("/health");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal("application/json", response.Content.Headers.ContentType?.MediaType);
