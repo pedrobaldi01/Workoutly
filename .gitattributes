@@ -1,0 +1,6 @@
+* text=auto
+# Preservar as skills de terceiros byte a byte conforme o manifesto SHA-256.
+.agents/skills/** -text
+*.png binary
+*.jpg binary
+*.ttf binary
