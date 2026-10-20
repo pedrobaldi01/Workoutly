@@ -4,7 +4,7 @@ Aplicativo acadêmico de acompanhamento de treinos, criado do zero para o Projet
 
 ## Situação atual
 
-O app já permite **cadastro, login, recuperação de sessão e logout**, integrado à API e ao MySQL. A sessão fica no armazenamento seguro do aparelho e é revogada no servidor ao sair. Fichas, exercícios, sessões de treino e indicadores ainda serão implementados; o MVP completo permanece pendente.
+O app já permite **cadastro, login, recuperação de sessão, logout e catálogo de exercícios**, integrado à API e ao MySQL. Há dez exercícios iniciais compartilhados e cadastro de exercícios privados da conta, com busca e detalhes. A sessão fica no armazenamento seguro do aparelho e é revogada no servidor ao sair. Fichas, sessões de treino e indicadores ainda serão implementados; o MVP completo permanece pendente.
 
 Nenhum código do aplicativo anterior foi reutilizado. Os roteiros enviados ao professor permanecem na pasta superior, sem alterações.
 
@@ -38,7 +38,7 @@ python3 scripts/dev-native.py
 
 Esse helper usa o MySQL nativo instalado, em uma instância exclusiva do projeto, e inicia a API em localhost. Os dados ficam em `.local/`, ignorado pelo Git, e sobrevivem ao reinício. Use **Ctrl+C** no terminal para encerrar os serviços sem apagar as contas. O Docker não é necessário nesse caminho. Não execute uma segunda instância enquanto a primeira estiver aberta.
 
-Em seguida, execute o projeto MAUI no simulador pela IDE, toque em **Criar uma conta** e cadastre dados fictícios de teste. Os detalhes do contrato, da sessão e dos cenários validados estão em [Conta e acesso](docs/autenticacao.md).
+Em seguida, execute o projeto MAUI no simulador pela IDE, toque em **Criar uma conta** e cadastre dados fictícios de teste. Na conta, **Explorar exercícios** abre o catálogo; **Novo exercício** cria um registro privado. Os contratos e explicações estão em [Conta e acesso](docs/autenticacao.md) e [Catálogo de exercícios](docs/exercicios.md).
 
 ## Abrir e executar
 
@@ -97,7 +97,7 @@ A solução inclui o projeto mobile: compilar a solução inteira exige os workl
 
 ## Como vamos desenvolver
 
-Leia `docs/backlog.md` para a sequência e critérios de aceite, `docs/arquitetura.md` para a separação de responsabilidades e `docs/skills.md` para usar as skills instaladas. A persistência MySQL foi implementada na API. Prepare e verifique seu ambiente seguindo `docs/mysql.md`. Conta e acesso estão implementados; o próximo incremento é catálogo de exercícios e fichas, incluindo autorização dos recursos por usuário.
+Leia `docs/backlog.md` para a sequência e critérios de aceite, `docs/arquitetura.md` para a separação de responsabilidades e `docs/skills.md` para usar as skills instaladas. A persistência MySQL foi implementada na API. Prepare e verifique seu ambiente seguindo `docs/mysql.md`. Conta, acesso e exercícios estão implementados; o próximo incremento é criar e gerenciar fichas com exercícios, incluindo autorização por usuário.
 
 Ao concluir cada incremento serão registrados o conceito, a decisão, onde aparece no código e a forma de testar. Slides e avaliação com participantes permanecem para as etapas correspondentes.
 

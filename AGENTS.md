@@ -4,7 +4,7 @@
 - Responda em português e explique o conceito, a decisão e a verificação ao concluir cada incremento.
 - Implementação nova: não reutilizar o aplicativo antigo. Documentos acadêmicos na pasta superior são fontes de requisitos e não devem ser editados sem pedido específico.
 - Stack: .NET 10, MAUI com XAML e code-behind, API ASP.NET Core e MySQL somente no servidor.
-- Cadastro, login, perfil e logout estão integrados ao MySQL pela API; o app usa SecureStorage para a sessão. Exercícios, fichas e treinos ainda não existem. Não apresentar planejamento como resultado.
+- Cadastro, login, perfil, logout e catálogo de exercícios estão integrados ao MySQL pela API; o app usa SecureStorage para a sessão. Exercícios iniciais são compartilhados e cadastros próprios são privados. Fichas e treinos ainda não existem. Não apresentar planejamento como resultado.
 - Implementar o menor incremento completo pedido; evitar abstrações antecipadas, serviços vazios e recursos fora do MVP.
 - Funcionalidades finais online; preservar formulário em falhas de rede. Não implementar sincronização offline.
 - Autenticação usa PasswordHasher do ASP.NET Core Identity e tokens opacos revogáveis, guardados somente como hash no servidor. Não substituir por hash simples de senha ou sessão em Preferences.

@@ -5,7 +5,7 @@ namespace Workoutly.Api.Data;
 /// <summary>Acesso ao banco somente na API. Abrir a API não executa DDL.</summary>
 public sealed class MySqlDatabase(IConfiguration configuration)
 {
-    public const int CurrentSchemaVersion = 2;
+    public const int CurrentSchemaVersion = 3;
 
     private string? ConnectionString => configuration.GetConnectionString("Workoutly");
     public bool IsConfigured => !string.IsNullOrWhiteSpace(ConnectionString);

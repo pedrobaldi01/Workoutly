@@ -19,14 +19,17 @@ Fonte: Roteiro Workoutly e Roteiro Fase 2 na pasta superior. A Fase 2 descreve u
 
 **AUTH-01 — concluído:** cadastro, login, perfil, restauração de sessão no SecureStorage e logout com revogação MySQL. Doze testes passaram em MySQL real e o fluxo foi exercitado no iPhone Simulator. Evidências em docs/evidencias/autenticacao.md.
 
-**AUTH-02 — parcial:** identidade da conta e isolamento de /auth/me validados com duas contas. A autorização de exercícios, fichas e treinos será implementada e testada junto com esses recursos.
+**AUTH-02 — parcial:** identidade, perfil e exercícios isolados por conta. Listagem e detalhes de exercícios foram testados com dois usuários, incluindo tentativa de consultar ID privado alheio. A autorização de fichas e treinos será implementada junto com esses recursos.
+
+## Catálogo concluído
+
+**EX-01 — concluído:** dez exercícios iniciais compartilhados, cadastro privado com validação, busca, filtro de exercícios próprios e detalhes no app. Selecionar um item abre seus detalhes; a inclusão em fichas depende de FICHA-01. Quinze testes HTTP passaram em MySQL real. Cadastro, validação, ausência de conexão e recuperação após reabrir foram verificados no iPhone Simulator. Evidências em docs/evidencias/exercicios.md.
 
 ## Próximos incrementos
 
 | ID | Dependência | Requisito | Critério de aceite |
 | --- | --- | --- | --- |
-| AUTH-02 | AUTH-01 | Autorização dos próximos recursos | Parcial: /auth/me isolado. Aplicar filtragem e testes de propriedade a exercícios, fichas e treinos. |
-| EX-01 | AUTH-02 | Catálogo e exercícios próprios | Selecionar exercício inicial ou cadastrar exercício próprio; validar nome e campos. |
+| AUTH-02 | AUTH-01 | Autorização dos próximos recursos | Parcial: perfil e exercícios isolados. Aplicar filtragem e testes de propriedade a fichas e treinos. |
 | FICHA-01 | EX-01 | Criar, consultar, editar e excluir fichas | Fichas com exercícios, séries e repetições; confirmar exclusão e respeitar o histórico já gravado. |
 | TREINO-01 | FICHA-01 | Registrar sessão | Salvar carga, séries, repetições, duração e observações; não duplicar sessão em reenvio. |
 | TREINO-02 | TREINO-01 | Corrigir registros próprios | Editar uma sessão, recalcular indicadores e manter dados de outros usuários intactos. |
@@ -36,7 +39,7 @@ Fonte: Roteiro Workoutly e Roteiro Fase 2 na pasta superior. A Fase 2 descreve u
 | AVAL-01 | QA-01 | Avaliação com três adultos | Consentimento, P1/P2/P3, tarefas, tempo, erros, ajuda, notas de facilidade 1–5 e comentários reais. |
 | DOC-01 | AVAL-01 | Documentação final | Resultados ligados às evidências, limitações explícitas, referências e declaração de uso de IA. |
 
-Os demais incrementos estão **pendentes**; AUTH-02 permanece parcial. Critérios da avaliação: três participantes concluem o fluxo principal sem auxílio, média de facilidade ≥ 4/5 e nenhuma falha crítica ou perda de dados. Se os resultados divergirem, relatar a divergência; nunca preencher resultados fictícios.
+Os demais incrementos estão **pendentes**, começando por FICHA-01; AUTH-02 permanece parcial. Critérios da avaliação: três participantes concluem o fluxo principal sem auxílio, média de facilidade ≥ 4/5 e nenhuma falha crítica ou perda de dados. Se os resultados divergirem, relatar a divergência; nunca preencher resultados fictícios.
 
 ## Fora do MVP
 

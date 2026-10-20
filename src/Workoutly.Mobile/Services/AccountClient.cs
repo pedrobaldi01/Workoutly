@@ -12,6 +12,12 @@ public sealed record AccountSession(string AccessToken, DateTimeOffset ExpiresAt
 public sealed record LoginPayload(string Email, string Password);
 public sealed record RegisterPayload(string Name, string Email, string Password);
 public sealed record StoredSession(string ApiUrl, string Token);
+public sealed record ExerciseItem(string Id, string Name, string MuscleGroup, string Equipment, string Description, bool IsShared)
+{
+    public string Origin => IsShared ? "Catálogo inicial" : "Meu exercício";
+    public string Summary => $"{MuscleGroup} • {Equipment}";
+}
+public sealed record CreateExercisePayload(string Name, string MuscleGroup, string Equipment, string Description);
 
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
 [JsonSerializable(typeof(AccountProfile))]
@@ -19,6 +25,9 @@ public sealed record StoredSession(string ApiUrl, string Token);
 [JsonSerializable(typeof(LoginPayload))]
 [JsonSerializable(typeof(RegisterPayload))]
 [JsonSerializable(typeof(StoredSession))]
+[JsonSerializable(typeof(ExerciseItem))]
+[JsonSerializable(typeof(ExerciseItem[]))]
+[JsonSerializable(typeof(CreateExercisePayload))]
 internal partial class AccountJson : JsonSerializerContext;
 
 public sealed class AccountClient
@@ -93,6 +102,14 @@ public sealed class AccountClient
     }
 
     public Task<AccountProfile> GetProfileAsync() => SendAsync(HttpMethod.Get, "auth/me", null, AccountJson.Default.AccountProfile, true);
+
+    public Task<ExerciseItem[]> GetExercisesAsync() => SendAsync(HttpMethod.Get, "exercises", null, AccountJson.Default.ExerciseItemArray, true);
+
+    public async Task<ExerciseItem> CreateExerciseAsync(string name, string muscleGroup, string equipment, string description)
+    {
+        using var content = JsonContent.Create(new CreateExercisePayload(name, muscleGroup, equipment, description), AccountJson.Default.CreateExercisePayload);
+        return await SendAsync(HttpMethod.Post, "exercises", content, AccountJson.Default.ExerciseItem, true);
+    }
 
     public async Task LogoutAsync()
     {

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Threading.RateLimiting;
 using Workoutly.Api.Auth;
 using Workoutly.Api.Data;
+using Workoutly.Api.Exercises;
 
 var migrateOnly = args.Contains("--migrate");
 var builder = WebApplication.CreateBuilder(args.Where(argument => argument != "--migrate").ToArray());
@@ -12,6 +13,7 @@ builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.Configure<PasswordHasherOptions>(options => options.IterationCount = 210_000);
 builder.Services.AddSingleton<IPasswordHasher<AccountProfile>, PasswordHasher<AccountProfile>>();
 builder.Services.AddSingleton<AuthService>();
+builder.Services.AddSingleton<ExerciseService>();
 builder.Services.AddAuthentication("Session")
     .AddScheme<AuthenticationSchemeOptions, SessionAuthenticationHandler>("Session", _ => { });
 builder.Services.AddAuthorization();
@@ -47,7 +49,8 @@ if (migrateOnly)
 
 app.Use(async (context, next) =>
 {
-    if (context.Request.Path.StartsWithSegments("/auth"))
+    var protectedResource = context.Request.Path.StartsWithSegments("/auth") || context.Request.Path.StartsWithSegments("/exercises");
+    if (protectedResource)
     {
         context.Response.Headers.CacheControl = "no-store";
         if (!context.Request.IsHttps && !app.Environment.IsDevelopment())
@@ -58,7 +61,7 @@ app.Use(async (context, next) =>
         }
     }
     try { await next(context); }
-    catch (Exception exception) when (context.Request.Path.StartsWithSegments("/auth") &&
+    catch (Exception exception) when (protectedResource &&
         exception is MySqlException or InvalidOperationException or ArgumentException)
     {
         context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
@@ -69,6 +72,7 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapAccountEndpoints();
+app.MapExerciseEndpoints();
 
 // Liveness não depende do banco. Readiness comprova acesso ao esquema preparado.
 app.MapGet("/health", (MySqlDatabase database) => Results.Ok(new

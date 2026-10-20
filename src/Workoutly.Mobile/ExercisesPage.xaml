@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:services="clr-namespace:Workoutly.Mobile.Services"
+             x:Class="Workoutly.Mobile.ExercisesPage" Title="Exercícios" BackgroundColor="#111827">
+    <Grid Padding="24,16" RowDefinitions="Auto,Auto,Auto,Auto,Auto,*" RowSpacing="12">
+        <VerticalStackLayout Spacing="6">
+            <Label Text="Seu catálogo" TextColor="#F9FAFB" FontSize="28" FontAttributes="Bold" SemanticProperties.HeadingLevel="Level1" />
+            <Label Text="Explore os movimentos ou cadastre um exercício só seu." TextColor="#CBD5E1" />
+        </VerticalStackLayout>
+        <Entry Grid.Row="1" x:Name="Search" Placeholder="Nome, grupo ou equipamento" TextColor="#F9FAFB" PlaceholderColor="#94A3B8"
+               BackgroundColor="#1F2937" ClearButtonVisibility="WhileEditing" TextChanged="OnSearch" AutomationId="exercise_search" />
+        <Grid Grid.Row="2" ColumnDefinitions="*,*" ColumnSpacing="10">
+            <Button x:Name="CreateButton" Text="Novo exercício" Clicked="OnCreate" BackgroundColor="#A78BFA" TextColor="#111827" AutomationId="exercise_new" />
+            <Button Grid.Column="1" x:Name="RefreshButton" Text="Atualizar" Clicked="OnRefresh" BackgroundColor="#374151" TextColor="#F9FAFB" />
+        </Grid>
+        <HorizontalStackLayout Grid.Row="3" Spacing="10">
+            <Switch x:Name="OnlyMine" Toggled="OnFilter" OnColor="#A78BFA" AutomationId="exercise_only_mine" />
+            <Label Text="Somente meus exercícios" TextColor="#CBD5E1" VerticalOptions="Center" />
+        </HorizontalStackLayout>
+        <VerticalStackLayout Grid.Row="4" Spacing="6">
+            <ActivityIndicator x:Name="Loading" IsVisible="False" Color="#A78BFA" />
+            <Label x:Name="StatusText" TextColor="#94A3B8" FontSize="13" />
+            <Label x:Name="ErrorText" TextColor="#FDA4AF" IsVisible="False" AutomationId="exercise_error" />
+        </VerticalStackLayout>
+        <CollectionView Grid.Row="5" x:Name="ExerciseList" SelectionMode="Single" SelectionChanged="OnSelected" AutomationId="exercise_list">
+            <CollectionView.EmptyView>
+                <Label Text="Nenhum exercício encontrado. Ajuste a busca ou cadastre o seu." TextColor="#CBD5E1" Margin="0,20" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="services:ExerciseItem">
+                    <Border BackgroundColor="#1F2937" StrokeThickness="0" Padding="16" Margin="0,0,0,10">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="{Binding Origin}" TextColor="#C4B5FD" FontSize="12" />
+                            <Label Text="{Binding Name}" TextColor="#F9FAFB" FontSize="18" FontAttributes="Bold" />
+                            <Label Text="{Binding Summary}" TextColor="#CBD5E1" FontSize="14" />
+                        </VerticalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

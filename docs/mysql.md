@@ -64,12 +64,12 @@ O banco e o usuário devem existir antes da migração; no caminho local o Compo
 | Rota | Significado | Resposta |
 | --- | --- | --- |
 | GET /health | Processo da API atende HTTP, mesmo sem banco. | 200; `databaseConfigured` indica somente a presença da configuração. |
-| GET /health/ready | Conexão ao banco escolhido e leitura da versão do esquema. | 200 se versão 2; 503 se não pronto. |
+| GET /health/ready | Conexão ao banco escolhido e leitura da versão do esquema. | 200 se versão 3; 503 se não pronto. |
 
 Exemplo de prontidão:
 
 ```json
-{"status":"ready","database":"ready","schemaVersion":2}
+{"status":"ready","database":"ready","schemaVersion":3}
 ```
 
 Estados sem prontidão: `not_configured`, `invalid_configuration`, `unreachable` ou `schema_pending`. A sondagem tem limite de 3 segundos. A resposta não revela conexão, usuário, senha ou detalhes do driver. Ela não executa DDL e não comprova requisitos futuros de autenticação ou treino.

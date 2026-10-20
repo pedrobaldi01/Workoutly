@@ -48,6 +48,7 @@
                         <Label x:Name="AccountEmail" TextColor="#CBD5E1" FontSize="16" />
                     </VerticalStackLayout>
                 </Border>
+                <Button x:Name="ExercisesButton" Text="Explorar exercícios" Clicked="OnExercises" BackgroundColor="#A78BFA" TextColor="#111827" AutomationId="open_exercises" />
                 <Button x:Name="LogoutButton" Text="Sair da conta" Clicked="OnLogout" BackgroundColor="#374151" TextColor="#F9FAFB" />
             </VerticalStackLayout>
         </VerticalStackLayout>

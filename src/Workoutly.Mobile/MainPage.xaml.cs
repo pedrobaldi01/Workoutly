@@ -6,7 +6,6 @@ public partial class MainPage : ContentPage
 {
     private readonly AccountClient _accounts = new();
     private bool _registering;
-    private bool _initialized;
     private bool _busy;
 
     public MainPage()
@@ -18,13 +17,13 @@ public partial class MainPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        if (_initialized) return;
-        _initialized = true;
+        if (_busy) return;
         SetBusy(true);
         try
         {
             var profile = await _accounts.RestoreAsync();
             if (profile is not null) ShowAccount(profile);
+            else ShowSignedOut();
         }
         catch (AccountException exception) { ShowError(exception.Message); }
         finally { SetBusy(false); }
@@ -74,10 +73,7 @@ public partial class MainPage : ContentPage
         try
         {
             await _accounts.LogoutAsync();
-            AccountPanel.IsVisible = false;
-            AuthPanel.IsVisible = true;
-            Heading.Text = "Seu treino, no seu ritmo.";
-            Subtitle.Text = _registering ? "Crie sua conta para organizar sua rotina." : "Entre na sua conta para começar.";
+            ShowSignedOut();
         }
         catch (AccountException exception) { ShowError(exception.Message); }
         finally { SetBusy(false); }
@@ -94,6 +90,20 @@ public partial class MainPage : ContentPage
         ErrorText.IsVisible = false;
     }
 
+    private async void OnExercises(object? sender, EventArgs args)
+    {
+        if (_busy) return;
+        await Navigation.PushAsync(new ExercisesPage(_accounts));
+    }
+
+    private void ShowSignedOut()
+    {
+        AccountPanel.IsVisible = false;
+        AuthPanel.IsVisible = true;
+        Heading.Text = "Seu treino, no seu ritmo.";
+        Subtitle.Text = _registering ? "Crie sua conta para organizar sua rotina." : "Entre na sua conta para começar.";
+    }
+
     private void ShowError(string message)
     {
         ErrorText.Text = message;
@@ -106,5 +116,6 @@ public partial class MainPage : ContentPage
         Loading.IsVisible = Loading.IsRunning = busy;
         AuthPanel.IsEnabled = !busy;
         LogoutButton.IsEnabled = !busy;
+        ExercisesButton.IsEnabled = !busy;
     }
 }
