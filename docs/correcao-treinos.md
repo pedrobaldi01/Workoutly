@@ -1,10 +1,10 @@
 # Correção de treinos salvos
 
-TREINO-02 permite ao aluno corrigir seus próprios registros. Séries, repetições, cargas, duração e observações podem ser atualizadas; início, proprietário e revisão da ficha executada permanecem os mesmos. Indicadores por período e acompanhamento pelo professor continuam em HIST-01.
+TREINO-02 permite ao aluno corrigir seus próprios registros. Séries, repetições, cargas, duração e observações podem ser atualizadas; início, proprietário e revisão da ficha executada permanecem os mesmos. Indicadores por período e acompanhamento pelo professor foram implementados em HIST-01; ver historico-e-armazenamento.md.
 
 ## Como usar
 
-1. No início do aluno, abra **Treinos salvos → Ver treino → Corrigir treino**.
+1. No início do aluno, abra **Histórico e evolução → Ver treino → Corrigir treino**.
 2. Ajuste horas, minutos e segundos da duração. Os campos vêm preenchidos com o registro atual.
 3. Corrija as repetições e cargas de cada série. **Remover série** pede confirmação e retira o item somente do formulário, até salvar.
 4. Use **Adicionar série** no exercício correspondente para registrar algo esquecido. Todos os exercícios da ficha original aparecem, inclusive os que ficaram sem séries na primeira gravação. Não é possível trocar o treino para outra ficha ou escolher movimentos que não pertencem à revisão executada.

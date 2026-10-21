@@ -1,6 +1,6 @@
 # Perfis e vínculo de acompanhamento
 
-Decisão do usuário: dois perfis, **aluno** e **professor/admin**. O professor poderá montar fichas e acompanhar treinos dos alunos vinculados. A base de acessos e vínculo está concluída. Fichas também foram implementadas no incremento seguinte, descrito em fichas.md; sessões próprias foram implementadas em TREINO-01 (treinos.md); acompanhamento pelo professor continua pendente.
+Decisão do usuário: dois perfis, **aluno** e **professor/admin**. O professor poderá montar fichas e acompanhar treinos dos alunos vinculados. A base de acessos e vínculo está concluída. Fichas também foram implementadas no incremento seguinte, descrito em fichas.md; sessões próprias foram implementadas em TREINO-01 (treinos.md); acompanhamento pelo professor também foi implementado em HIST-01 (historico-e-armazenamento.md).
 
 ## Como usar
 
@@ -52,7 +52,7 @@ No app, `Services/AccountClient.cs` recebe o papel e realiza HTTP usando a sess�
 | POST /enrollment | Aluno | Corpo com code; 201 vínculo criado, 200 se já era o mesmo, 400 código inválido/expirado, 409 se outro professor já está vinculado. |
 | DELETE /enrollment | Aluno | 204, remove somente o vínculo da conta autenticada. |
 
-Sem sessão: 401. Perfil incorreto: 403. Falhas de banco: 503 genérico. Fora de Development, exigir HTTPS; respostas dessas rotas usam no-store. Um vínculo não muda a autorização atual do catálogo: exercícios privados continuam pertencendo ao próprio criador. O acesso às fichas usa o vínculo ativo, conforme fichas.md. Alunos acessam apenas as próprias sessões em /sessions; o acesso do professor a sessões será implementado em HIST-01.
+Sem sessão: 401. Perfil incorreto: 403. Falhas de banco: 503 genérico. Fora de Development, exigir HTTPS; respostas dessas rotas usam no-store. Um vínculo não muda a autorização atual do catálogo: exercícios privados continuam pertencendo ao próprio criador. O acesso às fichas usa o vínculo ativo, conforme fichas.md. Alunos acessam apenas as próprias sessões em /sessions; o professor consulta /teaching/students/{studentId}/history e /teaching/students/{studentId}/sessions/{id} enquanto houver vínculo ativo; não pode corrigir sessões dos alunos.
 
 ## Como testar
 

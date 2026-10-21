@@ -85,7 +85,7 @@ public partial class ConnectionsPage : ContentPage
     {
         var code = JoinCode.Text ?? string.Empty;
         if (code.Trim().Length != 12) throw new AccountException("Informe o código de 12 caracteres enviado pelo professor.");
-        if (!await DisplayAlertAsync("Vincular professor?", "Seu nome e e-mail ficarão disponíveis para o professor que enviou o código. Você poderá remover o vínculo depois.", "Vincular", "Cancelar")) return;
+        if (!await DisplayAlertAsync("Vincular professor?", "O professor verá seu nome, e-mail e histórico de treinos, inclusive anteriores ao vínculo, e poderá gerenciar suas fichas. Você poderá remover o vínculo depois.", "Vincular", "Cancelar")) return;
         ShowEnrollment(await _accounts.JoinTeacherAsync(code));
         JoinCode.Text = string.Empty;
     });
@@ -113,6 +113,14 @@ public partial class ConnectionsPage : ContentPage
         if (_busy || sender is not Button { CommandParameter: AccountProfile student }) return;
         SetBusy(true);
         try { await Navigation.PushAsync(new PlansPage(_accounts, student.Id, student.Name)); }
+        finally { SetBusy(false); }
+    }
+
+    private async void OnStudentHistory(object? sender, EventArgs args)
+    {
+        if (_busy || sender is not Button { CommandParameter: AccountProfile student }) return;
+        SetBusy(true);
+        try { await Navigation.PushAsync(new WorkoutsPage(_accounts, student.Id, student.Name)); }
         finally { SetBusy(false); }
     }
 

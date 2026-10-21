@@ -5,8 +5,9 @@ public partial class WorkoutDetailsPage : ContentPage
 {
     private readonly AccountClient _accounts;
     private readonly string _id;
+    private readonly string? _studentId;
     private bool _busy;
-    public WorkoutDetailsPage(AccountClient accounts, string id) { InitializeComponent(); _accounts = accounts; _id = id; }
+    public WorkoutDetailsPage(AccountClient accounts, string id, string? studentId = null) { InitializeComponent(); _accounts = accounts; _id = id; _studentId = studentId; }
     protected override async void OnAppearing() { base.OnAppearing(); await LoadAsync(); }
     private async Task LoadAsync()
     {
@@ -15,7 +16,7 @@ public partial class WorkoutDetailsPage : ContentPage
         ErrorText.IsVisible = DetailPanel.IsVisible = EditButton.IsVisible = false;
         try
         {
-            var session = await _accounts.GetWorkoutAsync(_id);
+            var session = await _accounts.GetWorkoutAsync(_id, _studentId);
             Heading.Text = session.PlanName;
             DateText.Text = $"{session.StartedAt.ToLocalTime():dd/MM/yyyy 'às' HH:mm} • ficha na versão {session.PlanVersion}";
             SummaryText.Text = $"{session.Exercises.Sum(e => e.Sets.Length)} série(s) realizadas • {WorkoutSummaryItem.FormatDuration(session.DurationSeconds)}";
@@ -34,7 +35,8 @@ public partial class WorkoutDetailsPage : ContentPage
                 }
                 ExercisesPanel.Children.Add(new Border { Style = (Style)Application.Current!.Resources["SurfaceCard"], Content = content });
             }
-            DetailPanel.IsVisible = EditButton.IsVisible = true;
+            DetailPanel.IsVisible = true;
+            EditButton.IsVisible = _studentId is null;
         }
         catch (SessionExpiredException exception) { await DisplayAlertAsync("Acesso", exception.Message, "OK"); await Navigation.PopToRootAsync(); }
         catch (AccountException exception) { ErrorText.Text = exception.Message; ErrorText.IsVisible = true; }
@@ -42,7 +44,7 @@ public partial class WorkoutDetailsPage : ContentPage
     }
     private async void OnEdit(object? sender, EventArgs args)
     {
-        if (_busy) return;
+        if (_busy || _studentId is not null) return;
         _busy = true; EditButton.IsEnabled = RefreshButton.IsEnabled = false; ErrorText.IsVisible = false;
         try
         {

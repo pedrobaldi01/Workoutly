@@ -6,7 +6,7 @@
 
 A identidade visual vem do Figma do grupo. Colors.xaml concentra a paleta e Styles.xaml os padrões de texto, botões, campos e cartões. MauiProgram registra a fonte Inter e remove os contornos nativos dos campos para usar os Border XAML. Os controles permanecem nativos; regras e contratos HTTP não dependem dos estilos. Detalhes em identidade-visual.md.
 
-O perfil faz parte de AccountProfile e vem da API. ConnectionsPage apresenta Meus alunos para professor/admin ou Meu professor para aluno. A migração 004 adiciona account_roles, student_teachers e teacher_invitations, registrando a versão 4 do esquema. Claims de papel são reconstruídas pelo SessionAuthenticationHandler a partir do banco a cada requisição. As políticas teacher/student protegem as rotas de vínculo; a consulta SQL restringe a propriedade da relação. Essa base também autoriza as fichas dos alunos vinculados; acompanhamento das sessões pelo professor e indicadores continuam pendentes. Detalhes em perfis-e-vinculos.md.
+O perfil faz parte de AccountProfile e vem da API. ConnectionsPage apresenta Meus alunos para professor/admin ou Meu professor para aluno. A migração 004 adiciona account_roles, student_teachers e teacher_invitations, registrando a versão 4 do esquema. Claims de papel são reconstruídas pelo SessionAuthenticationHandler a partir do banco a cada requisição. As políticas teacher/student protegem as rotas de vínculo; a consulta SQL restringe a propriedade da relação. Essa base também autoriza as fichas dos alunos vinculados; acompanhamento das sessões e indicadores também exigem vínculo ativo e são somente de leitura para o professor. Detalhes em perfis-e-vinculos.md.
 
 `Workoutly.Api` possui `GET /health` para verificar o processo e `GET /health/ready` para consultar a versão persistida no MySQL. A conexão é configurada por variável de ambiente, somente no servidor. O comando `--migrate` prepara o histórico de versões; abrir a API não modifica o banco. As rotas /auth/register, /auth/login, /auth/me e /auth/logout usam as tabelas users e user_sessions. As rotas autenticadas /exercises usam a tabela exercises: owner_id nulo identifica o catálogo inicial, e owner_id preenchido limita acesso à conta proprietária. A migração 003 registra o esquema na versão 3. A migração 005 adiciona workout_plans, workout_plan_versions e workout_plan_items; a migração 006 adiciona workout_sessions/workout_session_sets e registra a versão 6. A migração 007 adiciona workout_session_changes e eleva o esquema atual a 7. As rotas /sessions registram, consultam e corrigem somente sessões do aluno autenticado. Detalhes e comandos em mysql.md e exercicios.md.
 
@@ -14,7 +14,7 @@ O perfil faz parte de AccountProfile e vem da API. ConnectionsPage apresenta Meu
 
 ## Fluxo atual
 
-O usuário interage com o app MAUI. O app envia requisições HTTP para contas, vínculos, exercícios, fichas e sessões de treino. A API valida os dados, autentica, autoriza as consultas e persiste os registros no MySQL. Os próximos recursos seguirão esse fluxo. Somente a API conhece a conexão com o banco.
+O usuário interage com o app MAUI. O app envia requisições HTTP para contas, vínculos, exercícios, fichas, sessões de treino e histórico com indicadores. A API valida os dados, autentica, autoriza as consultas e persiste os registros no MySQL. Os próximos recursos seguirão esse fluxo. Somente a API conhece a conexão com o banco.
 
 Esses três componentes são separados porque a interface muda sem exigir conexão direta ao banco e as regras de acesso ficam centralizadas. Os futuros contratos serão documentados conforme cada recurso for implementado; não há contratos simulados de cadastro ou treino nesta base.
 
@@ -28,11 +28,13 @@ WorkoutPage registra séries realizadas e mede a duração; WorkoutsPage e Worko
 
 WorkoutEditPage corrige as séries da revisão original, duração e observações. O PUT /sessions/{id} valida version e editId; workout_session_changes identifica operações aceitas e não mantém snapshots dos valores anteriores. Séries e cabeçalho são atualizados em transação, e volume/contagens são calculados a partir dos registros atuais. A correção não troca início, proprietário ou revisão da ficha. Ver correcao-treinos.md.
 
+WorkoutsPage agora consulta /history por período e apresenta indicadores, frequência e evolução por exercício. WorkoutHistoryService lê sessões e séries em uma transação consistente, sem gravar totais ou gráficos em tabelas separadas. Professor acessa /teaching/students/{studentId}/history e detalhes das sessões somente enquanto existir o vínculo protegido na mesma transação. O esquema permanece na versão 7. Armazenamento local, fórmulas e contratos estão em historico-e-armazenamento.md.
+
 ## Aprendizado deste incremento
 
 - **Solução**: agrupa os projetos para a IDE; não é um servidor nem o aplicativo.
 - **Aplicativo MAUI**: gera apps nativos de cada plataforma a partir de C# e XAML.
-- **API**: processo independente que responde a requisições HTTP; estará entre o app e o banco.
+- **API**: processo independente que responde a requisições HTTP entre o app e o banco.
 - **Teste de integração**: verifica o comportamento do endpoint a partir de uma requisição, não chama diretamente a função da rota.
 - **Git**: registra versões de código e documentação; publicar no GitHub é uma ação separada.
 - **Skill**: procedimento lido pelo agente quando apropriado. Não faz parte do aplicativo que o usuário instala.

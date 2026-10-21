@@ -21,6 +21,7 @@ builder.Services.AddSingleton<ExerciseService>();
 builder.Services.AddSingleton<TeachingService>();
 builder.Services.AddSingleton<PlanService>();
 builder.Services.AddSingleton<WorkoutService>();
+builder.Services.AddSingleton<WorkoutHistoryService>();
 builder.Services.AddAuthentication("Session")
     .AddScheme<AuthenticationSchemeOptions, SessionAuthenticationHandler>("Session", _ => { });
 builder.Services.AddAuthorization(options =>
@@ -92,7 +93,7 @@ if (migrateOnly)
 app.Use(async (context, next) =>
 {
     var protectedResource = context.Request.Path.StartsWithSegments("/auth") || context.Request.Path.StartsWithSegments("/exercises") ||
-        context.Request.Path.StartsWithSegments("/teaching") || context.Request.Path.StartsWithSegments("/enrollment") || context.Request.Path.StartsWithSegments("/plans") || context.Request.Path.StartsWithSegments("/sessions");
+        context.Request.Path.StartsWithSegments("/teaching") || context.Request.Path.StartsWithSegments("/enrollment") || context.Request.Path.StartsWithSegments("/plans") || context.Request.Path.StartsWithSegments("/sessions") || context.Request.Path.StartsWithSegments("/history");
     if (protectedResource)
     {
         context.Response.Headers.CacheControl = "no-store";
@@ -119,6 +120,7 @@ app.MapExerciseEndpoints();
 app.MapTeachingEndpoints();
 app.MapPlanEndpoints();
 app.MapWorkoutEndpoints();
+app.MapWorkoutHistoryEndpoints();
 
 // Liveness não depende do banco. Readiness comprova acesso ao esquema preparado.
 app.MapGet("/health", (MySqlDatabase database) => Results.Ok(new

@@ -33,6 +33,7 @@
                                 <Label Text="{Binding Name}" FontFamily="InterSemiBold" FontSize="18" />
                                 <Label Text="{Binding Email}" Style="{StaticResource SecondaryText}" LineBreakMode="CharacterWrap" />
                                 <Button Text="Fichas do aluno" CommandParameter="{Binding .}" Clicked="OnStudentPlans" Style="{StaticResource SecondaryButton}" />
+                                <Button Text="Histórico do aluno" CommandParameter="{Binding .}" Clicked="OnStudentHistory" Style="{StaticResource SecondaryButton}" />
                                 <Button Text="Remover vínculo" CommandParameter="{Binding Id}" Clicked="OnRemoveStudent" Style="{StaticResource TextButton}" TextColor="{StaticResource Mint}" />
                             </VerticalStackLayout>
                         </Border>
@@ -53,7 +54,7 @@
                 <Border x:Name="JoinCard" Style="{StaticResource SurfaceCard}" IsVisible="False">
                     <VerticalStackLayout Spacing="14">
                         <Label Text="Vincule seu professor" FontFamily="InterSemiBold" FontSize="20" />
-                        <Label Text="Peça o código de 12 caracteres ao seu professor. Ele verá seu nome e e-mail na lista de alunos vinculados." Style="{StaticResource SecondaryText}" />
+                        <Label Text="Peça o código de 12 caracteres ao seu professor. Ele poderá montar fichas e consultar seus treinos e indicadores enquanto o vínculo estiver ativo." Style="{StaticResource SecondaryText}" />
                         <Border Style="{StaticResource InputBorder}">
                             <VerticalStackLayout Spacing="0">
                                 <Label Text="Código do professor" Style="{StaticResource FieldLabel}" />

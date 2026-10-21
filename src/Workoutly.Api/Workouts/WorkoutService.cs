@@ -25,17 +25,25 @@ public sealed class WorkoutService(MySqlDatabase database)
     public async Task<List<WorkoutSummary>> ListAsync(string student, CancellationToken ct)
     {
         await using var connection = await database.OpenConnectionAsync(ct);
+        return await List(connection, null, student, null, null, ct);
+    }
+
+    internal static async Task<List<WorkoutSummary>> List(MySqlConnection connection, MySqlTransaction? transaction, string student, DateTime? from, DateTime? until, CancellationToken ct)
+    {
         await using var command = connection.CreateCommand();
+        command.Transaction = transaction;
         command.CommandText = """
             SELECT s.id,v.name,s.started_at,s.duration_seconds,COUNT(DISTINCT x.exercise_id),COUNT(*),SUM(x.repetitions*x.weight_kg)
             FROM workout_sessions s
             JOIN workout_plan_versions v ON v.plan_id=s.plan_id AND v.version=s.plan_version
             JOIN workout_session_sets x ON x.session_id=s.id
-            WHERE s.student_id=@student
+            WHERE s.student_id=@student AND (@from IS NULL OR s.started_at>=@from) AND (@until IS NULL OR s.started_at<@until)
             GROUP BY s.id,v.name,s.started_at,s.duration_seconds
             ORDER BY s.started_at DESC,s.id
             """;
         command.Parameters.AddWithValue("@student", student);
+        command.Parameters.AddWithValue("@from", (object?)from ?? DBNull.Value);
+        command.Parameters.AddWithValue("@until", (object?)until ?? DBNull.Value);
         var sessions = new List<WorkoutSummary>();
         await using var reader = await command.ExecuteReaderAsync(ct);
         while (await reader.ReadAsync(ct))
@@ -49,7 +57,7 @@ public sealed class WorkoutService(MySqlDatabase database)
         return await Read(connection, null, student, id, ct);
     }
     private static DateTimeOffset Utc(DateTime value) => new(DateTime.SpecifyKind(value, DateTimeKind.Utc));
-    private static async Task<WorkoutSession?> Read(MySqlConnection connection, MySqlTransaction? transaction, string student, string id, CancellationToken ct)
+    internal static async Task<WorkoutSession?> Read(MySqlConnection connection, MySqlTransaction? transaction, string student, string id, CancellationToken ct)
     {
         await using var command = connection.CreateCommand();
         command.Transaction = transaction;

@@ -44,7 +44,15 @@ public sealed record WorkoutSummaryItem(string Id, string PlanName, DateTimeOffs
     public static string FormatDuration(int seconds) => $"{seconds / 3600:00}:{seconds / 60 % 60:00}:{seconds % 60:00}";
 }
 
+public sealed record WorkoutDayItem(DateOnly Date, int SessionCount);
+public sealed record LoadPointItem(string SessionId, DateTimeOffset StartedAt, decimal MaxWeightKg, int SetCount, long RepetitionCount, decimal VolumeKg);
+public sealed record ExerciseEvolutionItem(string ExerciseId, string Name, LoadPointItem[] Points);
+public sealed record WorkoutHistoryItem(DateOnly From, DateOnly To, int OffsetMinutes, int SessionCount, int ActiveDays,
+    int SetCount, long RepetitionCount, long DurationSeconds, decimal VolumeKg,
+    WorkoutDayItem[] Days, ExerciseEvolutionItem[] Exercises, WorkoutSummaryItem[] Sessions);
+
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
+[JsonSerializable(typeof(WorkoutHistoryItem))]
 [JsonSerializable(typeof(CreateWorkoutPayload))]
 [JsonSerializable(typeof(UpdateWorkoutPayload))]
 [JsonSerializable(typeof(WorkoutSessionItem))]
@@ -183,7 +191,14 @@ public sealed class AccountClient
     }
 
     public Task<WorkoutSummaryItem[]> GetWorkoutsAsync() => SendAsync(HttpMethod.Get, "sessions", null, AccountJson.Default.WorkoutSummaryItemArray, true);
-    public Task<WorkoutSessionItem> GetWorkoutAsync(string id) => SendAsync(HttpMethod.Get, $"sessions/{Uri.EscapeDataString(id)}", null, AccountJson.Default.WorkoutSessionItem, true);
+    public Task<WorkoutSessionItem> GetWorkoutAsync(string id, string? studentId = null) => SendAsync(HttpMethod.Get,
+        studentId is null ? $"sessions/{Uri.EscapeDataString(id)}" : $"teaching/students/{Uri.EscapeDataString(studentId)}/sessions/{Uri.EscapeDataString(id)}",
+        null, AccountJson.Default.WorkoutSessionItem, true);
+    public Task<WorkoutHistoryItem> GetHistoryAsync(DateOnly from, DateOnly to, int offsetMinutes, string? studentId = null)
+    {
+        var path = studentId is null ? "history" : $"teaching/students/{Uri.EscapeDataString(studentId)}/history";
+        return SendAsync(HttpMethod.Get, FormattableString.Invariant($"{path}?from={from:yyyy-MM-dd}&to={to:yyyy-MM-dd}&offsetMinutes={offsetMinutes}"), null, AccountJson.Default.WorkoutHistoryItem, true);
+    }
     public async Task<WorkoutSessionItem> SaveWorkoutAsync(CreateWorkoutPayload payload)
     {
         using var content = JsonContent.Create(payload, AccountJson.Default.CreateWorkoutPayload);

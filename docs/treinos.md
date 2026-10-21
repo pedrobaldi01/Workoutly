@@ -1,6 +1,6 @@
 # Registro de treinos
 
-TREINO-01 permite ao aluno executar uma ficha e salvar os dados realizados pela API no MySQL. Inclui consulta dos próprios registros para conferir o salvamento. A correção posterior foi implementada em TREINO-02 (correcao-treinos.md); indicadores por período e acompanhamento pelo professor (HIST-01) continuam pendentes.
+TREINO-01 permite ao aluno executar uma ficha e salvar os dados realizados pela API no MySQL. Inclui consulta dos próprios registros para conferir o salvamento. A correção posterior foi implementada em TREINO-02 (correcao-treinos.md); indicadores por período e acompanhamento pelo professor foram implementados em HIST-01, descrito em historico-e-armazenamento.md.
 
 ## Como usar
 
@@ -9,7 +9,7 @@ TREINO-01 permite ao aluno executar uma ficha e salvar os dados realizados pela 
 3. Em cada série realizada, informe repetições e carga em kg e marque **Feita**. Os valores previstos aparecem como referência, sem preenchimento automático dos resultados.
 4. Use **Adicionar série** ou **Remover última série** se necessário. Séries vazias e não marcadas são omitidas; se há campos preenchidos sem Feita, o app pede revisar antes de concluir. A remoção de uma série preenchida exige confirmação.
 5. Informe observações opcionais e toque em **Concluir e salvar treino**. Confira a confirmação: somente séries marcadas serão registradas.
-6. Após salvar, a tela apresenta data, duração, observações e cada série realizada. No início, **Treinos salvos → Ver treino** recupera os registros pela API, inclusive após reabrir o aplicativo.
+6. Após salvar, a tela apresenta data, duração, observações e cada série realizada. No início, **Histórico e evolução → Ver treino** recupera os registros pela API, inclusive após reabrir o aplicativo.
 
 Cargas aceitam vírgula ou ponto decimal no app. Use **0 kg para peso corporal/sem carga externa**; não informe o peso do corpo como carga. A ficha não constitui prescrição clínica. Os valores limites do formulário são restrições de entrada, não recomendações de treino.
 
@@ -40,7 +40,7 @@ Chaves estrangeiras ligam cada série à sessão e ao exercício daquela revisã
 
 **Tempo.** O início usa o relógio UTC do aparelho; o cronômetro usa Stopwatch para medir a duração, inclusive o tempo decorrido em segundo plano enquanto a página continua viva. Ao concluir, a duração é fixada. A API aceita de 1 segundo a 24 horas, datas desde 2000 e no máximo cinco minutos de tolerância de relógio para início/término no futuro. O horário é normalizado em UTC com precisão de milissegundos e exibido no fuso local do aparelho.
 
-**Privacidade.** `/sessions` exige o perfil student. O aluno é obtido da sessão de acesso e aplicado nas consultas SQL. Campos studentId e descrições adicionais enviados no corpo não mudam o proprietário nem os dados da revisão. Professor/admin ainda não possui rotas de consulta de sessões; seu acompanhamento será implementado com autorização por vínculo em HIST-01.
+**Privacidade.** `/sessions` exige o perfil student. O aluno é obtido da sessão de acesso e aplicado nas consultas SQL. Campos studentId e descrições adicionais enviados no corpo não mudam o proprietário nem os dados da revisão. Professor/admin consulta pela rota /teaching/students/{studentId}/sessions/{id}, com vínculo ativo e sem edição, conforme historico-e-armazenamento.md.
 
 ## Onde aparece no código
 
@@ -94,4 +94,4 @@ Execute `python3 scripts/test-native-mysql.py` para os contratos públicos com M
 
 No simulador, faça o fluxo acima com dados fictícios, abra o detalhe salvo e reabra o app para recuperar pela lista. Para conferir a recuperação de conexão, mantenha o formulário aberto, encerre apenas o helper local, tente salvar, reinicie o ambiente e repita a mesma tentativa.
 
-Veja resultados e limites em [evidências](evidencias/treinos.md). Esta consulta básica não conclui HIST-01: faltam indicadores, filtros de análise e acompanhamento pelo professor.
+Veja resultados e limites em [evidências](evidencias/treinos.md). HIST-01 foi implementado posteriormente; filtros, indicadores e acompanhamento estão documentados em historico-e-armazenamento.md.

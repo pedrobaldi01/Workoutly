@@ -72,7 +72,7 @@
                         <Label x:Name="PlansTitle" Text="Suas fichas de treino" FontFamily="InterSemiBold" FontSize="22" />
                         <Label x:Name="PlansDescription" Text="Organize exercícios, séries e repetições para o próximo treino." Style="{StaticResource SecondaryText}" />
                         <Button x:Name="PlansButton" Text="Minhas fichas" Clicked="OnPlans" AutomationId="open_plans" />
-                        <Button x:Name="WorkoutsButton" Text="Treinos salvos" Clicked="OnWorkouts" Style="{StaticResource SecondaryButton}" AutomationId="open_workouts" IsVisible="False" />
+                        <Button x:Name="WorkoutsButton" Text="Histórico e evolução" Clicked="OnWorkouts" Style="{StaticResource SecondaryButton}" AutomationId="open_workouts" IsVisible="False" />
                     </VerticalStackLayout>
                 </Border>
                 <Border Grid.Row="2" Style="{StaticResource SurfaceCard}" Padding="20,22,20,20" MinimumHeightRequest="244">
