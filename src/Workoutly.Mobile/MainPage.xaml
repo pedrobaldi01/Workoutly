@@ -44,7 +44,7 @@
                                 <Entry x:Name="ConfirmEntry" Placeholder="Repita sua senha" IsPassword="True" MaxLength="128" AutomationId="account_confirm" />
                             </VerticalStackLayout>
                         </Border>
-                        <Label Text="Use entre 10 e 128 caracteres." Style="{StaticResource SecondaryText}" />
+                        <Label Text="Use entre 10 e 128 caracteres. O cadastro cria uma conta de aluno." Style="{StaticResource SecondaryText}" />
                     </VerticalStackLayout>
                     <Border x:Name="ConnectionPanel" Style="{StaticResource InputBorder}" IsVisible="False">
                         <VerticalStackLayout Spacing="0">
@@ -62,7 +62,7 @@
                 <Grid ColumnDefinitions="*,46" ColumnSpacing="12" MinimumHeightRequest="62">
                     <VerticalStackLayout Spacing="4" VerticalOptions="Center">
                         <Label x:Name="Greeting" Style="{StaticResource SecondaryText}" FontSize="15" LineBreakMode="TailTruncation" />
-                        <Label Text="Pronto para treinar?" FontFamily="InterBold" FontSize="22" SemanticProperties.HeadingLevel="Level1" />
+                        <Label x:Name="HomeTitle" Text="Pronto para treinar?" FontFamily="InterBold" FontSize="22" SemanticProperties.HeadingLevel="Level1" />
                     </VerticalStackLayout>
                     <Image Grid.Column="1" Source="figma_avatar.svg" WidthRequest="46" HeightRequest="46" Aspect="AspectFit" VerticalOptions="Center" />
                 </Grid>
@@ -79,12 +79,14 @@
                         <Label Text="SUA CONTA" Style="{StaticResource Eyebrow}" />
                         <Label x:Name="AccountName" FontFamily="InterSemiBold" FontSize="19" />
                         <Label x:Name="AccountEmail" Style="{StaticResource SecondaryText}" LineBreakMode="CharacterWrap" />
+                        <Label x:Name="AccountRole" FontFamily="InterSemiBold" FontSize="12" TextColor="{StaticResource Mint}" AutomationId="account_role" />
                     </VerticalStackLayout>
                 </Border>
                 <Border Grid.Row="3" Style="{StaticResource SurfaceCard}" BackgroundColor="{StaticResource SurfaceRaised}" Padding="16">
                     <VerticalStackLayout Spacing="6">
-                        <Label Text="Tudo no seu ritmo" FontFamily="InterSemiBold" TextColor="{StaticResource Mint}" FontSize="13" />
-                        <Label Text="Mantenha seus movimentos organizados em um só lugar." Style="{StaticResource SecondaryText}" />
+                        <Label x:Name="ConnectionsTitle" FontFamily="InterSemiBold" TextColor="{StaticResource Mint}" FontSize="13" />
+                        <Label x:Name="ConnectionsDescription" Style="{StaticResource SecondaryText}" />
+                        <Button x:Name="ConnectionsButton" Text="Meu professor" Clicked="OnConnections" Style="{StaticResource SecondaryButton}" AutomationId="open_connections" />
                     </VerticalStackLayout>
                 </Border>
                 <Button Grid.Row="5" x:Name="LogoutButton" Text="Sair da conta" Clicked="OnLogout" Style="{StaticResource SecondaryButton}" />

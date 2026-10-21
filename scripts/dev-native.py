@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """MySQL local isolado e API para desenvolver no Mac/Linux, sem Docker."""
 import os
+import json
 from pathlib import Path
 import shutil
 import subprocess
@@ -34,6 +35,7 @@ def main():
     # Valor gerado no .env; nunca passado na linha de comando ou impresso.
     sql_password = password.replace("\\", "\\\\").replace("'", "''")
     data = ROOT / ".local/native-mysql/data"
+    runtime_file = data.parent / "runtime.json"
     data.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run([dotnet, "build", "src/Workoutly.Api/Workoutly.Api.csproj"], cwd=ROOT, check=True)
     with tempfile.TemporaryDirectory(prefix="wly-dev-", dir="/tmp") as folder:
@@ -72,6 +74,8 @@ def main():
                 environment["ASPNETCORE_ENVIRONMENT"] = "Development"
                 dll = ROOT / "src/Workoutly.Api/bin/Debug/net10.0/Workoutly.Api.dll"
                 subprocess.run([dotnet, str(dll), "--migrate"], cwd=ROOT, env=environment, check=True)
+                runtime_file.write_text(json.dumps({"socket": str(socket)}), encoding="utf-8")
+                runtime_file.chmod(0o600)
                 api = subprocess.Popen([dotnet, str(dll), "--urls", "http://localhost:5080"], cwd=ROOT, env=environment)
                 print("Workoutly disponível em http://localhost:5080. Ctrl+C encerra os serviços e preserva os dados em .local/.", flush=True)
                 return api.wait()
@@ -81,6 +85,8 @@ def main():
             finally:
                 stop(api)
                 stop(server)
+                if runtime_file.exists() and json.loads(runtime_file.read_text()).get("socket") == str(socket):
+                    runtime_file.unlink()
 
 
 if __name__ == "__main__":

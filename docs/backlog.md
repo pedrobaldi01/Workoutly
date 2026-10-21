@@ -27,15 +27,19 @@ Fonte: Roteiro Workoutly e Roteiro Fase 2 na pasta superior. A Fase 2 descreve u
 
 ## Próximos incrementos
 
+**AUTH-03 — concluído:** dois perfis, aluno e professor/admin. Cadastro público limitado a aluno, professor criado por comando administrativo, papel fornecido pela API e validado no servidor. As contas anteriores permanecem como aluno.
+
+**VINC-01 — concluído:** código de vínculo com validade de sete dias, renovação, confirmação pelo aluno, consulta dos alunos vinculados e remoção da relação por qualquer parte. Um professor ativo por aluno. Autorização testada com dois professores; evidências em docs/evidencias/perfis-e-vinculos.md. O vínculo ainda não expõe sessões nem permite montar fichas, recursos dos próximos incrementos.
+
 **VISUAL-01 — concluído antes de FICHA-01:** identidade do Figma aplicada às telas existentes de acesso, cadastro, início, catálogo e formulário/detalhes de exercício. Tokens e Inter locais, marca e avatar originais; referências em docs/identidade-visual.md e verificação em docs/evidencias/identidade-visual.md. Não antecipa funções de fichas ou histórico.
 
 | ID | Dependência | Requisito | Critério de aceite |
 | --- | --- | --- | --- |
 | AUTH-02 | AUTH-01 | Autorização dos próximos recursos | Parcial: perfil e exercícios isolados. Aplicar filtragem e testes de propriedade a fichas e treinos. |
-| FICHA-01 | EX-01 | Criar, consultar, editar e excluir fichas | Fichas com exercícios, séries e repetições; confirmar exclusão e respeitar o histórico já gravado. |
+| FICHA-01 | EX-01, VINC-01 | Criar, consultar, editar e excluir fichas | Fichas próprias do aluno e montagem pelo professor para alunos vinculados; exercícios, séries e repetições; confirmar exclusão e preservar o histórico. |
 | TREINO-01 | FICHA-01 | Registrar sessão | Salvar carga, séries, repetições, duração e observações; não duplicar sessão em reenvio. |
 | TREINO-02 | TREINO-01 | Corrigir registros próprios | Editar uma sessão, recalcular indicadores e manter dados de outros usuários intactos. |
-| HIST-01 | TREINO-02 | Histórico e indicadores | Histórico consistente, frequência, volume e evolução de carga por exercício calculados a partir das sessões. |
+| HIST-01 | TREINO-02, VINC-01 | Histórico e indicadores | Histórico, frequência, volume e evolução de carga a partir das sessões; professor acompanha somente alunos vinculados. |
 | UX-01 | HIST-01 | Uso online compreensível | Carregamento, estados vazios e erros claros; falha de rede preserva o formulário para tentar novamente. |
 | QA-01 | UX-01 | Validação multiplataforma | Fluxo completo no iOS e Android; registrar dispositivo, ambiente, versão, resultados e limites. |
 | AVAL-01 | QA-01 | Avaliação com três adultos | Consentimento, P1/P2/P3, tarefas, tempo, erros, ajuda, notas de facilidade 1–5 e comentários reais. |

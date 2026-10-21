@@ -7,6 +7,7 @@ public partial class MainPage : ContentPage
     private readonly AccountClient _accounts = new();
     private bool _registering;
     private bool _busy;
+    private bool _isTeacher;
 
     public MainPage()
     {
@@ -82,6 +83,12 @@ public partial class MainPage : ContentPage
     {
         AccountName.Text = profile.Name;
         AccountEmail.Text = profile.Email;
+        _isTeacher = profile.Role == "teacher";
+        AccountRole.Text = _isTeacher ? "Professor / admin" : "Aluno";
+        HomeTitle.Text = _isTeacher ? "Área do professor" : "Pronto para treinar?";
+        ConnectionsTitle.Text = _isTeacher ? "Seus alunos" : "Seu acompanhamento";
+        ConnectionsDescription.Text = _isTeacher ? "Compartilhe seu código para receber os vínculos dos alunos." : "Use o código do seu professor para se vincular a ele.";
+        ConnectionsButton.Text = _isTeacher ? "Meus alunos" : "Meu professor";
         Greeting.Text = $"Olá, {profile.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()}";
         Intro.IsVisible = false;
         AuthPanel.IsVisible = false;
@@ -101,6 +108,12 @@ public partial class MainPage : ContentPage
         AuthPanel.IsVisible = true;
         Intro.IsVisible = true;
         UpdateAccessCopy();
+    }
+
+    private async void OnConnections(object? sender, EventArgs args)
+    {
+        if (_busy) return;
+        await Navigation.PushAsync(new ConnectionsPage(_accounts, _isTeacher));
     }
 
     private void UpdateAccessCopy()
@@ -124,5 +137,6 @@ public partial class MainPage : ContentPage
         LogoutButton.IsEnabled = !busy;
         ExercisesButton.IsEnabled = !busy;
         ConnectionButton.IsEnabled = !busy;
+        ConnectionsButton.IsEnabled = !busy;
     }
 }

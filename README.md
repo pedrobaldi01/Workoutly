@@ -10,6 +10,8 @@ Nenhum código do aplicativo anterior foi reutilizado. Os roteiros enviados ao p
 
 A interface segue a identidade visual do Figma do grupo: fundo escuro, verde-lima, detalhes turquesa, fonte Inter, marca e cartões arredondados. A aplicação às telas atuais e as referências estão em [Identidade visual](docs/identidade-visual.md).
 
+Há dois perfis: **aluno** e **professor/admin**. O login é o mesmo, por e-mail e senha; a API identifica o perfil. Cadastre-se pelo app para criar aluno. Para criar professor no ambiente nativo já iniciado, use `python3 scripts/dev.py create-teacher --native`: o comando pede nome, e-mail e senha sem exibi-la. Professor gera um código em Meus alunos; aluno informa esse código em Meu professor e confirma o vínculo. Detalhes em [Perfis e vínculos](docs/perfis-e-vinculos.md). Fichas e acompanhamento de treinos ainda serão implementados sobre essa autorização.
+
 ## Componentes
 
 | Local | Responsabilidade |

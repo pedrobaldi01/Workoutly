@@ -7,7 +7,7 @@ using Workoutly.Api.Data;
 
 namespace Workoutly.Api.Auth;
 
-public sealed record AccountProfile(string Id, string Name, string Email);
+public sealed record AccountProfile(string Id, string Name, string Email, string Role = "student");
 public sealed record AccountSession(string AccessToken, DateTimeOffset ExpiresAt, AccountProfile User);
 
 public sealed class AuthService(MySqlDatabase database, IPasswordHasher<AccountProfile> passwords, TimeProvider time)
@@ -15,9 +15,15 @@ public sealed class AuthService(MySqlDatabase database, IPasswordHasher<AccountP
     private readonly AccountProfile _dummy = new("", "", "");
     private readonly string _dummyHash = passwords.HashPassword(new("", "", ""), "timing-placeholder-only");
 
-    public async Task<AccountSession?> RegisterAsync(string name, string email, string password, CancellationToken cancellationToken)
+    public async Task<AccountSession?> RegisterAsync(string name, string email, string password, CancellationToken cancellationToken) =>
+        (await CreateAccountAsync(name, email, password, "student", true, cancellationToken))?.Session;
+
+    public async Task<AccountProfile?> CreateTeacherAsync(string name, string email, string password, CancellationToken cancellationToken) =>
+        (await CreateAccountAsync(name, email, password, "teacher", false, cancellationToken))?.Profile;
+
+    private async Task<(AccountProfile Profile, AccountSession? Session)?> CreateAccountAsync(string name, string email, string password, string role, bool signIn, CancellationToken cancellationToken)
     {
-        var profile = new AccountProfile(Guid.NewGuid().ToString(), name.Trim(), email.Trim().ToLowerInvariant());
+        var profile = new AccountProfile(Guid.NewGuid().ToString(), name.Trim(), email.Trim().ToLowerInvariant(), role);
         var hash = passwords.HashPassword(profile, password);
         await using var connection = await database.OpenConnectionAsync(cancellationToken);
         await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
@@ -33,9 +39,14 @@ public sealed class AuthService(MySqlDatabase database, IPasswordHasher<AccountP
             command.Parameters.AddWithValue("hash", hash);
             command.Parameters.AddWithValue("now", time.GetUtcNow().UtcDateTime);
             await command.ExecuteNonQueryAsync(cancellationToken);
-            var session = await CreateSessionAsync(profile, connection, transaction, cancellationToken);
+            command.CommandText = "INSERT INTO account_roles (user_id, role) VALUES (@id, @role)";
+            command.Parameters.Clear();
+            command.Parameters.AddWithValue("id", profile.Id);
+            command.Parameters.AddWithValue("role", role);
+            await command.ExecuteNonQueryAsync(cancellationToken);
+            var session = signIn ? await CreateSessionAsync(profile, connection, transaction, cancellationToken) : null;
             await transaction.CommitAsync(cancellationToken);
-            return session;
+            return (profile, session);
         }
         catch (MySqlException exception) when (exception.Number == 1062)
         {
@@ -50,12 +61,12 @@ public sealed class AuthService(MySqlDatabase database, IPasswordHasher<AccountP
         string hash = _dummyHash;
         await using (var command = connection.CreateCommand())
         {
-            command.CommandText = "SELECT id, name, email, password_hash FROM users WHERE normalized_email = @email LIMIT 1";
+            command.CommandText = "SELECT u.id, u.name, u.email, u.password_hash, r.role FROM users u JOIN account_roles r ON r.user_id = u.id WHERE u.normalized_email = @email LIMIT 1";
             command.Parameters.AddWithValue("email", email.Trim().ToUpperInvariant());
             await using var reader = await command.ExecuteReaderAsync(cancellationToken);
             if (await reader.ReadAsync(cancellationToken))
             {
-                profile = new(reader.GetGuid(0).ToString(), reader.GetString(1), reader.GetString(2));
+                profile = new(reader.GetGuid(0).ToString(), reader.GetString(1), reader.GetString(2), reader.GetString(4));
                 hash = reader.GetString(3);
             }
         }
@@ -79,11 +90,11 @@ public sealed class AuthService(MySqlDatabase database, IPasswordHasher<AccountP
             return null;
         await using var connection = await database.OpenConnectionAsync(cancellationToken);
         await using var command = connection.CreateCommand();
-        command.CommandText = "SELECT u.id, u.name, u.email FROM user_sessions s JOIN users u ON u.id = s.user_id WHERE s.token_hash = @hash AND s.expires_at > @now";
+        command.CommandText = "SELECT u.id, u.name, u.email, r.role FROM user_sessions s JOIN users u ON u.id = s.user_id JOIN account_roles r ON r.user_id = u.id WHERE s.token_hash = @hash AND s.expires_at > @now";
         command.Parameters.AddWithValue("hash", HashToken(token));
         command.Parameters.AddWithValue("now", time.GetUtcNow().UtcDateTime);
         await using var reader = await command.ExecuteReaderAsync(cancellationToken);
-        return await reader.ReadAsync(cancellationToken) ? new(reader.GetGuid(0).ToString(), reader.GetString(1), reader.GetString(2)) : null;
+        return await reader.ReadAsync(cancellationToken) ? new(reader.GetGuid(0).ToString(), reader.GetString(1), reader.GetString(2), reader.GetString(3)) : null;
     }
 
     public async Task RevokeAsync(string token, CancellationToken cancellationToken)

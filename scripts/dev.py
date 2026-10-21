@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Inicialização e comandos locais, sem imprimir credenciais ou carregar .env no shell."""
 import argparse
+import getpass
+import json
 import os
 from pathlib import Path
 import secrets
@@ -15,8 +17,10 @@ TESTS = "tests/Workoutly.Api.Tests/Workoutly.Api.Tests.csproj"
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["init", "migrate", "run", "test-db"])
-    command = parser.parse_args().command
+    parser.add_argument("command", choices=["init", "migrate", "run", "test-db", "create-teacher"])
+    parser.add_argument("--native", action="store_true", help="Usar a instância nativa já iniciada por Executar-local.command")
+    arguments = parser.parse_args()
+    command = arguments.command
     if command == "init":
         password, root_password = secrets.token_hex(24), secrets.token_hex(24)
         content = (
@@ -45,6 +49,17 @@ def main():
     environment = os.environ.copy()
     environment.setdefault("ASPNETCORE_ENVIRONMENT", "Development")
     connection = environment.get("ConnectionStrings__Workoutly") or values.get("ConnectionStrings__Workoutly")
+    if arguments.native:
+        runtime = ROOT / ".local/native-mysql/runtime.json"
+        if not runtime.exists():
+            print("Inicie ou reinicie Executar-local.command antes de usar --native.", file=sys.stderr)
+            return 1
+        socket = Path(json.loads(runtime.read_text())["socket"])
+        if not socket.exists():
+            print("A instância nativa não está ativa. Reinicie Executar-local.command.", file=sys.stderr)
+            return 1
+        quoted_password = '"' + values["MYSQL_PASSWORD"].replace('"', '""') + '"'
+        connection = f"Server={socket};Database=workoutly;User ID=workoutly;Password={quoted_password};SslMode=Required"
     if connection:
         environment["ConnectionStrings__Workoutly"] = connection
     local_dotnet = Path.home() / ".dotnet" / "dotnet"
@@ -52,12 +67,24 @@ def main():
     if not dotnet:
         print("SDK .NET não encontrado. Configure DOTNET_COMMAND.", file=sys.stderr)
         return 1
-    if command in {"run", "migrate"}:
+    if command in {"run", "migrate", "create-teacher"}:
         if not connection:
             print("Defina ConnectionStrings__Workoutly ou prepare o .env; veja docs/mysql.md.", file=sys.stderr)
             return 1
         arguments = ["run", "--project", API, "--no-launch-profile"]
-        arguments += ["--", "--migrate"] if command == "migrate" else ["--urls", "http://localhost:5080"]
+        if command == "create-teacher":
+            for key, prompt in (("TeacherSetup__Name", "Nome do professor/admin: "), ("TeacherSetup__Email", "E-mail: ")):
+                if not environment.get(key):
+                    environment[key] = input(prompt)
+            if not environment.get("TeacherSetup__Password"):
+                password = getpass.getpass("Senha (10 a 128 caracteres): ")
+                if password != getpass.getpass("Confirme a senha: "):
+                    print("As senhas não coincidem.", file=sys.stderr)
+                    return 1
+                environment["TeacherSetup__Password"] = password
+            arguments += ["--", "--create-teacher"]
+        else:
+            arguments += ["--", "--migrate"] if command == "migrate" else ["--urls", "http://localhost:5080"]
     else:
         if not environment.get("WORKOUTLY_TEST_ADMIN_CONNECTION"):
             # Credencial administrativa apenas para o MySQL local e para bases aleatórias de teste.

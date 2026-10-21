@@ -7,7 +7,10 @@ using System.Text.Json.Serialization.Metadata;
 
 namespace Workoutly.Mobile.Services;
 
-public sealed record AccountProfile(string Id, string Name, string Email);
+public sealed record AccountProfile(string Id, string Name, string Email, string Role = "student");
+public sealed record TeacherInvitation(string? Code, DateTimeOffset? ExpiresAt);
+public sealed record EnrollmentInfo(AccountProfile? Teacher);
+public sealed record JoinTeacherPayload(string Code);
 public sealed record AccountSession(string AccessToken, DateTimeOffset ExpiresAt, AccountProfile User);
 public sealed record LoginPayload(string Email, string Password);
 public sealed record RegisterPayload(string Name, string Email, string Password);
@@ -21,6 +24,10 @@ public sealed record CreateExercisePayload(string Name, string MuscleGroup, stri
 
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
 [JsonSerializable(typeof(AccountProfile))]
+[JsonSerializable(typeof(AccountProfile[]))]
+[JsonSerializable(typeof(TeacherInvitation))]
+[JsonSerializable(typeof(EnrollmentInfo))]
+[JsonSerializable(typeof(JoinTeacherPayload))]
 [JsonSerializable(typeof(AccountSession))]
 [JsonSerializable(typeof(LoginPayload))]
 [JsonSerializable(typeof(RegisterPayload))]
@@ -103,6 +110,24 @@ public sealed class AccountClient
 
     public Task<AccountProfile> GetProfileAsync() => SendAsync(HttpMethod.Get, "auth/me", null, AccountJson.Default.AccountProfile, true);
 
+    public Task<AccountProfile[]> GetStudentsAsync() => SendAsync(HttpMethod.Get, "teaching/students", null, AccountJson.Default.AccountProfileArray, true);
+    public Task<TeacherInvitation> GetInvitationAsync() => SendAsync(HttpMethod.Get, "teaching/invitation", null, AccountJson.Default.TeacherInvitation, true);
+    public Task<TeacherInvitation> CreateInvitationAsync() => SendAsync(HttpMethod.Post, "teaching/invitation", null, AccountJson.Default.TeacherInvitation, true);
+    public Task<EnrollmentInfo> GetEnrollmentAsync() => SendAsync(HttpMethod.Get, "enrollment", null, AccountJson.Default.EnrollmentInfo, true);
+    public async Task<EnrollmentInfo> JoinTeacherAsync(string code)
+    {
+        using var content = JsonContent.Create(new JoinTeacherPayload(code.Trim()), AccountJson.Default.JoinTeacherPayload);
+        return await SendAsync(HttpMethod.Post, "enrollment", content, AccountJson.Default.EnrollmentInfo, true);
+    }
+    public async Task RemoveStudentAsync(string id)
+    {
+        using var response = await RequestAsync(HttpMethod.Delete, $"teaching/students/{Uri.EscapeDataString(id)}", null, true);
+    }
+    public async Task LeaveTeacherAsync()
+    {
+        using var response = await RequestAsync(HttpMethod.Delete, "enrollment", null, true);
+    }
+
     public Task<ExerciseItem[]> GetExercisesAsync() => SendAsync(HttpMethod.Get, "exercises", null, AccountJson.Default.ExerciseItemArray, true);
 
     public async Task<ExerciseItem> CreateExerciseAsync(string name, string muscleGroup, string equipment, string description)
@@ -177,7 +202,11 @@ public sealed class AccountClient
                 throw new AccountException("E-mail ou senha inválidos.");
             }
             if (response.StatusCode == HttpStatusCode.Conflict)
-                throw new AccountException("Este e-mail já está cadastrado. Use Entrar.");
+                throw new AccountException(path == "auth/register" ? "Este e-mail já está cadastrado. Use Entrar." : "Você já tem um professor vinculado. Remova o vínculo atual antes de trocar.");
+            if (response.StatusCode == HttpStatusCode.Forbidden)
+                throw new AccountException("Seu perfil não tem permissão para esta ação. Volte à sua conta e atualize o acesso.");
+            if (response.StatusCode == HttpStatusCode.NotFound)
+                throw new AccountException("Registro não encontrado ou não disponível para sua conta. Atualize a tela.");
             if ((int)response.StatusCode == 429)
                 throw new AccountException("Muitas tentativas. Aguarde um minuto e tente novamente.");
             if (response.StatusCode == HttpStatusCode.BadRequest)

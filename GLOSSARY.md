@@ -15,3 +15,6 @@
 | Evidência | Registro verificável vinculado à versão, ambiente e procedimento. |
 | Sessão de acesso | Token que autentica a conta por até sete dias; diferente de uma sessão de treino. |
 | Logout | Revogação da sessão de acesso atual no MySQL e remoção do token do aparelho. |
+| Aluno | Perfil student, criado pelo cadastro público; acessa os próprios registros e pode se vincular a um professor. |
+| Professor/admin | Perfil teacher, criado pelo operador; administra o vínculo dos próprios alunos. Montar fichas e acompanhar os treinos desses alunos serão os próximos fluxos. |
+| Vínculo | Associação voluntária do aluno com um professor por código; neste MVP, um professor ativo por aluno. Pode ser removida sem apagar contas ou registros. |

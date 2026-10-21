@@ -9,6 +9,7 @@
 - Identidade visual: seguir o Figma fornecido e docs/identidade-visual.md. Usar cores e estilos em Resources/Styles, fonte Inter e recursos locais originais; não voltar ao tema roxo padrão. Dados exemplificativos do protótipo não são registros reais.
 - Funcionalidades finais online; preservar formulário em falhas de rede. Não implementar sincronização offline.
 - Autenticação usa PasswordHasher do ASP.NET Core Identity e tokens opacos revogáveis, guardados somente como hash no servidor. Não substituir por hash simples de senha ou sessão em Preferences.
+- Dois perfis: student (aluno) e teacher (professor/admin). Cadastro público sempre cria aluno; professor somente pelo comando administrativo documentado em docs/perfis-e-vinculos.md. O papel vem do MySQL a cada requisição, nunca de seleção no cliente. Professor acessa somente alunos vinculados; manter essa regra ao implementar fichas e treinos.
 - Não embutir credenciais ou dados pessoais. Somente dados fictícios nos testes automatizados.
 - Ler docs/backlog.md e docs/arquitetura.md antes de alterar o escopo. Usar GLOSSARY.md para os termos.
 - Não adicionar integrações sociais, wearables, prescrição clínica ou AI Coach ao MVP.

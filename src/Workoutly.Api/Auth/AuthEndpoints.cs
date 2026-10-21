@@ -31,7 +31,7 @@ public static class AuthEndpoints
         }).RequireRateLimiting("account");
 
         accounts.MapGet("/me", (ClaimsPrincipal user) => Results.Ok(new AccountProfile(
-            user.FindFirstValue(ClaimTypes.NameIdentifier)!, user.FindFirstValue(ClaimTypes.Name)!, user.FindFirstValue(ClaimTypes.Email)!)))
+            user.FindFirstValue(ClaimTypes.NameIdentifier)!, user.FindFirstValue(ClaimTypes.Name)!, user.FindFirstValue(ClaimTypes.Email)!, user.FindFirstValue(ClaimTypes.Role)!)))
             .RequireAuthorization();
 
         accounts.MapPost("/logout", async (HttpRequest request, AuthService auth, CancellationToken cancellationToken) =>
@@ -41,7 +41,7 @@ public static class AuthEndpoints
         }).RequireAuthorization();
     }
 
-    private static Dictionary<string, string[]> Validate(string? email, string? password, bool registration)
+    internal static Dictionary<string, string[]> Validate(string? email, string? password, bool registration)
     {
         var errors = new Dictionary<string, string[]>();
         var address = email?.Trim();
