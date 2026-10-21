@@ -34,17 +34,19 @@ public sealed record UpdatePlanPayload(int Version, string Name, string Notes, P
 public sealed record WorkoutSetItem(int Repetitions, decimal WeightKg);
 public sealed record WorkoutExercisePayload(string ExerciseId, WorkoutSetItem[] Sets);
 public sealed record CreateWorkoutPayload(string Id, string PlanId, int PlanVersion, DateTimeOffset StartedAt, int DurationSeconds, string Notes, WorkoutExercisePayload[] Exercises);
+public sealed record UpdateWorkoutPayload(string EditId, int Version, int DurationSeconds, string Notes, WorkoutExercisePayload[] Exercises);
 public sealed record WorkoutExerciseItem(string ExerciseId, string Name, string MuscleGroup, string Equipment, string Description, int PlannedSets, int PlannedRepetitions, WorkoutSetItem[] Sets);
-public sealed record WorkoutSessionItem(string Id, string StudentId, string PlanId, int PlanVersion, string PlanName, DateTimeOffset StartedAt, int DurationSeconds, string Notes, WorkoutExerciseItem[] Exercises);
-public sealed record WorkoutSummaryItem(string Id, string PlanName, DateTimeOffset StartedAt, int DurationSeconds, int ExerciseCount, int SetCount)
+public sealed record WorkoutSessionItem(string Id, string StudentId, string PlanId, int PlanVersion, string PlanName, DateTimeOffset StartedAt, int DurationSeconds, string Notes, WorkoutExerciseItem[] Exercises, int Version = 1, PlanExerciseItem[]? PlanExercises = null, decimal VolumeKg = 0);
+public sealed record WorkoutSummaryItem(string Id, string PlanName, DateTimeOffset StartedAt, int DurationSeconds, int ExerciseCount, int SetCount, decimal VolumeKg = 0)
 {
     public string DateLabel => StartedAt.ToLocalTime().ToString("dd/MM/yyyy 'às' HH:mm");
-    public string Summary => $"{ExerciseCount} exercício(s) • {SetCount} série(s) • {FormatDuration(DurationSeconds)}";
+    public string Summary => $"{ExerciseCount} exercício(s) • {SetCount} série(s) • {FormatDuration(DurationSeconds)}\nVolume de carga: {VolumeKg:0.##} kg";
     public static string FormatDuration(int seconds) => $"{seconds / 3600:00}:{seconds / 60 % 60:00}:{seconds % 60:00}";
 }
 
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
 [JsonSerializable(typeof(CreateWorkoutPayload))]
+[JsonSerializable(typeof(UpdateWorkoutPayload))]
 [JsonSerializable(typeof(WorkoutSessionItem))]
 [JsonSerializable(typeof(WorkoutSummaryItem[]))]
 [JsonSerializable(typeof(PlanItem))]
@@ -188,6 +190,12 @@ public sealed class AccountClient
         return await SendAsync(HttpMethod.Post, "sessions", content, AccountJson.Default.WorkoutSessionItem, true);
     }
 
+    public async Task<WorkoutSessionItem> UpdateWorkoutAsync(string id, UpdateWorkoutPayload payload)
+    {
+        using var content = JsonContent.Create(payload, AccountJson.Default.UpdateWorkoutPayload);
+        return await SendAsync(HttpMethod.Put, $"sessions/{Uri.EscapeDataString(id)}", content, AccountJson.Default.WorkoutSessionItem, true);
+    }
+
     public async Task LogoutAsync()
     {
         try
@@ -254,7 +262,7 @@ public sealed class AccountClient
                 throw new AccountException("E-mail ou senha inválidos.");
             }
             if (response.StatusCode == HttpStatusCode.Conflict)
-                throw new AccountException(path == "auth/register" ? "Este e-mail já está cadastrado. Use Entrar." : path == "enrollment" ? "Você já tem um professor vinculado. Remova o vínculo atual antes de trocar." : path == "sessions" ? "Esta tentativa já corresponde a outro conteúdo salvo. Consulte os treinos salvos antes de registrar novamente." : "A ficha já foi salva, alterada ou excluída. Seus campos foram preservados. Volte à lista ou recarregue a ficha para abrir a versão atual.");
+                throw new AccountException(path == "auth/register" ? "Este e-mail já está cadastrado. Use Entrar." : path == "enrollment" ? "Você já tem um professor vinculado. Remova o vínculo atual antes de trocar." : path.StartsWith("sessions/", StringComparison.Ordinal) ? "Este treino já foi alterado. Seus campos foram preservados. Recarregue o registro para corrigir a versão atual." : path == "sessions" ? "Esta tentativa já corresponde a outro conteúdo salvo. Consulte os treinos salvos antes de registrar novamente." : "A ficha já foi salva, alterada ou excluída. Seus campos foram preservados. Volte à lista ou recarregue a ficha para abrir a versão atual.", HttpStatusCode.Conflict);
             if (response.StatusCode == HttpStatusCode.Forbidden)
                 throw new AccountException("Seu perfil não tem permissão para esta ação. Volte à sua conta e atualize o acesso.");
             if (response.StatusCode == HttpStatusCode.NotFound)

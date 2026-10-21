@@ -4,7 +4,7 @@ Aplicativo acadêmico de acompanhamento de treinos, criado do zero para o Projet
 
 ## Situação atual
 
-O app já permite **cadastro, login, recuperação de sessão, logout e catálogo de exercícios**, integrado à API e ao MySQL. Há dez exercícios iniciais compartilhados e cadastro de exercícios privados da conta, com busca e detalhes. A sessão fica no armazenamento seguro do aparelho e é revogada no servidor ao sair. Fichas já permitem criar, consultar, editar, ordenar exercícios e excluir com revisões preservadas. O aluno também registra séries realizadas, cargas, duração e observações e recupera seus treinos salvos. Correção de registros, indicadores e acompanhamento das sessões pelo professor ainda serão implementados; o MVP completo permanece pendente.
+O app já permite **cadastro, login, recuperação de sessão, logout e catálogo de exercícios**, integrado à API e ao MySQL. Há dez exercícios iniciais compartilhados e cadastro de exercícios privados da conta, com busca e detalhes. A sessão fica no armazenamento seguro do aparelho e é revogada no servidor ao sair. Fichas já permitem criar, consultar, editar, ordenar exercícios e excluir com revisões preservadas. O aluno também registra séries realizadas, cargas, duração e observações e recupera seus treinos salvos. Correção dos registros próprios já está disponível em Treinos salvos → Ver treino → Corrigir treino, com totais recalculados. Indicadores por período e acompanhamento das sessões pelo professor ainda serão implementados; o MVP completo permanece pendente.
 
 Nenhum código do aplicativo anterior foi reutilizado. Os roteiros enviados ao professor permanecem na pasta superior, sem alterações.
 
@@ -101,7 +101,7 @@ A solução inclui o projeto mobile: compilar a solução inteira exige os workl
 
 ## Como vamos desenvolver
 
-Leia `docs/backlog.md` para a sequência e critérios de aceite, `docs/arquitetura.md` para a separação de responsabilidades e `docs/skills.md` para usar as skills instaladas. A persistência MySQL foi implementada na API. Prepare e verifique seu ambiente seguindo `docs/mysql.md`. Conta, acesso, exercícios, vínculos e fichas estão implementados. Registro e consulta de sessões próprias também estão implementados. O próximo incremento é corrigir registros próprios (TREINO-02); indicadores e acompanhamento pelo professor vêm em HIST-01.
+Leia `docs/backlog.md` para a sequência e critérios de aceite, `docs/arquitetura.md` para a separação de responsabilidades e `docs/skills.md` para usar as skills instaladas. A persistência MySQL foi implementada na API. Prepare e verifique seu ambiente seguindo `docs/mysql.md`. Conta, acesso, exercícios, vínculos e fichas estão implementados. Registro e consulta de sessões próprias também estão implementados. Correção dos registros próprios também está implementada; veja [Correção de treinos](docs/correcao-treinos.md). O próximo incremento é HIST-01: indicadores, evolução e acompanhamento pelo professor.
 
 Ao concluir cada incremento serão registrados o conceito, a decisão, onde aparece no código e a forma de testar. Slides e avaliação com participantes permanecem para as etapas correspondentes.
 

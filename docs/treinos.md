@@ -1,6 +1,6 @@
 # Registro de treinos
 
-TREINO-01 permite ao aluno executar uma ficha e salvar os dados realizados pela API no MySQL. Inclui consulta dos próprios registros para conferir o salvamento. Correção posterior (TREINO-02), indicadores e acompanhamento pelo professor (HIST-01) continuam pendentes.
+TREINO-01 permite ao aluno executar uma ficha e salvar os dados realizados pela API no MySQL. Inclui consulta dos próprios registros para conferir o salvamento. A correção posterior foi implementada em TREINO-02 (correcao-treinos.md); indicadores por período e acompanhamento pelo professor (HIST-01) continuam pendentes.
 
 ## Como usar
 
@@ -84,7 +84,9 @@ De 1 a 50 exercícios distintos da revisão, com 1 a 20 séries realizadas por e
 
 Resumo: id, planName, startedAt, durationSeconds, exerciseCount, setCount. Detalhe: id, studentId, planId, planVersion, planName, startedAt, durationSeconds, notes, exercises. Cada exercício traz exerciseId, name, muscleGroup, equipment, description, plannedSets, plannedRepetitions e sets com repetitions/weightKg. Os detalhes estão ordenados pela revisão e pela sequência realizada das séries.
 
-Outros status: 400 inválido; 401 sem sessão de acesso; 403 perfil diferente; 404 revisão/ficha não encontrada ou alheia; 409 ID usado com outro conteúdo; 503 serviço indisponível. As respostas usam no-store e exigem HTTPS fora de Development. Não existem PUT/DELETE de treino neste incremento.
+Outros status: 400 inválido; 401 sem sessão de acesso; 403 perfil diferente; 404 revisão/ficha não encontrada ou alheia; 409 ID usado com outro conteúdo; 503 serviço indisponível. As respostas usam no-store e exigem HTTPS fora de Development. PUT /sessions/{id} foi adicionado em TREINO-02; veja correcao-treinos.md. DELETE de sessão permanece ausente.
+
+O detalhe e o resumo agora incluem volumeKg calculado das séries atuais. O detalhe também retorna version do registro e planExercises da revisão original para a correção. Esses campos e seu uso estão documentados em correcao-treinos.md.
 
 ## Como verificar
 

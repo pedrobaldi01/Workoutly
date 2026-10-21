@@ -11,14 +11,15 @@ public partial class WorkoutDetailsPage : ContentPage
     private async Task LoadAsync()
     {
         if (_busy) return;
-        _busy = true; RefreshButton.IsEnabled = false; Loading.IsVisible = Loading.IsRunning = true;
-        ErrorText.IsVisible = DetailPanel.IsVisible = false;
+        _busy = true; RefreshButton.IsEnabled = EditButton.IsEnabled = false; Loading.IsVisible = Loading.IsRunning = true;
+        ErrorText.IsVisible = DetailPanel.IsVisible = EditButton.IsVisible = false;
         try
         {
             var session = await _accounts.GetWorkoutAsync(_id);
             Heading.Text = session.PlanName;
             DateText.Text = $"{session.StartedAt.ToLocalTime():dd/MM/yyyy 'às' HH:mm} • ficha na versão {session.PlanVersion}";
             SummaryText.Text = $"{session.Exercises.Sum(e => e.Sets.Length)} série(s) realizadas • {WorkoutSummaryItem.FormatDuration(session.DurationSeconds)}";
+            VolumeText.Text = $"Volume de carga registrada: {session.VolumeKg:0.##} kg";
             NotesText.Text = string.IsNullOrEmpty(session.Notes) ? "Sem observações neste treino." : session.Notes;
             ExercisesPanel.Children.Clear();
             foreach (var exercise in session.Exercises)
@@ -33,11 +34,25 @@ public partial class WorkoutDetailsPage : ContentPage
                 }
                 ExercisesPanel.Children.Add(new Border { Style = (Style)Application.Current!.Resources["SurfaceCard"], Content = content });
             }
-            DetailPanel.IsVisible = true;
+            DetailPanel.IsVisible = EditButton.IsVisible = true;
         }
         catch (SessionExpiredException exception) { await DisplayAlertAsync("Acesso", exception.Message, "OK"); await Navigation.PopToRootAsync(); }
         catch (AccountException exception) { ErrorText.Text = exception.Message; ErrorText.IsVisible = true; }
-        finally { _busy = false; RefreshButton.IsEnabled = true; Loading.IsVisible = Loading.IsRunning = false; }
+        finally { _busy = false; RefreshButton.IsEnabled = EditButton.IsEnabled = true; Loading.IsVisible = Loading.IsRunning = false; }
+    }
+    private async void OnEdit(object? sender, EventArgs args)
+    {
+        if (_busy) return;
+        _busy = true; EditButton.IsEnabled = RefreshButton.IsEnabled = false; ErrorText.IsVisible = false;
+        try
+        {
+            var current = await _accounts.GetWorkoutAsync(_id);
+            if (current.PlanExercises is null) throw new AccountException("Atualize o serviço para corrigir este registro.");
+            await Navigation.PushAsync(new WorkoutEditPage(_accounts, current));
+        }
+        catch (SessionExpiredException exception) { await DisplayAlertAsync("Acesso", exception.Message, "OK"); await Navigation.PopToRootAsync(); }
+        catch (AccountException exception) { ErrorText.Text = exception.Message; ErrorText.IsVisible = true; }
+        finally { _busy = false; EditButton.IsEnabled = RefreshButton.IsEnabled = true; }
     }
     private async void OnRefresh(object? sender, EventArgs args) => await LoadAsync();
 }

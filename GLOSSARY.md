@@ -22,3 +22,5 @@
 | Exclusão lógica | Retira a ficha do uso sem apagar versões e itens necessários à preservação dos registros. |
 | Série realizada | Repetições e carga efetivamente informadas pelo aluno; só entra no registro se marcada como feita. |
 | Idempotência | Repetir o mesmo ID e conteúdo de uma tentativa recupera o registro existente, sem duplicar ou sobrescrever o treino. |
+| Versão do registro | Número de edição do treino salvo, diferente da revisão da ficha usada como origem. |
+| Identificador da correção | editId que permite reconhecer uma edição já aceita e repetir a tentativa sem sobrescrever outra versão. |

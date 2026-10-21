@@ -38,14 +38,14 @@ Fonte: Roteiro Workoutly e Roteiro Fase 2 na pasta superior. A Fase 2 descreve u
 | AUTH-02 | AUTH-01 | Autorização dos próximos recursos | Parcial: perfil e exercícios isolados. Fichas e vínculos autorizados e testados. Sessões próprias também estão isoladas. Faltam indicadores e consulta de sessões pelo professor. |
 | FICHA-01 | EX-01, VINC-01 | Concluído: criar, consultar, editar e excluir fichas | Fichas próprias e de alunos vinculados; ordem, séries, repetições, revisões imutáveis e exclusão lógica. Evidências em docs/evidencias/fichas.md; sessões integradas em TREINO-01; indicadores ainda pendentes. |
 | TREINO-01 | FICHA-01 | Concluído: registrar sessão | Séries realizadas, cargas decimais, repetições, duração, observações e consulta própria; revisão original preservada e reenvio sem duplicação. Evidências em docs/evidencias/treinos.md. |
-| TREINO-02 | TREINO-01 | Corrigir registros próprios | Editar uma sessão, recalcular indicadores e manter dados de outros usuários intactos. |
+| TREINO-02 | TREINO-01 | Concluído: corrigir registros próprios | Edição de séries, repetições, cargas, duração e observações; volume/contagens recalculados; versões e reenvio seguro, sem alterar contas alheias. Evidências em docs/evidencias/correcao-treinos.md. |
 | HIST-01 | TREINO-02, VINC-01 | Histórico e indicadores | Histórico, frequência, volume e evolução de carga a partir das sessões; professor acompanha somente alunos vinculados. |
 | UX-01 | HIST-01 | Uso online compreensível | Carregamento, estados vazios e erros claros; falha de rede preserva o formulário para tentar novamente. |
 | QA-01 | UX-01 | Validação multiplataforma | Fluxo completo no iOS e Android; registrar dispositivo, ambiente, versão, resultados e limites. |
 | AVAL-01 | QA-01 | Avaliação com três adultos | Consentimento, P1/P2/P3, tarefas, tempo, erros, ajuda, notas de facilidade 1–5 e comentários reais. |
 | DOC-01 | AVAL-01 | Documentação final | Resultados ligados às evidências, limitações explícitas, referências e declaração de uso de IA. |
 
-Os demais incrementos estão **pendentes**, começando por TREINO-02; AUTH-02 permanece parcial. Critérios da avaliação: três participantes concluem o fluxo principal sem auxílio, média de facilidade ≥ 4/5 e nenhuma falha crítica ou perda de dados. Se os resultados divergirem, relatar a divergência; nunca preencher resultados fictícios.
+Os demais incrementos estão **pendentes**, começando por HIST-01; AUTH-02 permanece parcial. Critérios da avaliação: três participantes concluem o fluxo principal sem auxílio, média de facilidade ≥ 4/5 e nenhuma falha crítica ou perda de dados. Se os resultados divergirem, relatar a divergência; nunca preencher resultados fictícios.
 
 ## Fora do MVP
 
