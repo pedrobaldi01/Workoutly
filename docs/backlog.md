@@ -2,6 +2,8 @@
 
 Fonte: Roteiro Workoutly e Roteiro Fase 2 na pasta superior. A Fase 2 descreve uma entrega histórica; não comprova implementação ou testes desta nova versão.
 
+Balanço consolidado em 21/10/2026: [situação atual e aderência à Fase 2](situacao-atual-e-aderencia-fase-2.md), referente ao app 0.11.0: base validada bf5e0a6/tag v0.11.0-experiencia-uso e código atual 64cb525 após pull do GitHub, cujas alterações ainda precisam de nova validação. A consolidação é documental e não encerra a avaliação nem o relatório final.
+
 ## Etapa contratada agora
 
 | ID | Incremento | Aceite | Estado |
@@ -44,10 +46,21 @@ Fonte: Roteiro Workoutly e Roteiro Fase 2 na pasta superior. A Fase 2 descreve u
 | HIST-01 | TREINO-02, VINC-01 | Concluído: histórico e indicadores | Filtro por datas, frequência, dias ativos, séries, repetições, duração, volume e evolução de carga; professor consulta somente alunos vinculados. Evidências em docs/evidencias/historico.md. |
 | UX-01 | HIST-01 | Concluído: uso online compreensível | Confirmação de saída com alterações, estados de lista distintos, nova tentativa, recuperação de acesso e erros visíveis; campos preservados em falha de rede. Evidências em docs/evidencias/experiencia-de-uso.md. |
 | QA-01 | UX-01 | Validação multiplataforma | Fluxo completo no iOS e Android; registrar dispositivo, ambiente, versão, resultados e limites. |
-| AVAL-01 | QA-01 | Avaliação com três adultos | Consentimento, P1/P2/P3, tarefas, tempo, erros, ajuda, notas de facilidade 1–5 e comentários reais. |
-| DOC-01 | AVAL-01 | Documentação final | Resultados ligados às evidências, limitações explícitas, referências e declaração de uso de IA. |
+| AVAL-01 | QA-01 | Avaliação com três adultos | Preparar consentimento, entrevista, tarefas, observação e questionário de 1–5; aplicar com P1/P2/P3 e registrar tempos, erros, ajuda, integridade e comentários reais. |
+| DOC-01 | AVAL-01 | Documentação final | Resultados individuais e consolidados ligados às evidências, análise dos critérios de sucesso, limitações, figuras com título/fonte e declaração do uso efetivo de IA revisada pelo grupo. |
 
 Os demais incrementos estão **pendentes**, começando por QA-01. AUTH-02, HIST-01 e UX-01 estão concluídos. Critérios da avaliação: três participantes concluem o fluxo principal sem auxílio, média de facilidade ≥ 4/5 e nenhuma falha crítica ou perda de dados. Se os resultados divergirem, relatar a divergência; nunca preencher resultados fictícios.
+
+## Consolidação acadêmica e entrega
+
+A comparação com os DOCX identificou entregas que precisam ser acompanhadas além do desenvolvimento. São desdobramentos dos objetivos e da seção 9 da Fase 2, sem ampliar as funcionalidades do MVP.
+
+| ID | Dependência | Requisito | Critério de aceite / estado |
+| --- | --- | --- | --- |
+| DOC-02 | Arquitetura implementada | Consolidar fundamentação e artefatos de projeto | **Pendente.** Mapa conceitual específico, revisão das fichas de fontes já existentes no roteiro, diagrama de arquitetura, modelo de entidades compatível com esquema 7 e índice dos contratos HTTP. Pode avançar em paralelo a QA-01. |
+| ENTREGA-01 | Versão a apresentar e destino definido pelo grupo | Código disponível ao professor no forge | **Parcial.** Repositório informado: https://github.com/pedrobaldi01/Workoutly; origin configurado e commit remoto 64cb525 integrado. Faltam comprovar acesso do professor e fixar versão/pacote final. Não publicar automaticamente. |
+
+Antes da redação final, confirmar a lista oficial de integrantes: a Fase 2 acrescenta João Azambuja aos nomes do roteiro inicial. Preservar as entregas antigas e registrar a evolução em nova versão. Os diagramas/instrumentos não foram criados por este balanço; permanecem tarefas a executar. Slides continuam adiados.
 
 ## Fora do MVP
 

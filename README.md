@@ -4,6 +4,8 @@ Aplicativo acadêmico de acompanhamento de treinos, criado do zero para o Projet
 
 ## Situação atual
 
+O [balanço de aderência aos roteiros e à Fase 2](docs/situacao-atual-e-aderencia-fase-2.md) consolida o que já foi implementado, as evidências disponíveis e as pendências técnicas e acadêmicas da versão 0.11.0. Inclui a comparação por seção do relatório e um plano de fechamento sem modificar as entregas originais.
+
 O app já permite **cadastro, login, recuperação de sessão, logout e catálogo de exercícios**, integrado à API e ao MySQL. Há dez exercícios iniciais compartilhados e cadastro de exercícios privados da conta, com busca e detalhes. A sessão fica no armazenamento seguro do aparelho e é revogada no servidor ao sair. Fichas já permitem criar, consultar, editar, ordenar exercícios e excluir com revisões preservadas. O aluno também registra séries realizadas, cargas, duração e observações e recupera seus treinos salvos. Correção dos registros próprios já está disponível em Histórico e evolução → Ver treino → Corrigir treino, com totais recalculados. Histórico por período, frequência, volume e evolução de carga estão disponíveis; o professor consulta somente alunos vinculados. A experiência de uso já inclui confirmação ao sair de formulários alterados, recuperação de acesso e distinção entre falha de carregamento e listas vazias. A validação multiplataforma e a avaliação final do MVP permanecem pendentes.
 
 Nenhum código do aplicativo anterior foi reutilizado. Os roteiros enviados ao professor permanecem na pasta superior, sem alterações.
