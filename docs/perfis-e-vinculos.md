@@ -1,6 +1,6 @@
 # Perfis e vínculo de acompanhamento
 
-Decisão do usuário: dois perfis, **aluno** e **professor/admin**. O professor poderá montar fichas e acompanhar treinos dos alunos vinculados. Neste incremento foram implementados os acessos e o vínculo; fichas, sessões e acompanhamento dos registros continuam nas próximas etapas.
+Decisão do usuário: dois perfis, **aluno** e **professor/admin**. O professor poderá montar fichas e acompanhar treinos dos alunos vinculados. A base de acessos e vínculo está concluída. Fichas também foram implementadas no incremento seguinte, descrito em fichas.md; sessões e acompanhamento de registros continuam pendentes.
 
 ## Como usar
 
@@ -52,7 +52,7 @@ No app, `Services/AccountClient.cs` recebe o papel e realiza HTTP usando a sess�
 | POST /enrollment | Aluno | Corpo com code; 201 vínculo criado, 200 se já era o mesmo, 400 código inválido/expirado, 409 se outro professor já está vinculado. |
 | DELETE /enrollment | Aluno | 204, remove somente o vínculo da conta autenticada. |
 
-Sem sessão: 401. Perfil incorreto: 403. Falhas de banco: 503 genérico. Fora de Development, exigir HTTPS; respostas dessas rotas usam no-store. Um vínculo não muda a autorização atual do catálogo: exercícios privados continuam pertencendo ao próprio criador. O acesso às fichas e registros de aluno será definido e testado junto com esses recursos.
+Sem sessão: 401. Perfil incorreto: 403. Falhas de banco: 503 genérico. Fora de Development, exigir HTTPS; respostas dessas rotas usam no-store. Um vínculo não muda a autorização atual do catálogo: exercícios privados continuam pertencendo ao próprio criador. O acesso às fichas usa o vínculo ativo, conforme fichas.md. Acesso a sessões ainda será implementado.
 
 ## Como testar
 

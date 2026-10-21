@@ -22,7 +22,20 @@ public sealed record ExerciseItem(string Id, string Name, string MuscleGroup, st
 }
 public sealed record CreateExercisePayload(string Name, string MuscleGroup, string Equipment, string Description);
 
+public sealed record PlanExerciseItem(string ExerciseId, string Name, string MuscleGroup, string Equipment, string Description, int Sets, int Repetitions);
+public sealed record PlanItem(string Id, string StudentId, string Name, string Notes, int Version, PlanExerciseItem[] Exercises)
+{
+    public string Summary => $"{Exercises.Length} exercício(s) • {Exercises.Sum(item => item.Sets)} séries previstas";
+}
+public sealed record PlanExercisePayload(string ExerciseId, int Sets, int Repetitions);
+public sealed record CreatePlanPayload(string Id, string Name, string Notes, PlanExercisePayload[] Exercises);
+public sealed record UpdatePlanPayload(int Version, string Name, string Notes, PlanExercisePayload[] Exercises);
+
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
+[JsonSerializable(typeof(PlanItem))]
+[JsonSerializable(typeof(PlanItem[]))]
+[JsonSerializable(typeof(CreatePlanPayload))]
+[JsonSerializable(typeof(UpdatePlanPayload))]
 [JsonSerializable(typeof(AccountProfile))]
 [JsonSerializable(typeof(AccountProfile[]))]
 [JsonSerializable(typeof(TeacherInvitation))]
@@ -136,6 +149,22 @@ public sealed class AccountClient
         return await SendAsync(HttpMethod.Post, "exercises", content, AccountJson.Default.ExerciseItem, true);
     }
 
+    private static string PlansPath(string? studentId) => studentId is null ? "plans" : $"teaching/students/{Uri.EscapeDataString(studentId)}/plans";
+    public Task<PlanItem[]> GetPlansAsync(string? studentId) => SendAsync(HttpMethod.Get, PlansPath(studentId), null, AccountJson.Default.PlanItemArray, true);
+    public Task<PlanItem> GetPlanAsync(string? studentId, string id) => SendAsync(HttpMethod.Get, $"{PlansPath(studentId)}/{Uri.EscapeDataString(id)}", null, AccountJson.Default.PlanItem, true);
+    public async Task<PlanItem> SavePlanAsync(string? studentId, string id, int version, string name, string notes, PlanExercisePayload[] exercises)
+    {
+        using var content = version == 0
+            ? JsonContent.Create(new CreatePlanPayload(id, name, notes, exercises), AccountJson.Default.CreatePlanPayload)
+            : JsonContent.Create(new UpdatePlanPayload(version, name, notes, exercises), AccountJson.Default.UpdatePlanPayload);
+        return await SendAsync(version == 0 ? HttpMethod.Post : HttpMethod.Put,
+            version == 0 ? PlansPath(studentId) : $"{PlansPath(studentId)}/{Uri.EscapeDataString(id)}", content, AccountJson.Default.PlanItem, true);
+    }
+    public async Task DeletePlanAsync(string? studentId, string id, int version)
+    {
+        using var response = await RequestAsync(HttpMethod.Delete, $"{PlansPath(studentId)}/{Uri.EscapeDataString(id)}?version={version}", null, true);
+    }
+
     public async Task LogoutAsync()
     {
         try
@@ -202,7 +231,7 @@ public sealed class AccountClient
                 throw new AccountException("E-mail ou senha inválidos.");
             }
             if (response.StatusCode == HttpStatusCode.Conflict)
-                throw new AccountException(path == "auth/register" ? "Este e-mail já está cadastrado. Use Entrar." : "Você já tem um professor vinculado. Remova o vínculo atual antes de trocar.");
+                throw new AccountException(path == "auth/register" ? "Este e-mail já está cadastrado. Use Entrar." : path == "enrollment" ? "Você já tem um professor vinculado. Remova o vínculo atual antes de trocar." : "A ficha já foi salva, alterada ou excluída. Seus campos foram preservados. Volte à lista ou recarregue a ficha para abrir a versão atual.");
             if (response.StatusCode == HttpStatusCode.Forbidden)
                 throw new AccountException("Seu perfil não tem permissão para esta ação. Volte à sua conta e atualize o acesso.");
             if (response.StatusCode == HttpStatusCode.NotFound)

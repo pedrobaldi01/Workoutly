@@ -58,7 +58,7 @@
                     <Button x:Name="ToggleButton" Text="Ainda não tem conta?  Cadastre-se" Clicked="OnToggle" Style="{StaticResource TextButton}" HorizontalOptions="Start" Padding="0" />
                 </VerticalStackLayout>
             </Grid>
-            <Grid x:Name="AccountPanel" Grid.RowSpan="2" RowDefinitions="Auto,Auto,Auto,Auto,*,Auto" RowSpacing="18" IsVisible="False">
+            <Grid x:Name="AccountPanel" Grid.RowSpan="2" RowDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto" RowSpacing="18" IsVisible="False">
                 <Grid ColumnDefinitions="*,46" ColumnSpacing="12" MinimumHeightRequest="62">
                     <VerticalStackLayout Spacing="4" VerticalOptions="Center">
                         <Label x:Name="Greeting" Style="{StaticResource SecondaryText}" FontSize="15" LineBreakMode="TailTruncation" />
@@ -66,7 +66,15 @@
                     </VerticalStackLayout>
                     <Image Grid.Column="1" Source="figma_avatar.svg" WidthRequest="46" HeightRequest="46" Aspect="AspectFit" VerticalOptions="Center" />
                 </Grid>
-                <Border Grid.Row="1" Style="{StaticResource SurfaceCard}" Padding="20,22,20,20" MinimumHeightRequest="244">
+                <Border Grid.Row="1" Style="{StaticResource SurfaceCard}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="ROTINA SEMANAL" Style="{StaticResource Eyebrow}" />
+                        <Label x:Name="PlansTitle" Text="Suas fichas de treino" FontFamily="InterSemiBold" FontSize="22" />
+                        <Label x:Name="PlansDescription" Text="Organize exercícios, séries e repetições para o próximo treino." Style="{StaticResource SecondaryText}" />
+                        <Button x:Name="PlansButton" Text="Minhas fichas" Clicked="OnPlans" AutomationId="open_plans" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="2" Style="{StaticResource SurfaceCard}" Padding="20,22,20,20" MinimumHeightRequest="244">
                     <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="11">
                         <Label Text="BIBLIOTECA DE EXERCÍCIOS" Style="{StaticResource Eyebrow}" FontSize="12" />
                         <Label Grid.Row="1" Text="Explore os movimentos" FontFamily="InterBold" FontSize="26" />
@@ -74,7 +82,7 @@
                         <Button Grid.Row="4" x:Name="ExercisesButton" Text="Explorar exercícios" Clicked="OnExercises" HeightRequest="48" AutomationId="open_exercises" />
                     </Grid>
                 </Border>
-                <Border Grid.Row="2" Style="{StaticResource SurfaceCard}">
+                <Border Grid.Row="3" Style="{StaticResource SurfaceCard}">
                     <VerticalStackLayout Spacing="8">
                         <Label Text="SUA CONTA" Style="{StaticResource Eyebrow}" />
                         <Label x:Name="AccountName" FontFamily="InterSemiBold" FontSize="19" />
@@ -82,14 +90,14 @@
                         <Label x:Name="AccountRole" FontFamily="InterSemiBold" FontSize="12" TextColor="{StaticResource Mint}" AutomationId="account_role" />
                     </VerticalStackLayout>
                 </Border>
-                <Border Grid.Row="3" Style="{StaticResource SurfaceCard}" BackgroundColor="{StaticResource SurfaceRaised}" Padding="16">
+                <Border Grid.Row="4" Style="{StaticResource SurfaceCard}" BackgroundColor="{StaticResource SurfaceRaised}" Padding="16">
                     <VerticalStackLayout Spacing="6">
                         <Label x:Name="ConnectionsTitle" FontFamily="InterSemiBold" TextColor="{StaticResource Mint}" FontSize="13" />
                         <Label x:Name="ConnectionsDescription" Style="{StaticResource SecondaryText}" />
                         <Button x:Name="ConnectionsButton" Text="Meu professor" Clicked="OnConnections" Style="{StaticResource SecondaryButton}" AutomationId="open_connections" />
                     </VerticalStackLayout>
                 </Border>
-                <Button Grid.Row="5" x:Name="LogoutButton" Text="Sair da conta" Clicked="OnLogout" Style="{StaticResource SecondaryButton}" />
+                <Button Grid.Row="6" x:Name="LogoutButton" Text="Sair da conta" Clicked="OnLogout" Style="{StaticResource SecondaryButton}" />
             </Grid>
             <VerticalStackLayout Grid.Row="2" Spacing="8">
                 <ActivityIndicator x:Name="Loading" IsVisible="False" />

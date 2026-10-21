@@ -32,6 +32,7 @@
                             <VerticalStackLayout Spacing="8">
                                 <Label Text="{Binding Name}" FontFamily="InterSemiBold" FontSize="18" />
                                 <Label Text="{Binding Email}" Style="{StaticResource SecondaryText}" LineBreakMode="CharacterWrap" />
+                                <Button Text="Fichas do aluno" CommandParameter="{Binding .}" Clicked="OnStudentPlans" Style="{StaticResource SecondaryButton}" />
                                 <Button Text="Remover vínculo" CommandParameter="{Binding Id}" Clicked="OnRemoveStudent" Style="{StaticResource TextButton}" TextColor="{StaticResource Mint}" />
                             </VerticalStackLayout>
                         </Border>

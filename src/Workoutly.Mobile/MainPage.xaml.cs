@@ -89,6 +89,9 @@ public partial class MainPage : ContentPage
         ConnectionsTitle.Text = _isTeacher ? "Seus alunos" : "Seu acompanhamento";
         ConnectionsDescription.Text = _isTeacher ? "Compartilhe seu código para receber os vínculos dos alunos." : "Use o código do seu professor para se vincular a ele.";
         ConnectionsButton.Text = _isTeacher ? "Meus alunos" : "Meu professor";
+        PlansTitle.Text = _isTeacher ? "Planeje para seus alunos" : "Suas fichas de treino";
+        PlansDescription.Text = _isTeacher ? "Abra um aluno vinculado para montar ou ajustar suas fichas." : "Organize exercícios, séries e repetições para o próximo treino.";
+        PlansButton.Text = _isTeacher ? "Montar fichas" : "Minhas fichas";
         Greeting.Text = $"Olá, {profile.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()}";
         Intro.IsVisible = false;
         AuthPanel.IsVisible = false;
@@ -100,6 +103,12 @@ public partial class MainPage : ContentPage
     {
         if (_busy) return;
         await Navigation.PushAsync(new ExercisesPage(_accounts));
+    }
+
+    private async void OnPlans(object? sender, EventArgs args)
+    {
+        if (_busy) return;
+        await Navigation.PushAsync(_isTeacher ? new ConnectionsPage(_accounts, true) : new PlansPage(_accounts));
     }
 
     private void ShowSignedOut()
@@ -138,5 +147,6 @@ public partial class MainPage : ContentPage
         ExercisesButton.IsEnabled = !busy;
         ConnectionButton.IsEnabled = !busy;
         ConnectionsButton.IsEnabled = !busy;
+        PlansButton.IsEnabled = !busy;
     }
 }

@@ -16,5 +16,7 @@
 | Sessão de acesso | Token que autentica a conta por até sete dias; diferente de uma sessão de treino. |
 | Logout | Revogação da sessão de acesso atual no MySQL e remoção do token do aparelho. |
 | Aluno | Perfil student, criado pelo cadastro público; acessa os próprios registros e pode se vincular a um professor. |
-| Professor/admin | Perfil teacher, criado pelo operador; administra o vínculo dos próprios alunos. Montar fichas e acompanhar os treinos desses alunos serão os próximos fluxos. |
+| Professor/admin | Perfil teacher, criado pelo operador; administra o vínculo dos próprios alunos. Gerencia fichas dos alunos atualmente vinculados; acompanhamento de sessões ainda pendente. |
 | Vínculo | Associação voluntária do aluno com um professor por código; neste MVP, um professor ativo por aluno. Pode ser removida sem apagar contas ou registros. |
+| Revisão da ficha | Versão imutável do planejamento, com cópia dos exercícios, séries e repetições previstas. |
+| Exclusão lógica | Retira a ficha do uso sem apagar versões e itens necessários à preservação dos registros. |

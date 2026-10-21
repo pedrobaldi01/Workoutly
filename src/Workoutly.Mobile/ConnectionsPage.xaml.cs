@@ -108,6 +108,14 @@ public partial class ConnectionsPage : ContentPage
         });
     }
 
+    private async void OnStudentPlans(object? sender, EventArgs args)
+    {
+        if (_busy || sender is not Button { CommandParameter: AccountProfile student }) return;
+        SetBusy(true);
+        try { await Navigation.PushAsync(new PlansPage(_accounts, student.Id, student.Name)); }
+        finally { SetBusy(false); }
+    }
+
     private void SetBusy(bool busy)
     {
         _busy = busy;

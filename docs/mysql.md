@@ -2,7 +2,7 @@
 
 ## O que este incremento entrega
 
-A API conecta ao MySQL com MySqlConnector 2.6.2. A preparação explícita aplica as versões 1 (bootstrap) e 2 (users e user_sessions) em `schema_migrations`. Essa tabela registra quais alterações foram aplicadas; users e user_sessions já sustentam cadastro e acesso; as tabelas de fichas e sessões de treino continuam pendentes.
+A API conecta ao MySQL com MySqlConnector 2.6.2. A preparação explícita aplica as versões 1 (bootstrap), 2 (contas/sessões de acesso), 3 (exercícios), 4 (perfis/vínculos) e 5 (fichas/revisões/itens) em `schema_migrations`. Essa tabela registra o esquema preparado. Sessões de treino continuam pendentes.
 
 O aplicativo MAUI já chama a API para conta e acesso; não conhece credenciais MySQL.
 
@@ -64,12 +64,12 @@ O banco e o usuário devem existir antes da migração; no caminho local o Compo
 | Rota | Significado | Resposta |
 | --- | --- | --- |
 | GET /health | Processo da API atende HTTP, mesmo sem banco. | 200; `databaseConfigured` indica somente a presença da configuração. |
-| GET /health/ready | Conexão ao banco escolhido e leitura da versão do esquema. | 200 se versão 4; 503 se não pronto. |
+| GET /health/ready | Conexão ao banco escolhido e leitura da versão do esquema. | 200 se versão 5; 503 se não pronto. |
 
 Exemplo de prontidão:
 
 ```json
-{"status":"ready","database":"ready","schemaVersion":4}
+{"status":"ready","database":"ready","schemaVersion":5}
 ```
 
 Estados sem prontidão: `not_configured`, `invalid_configuration`, `unreachable` ou `schema_pending`. A sondagem tem limite de 3 segundos. A resposta não revela conexão, usuário, senha ou detalhes do driver. Ela não executa DDL e não comprova requisitos futuros de autenticação ou treino.

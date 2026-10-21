@@ -4,12 +4,13 @@
 - Responda em português e explique o conceito, a decisão e a verificação ao concluir cada incremento.
 - Implementação nova: não reutilizar o aplicativo antigo. Documentos acadêmicos na pasta superior são fontes de requisitos e não devem ser editados sem pedido específico.
 - Stack: .NET 10, MAUI com XAML e code-behind, API ASP.NET Core e MySQL somente no servidor.
-- Cadastro, login, perfil, logout e catálogo de exercícios estão integrados ao MySQL pela API; o app usa SecureStorage para a sessão. Exercícios iniciais são compartilhados e cadastros próprios são privados. Fichas e treinos ainda não existem. Não apresentar planejamento como resultado.
+- Cadastro, login, perfil, logout e catálogo de exercícios estão integrados ao MySQL pela API; o app usa SecureStorage para a sessão. Exercícios iniciais são compartilhados e cadastros próprios são privados. Fichas próprias e de alunos vinculados estão implementadas com revisões; sessões de treino ainda não existem. Não apresentar planejamento como resultado.
 - Implementar o menor incremento completo pedido; evitar abstrações antecipadas, serviços vazios e recursos fora do MVP.
 - Identidade visual: seguir o Figma fornecido e docs/identidade-visual.md. Usar cores e estilos em Resources/Styles, fonte Inter e recursos locais originais; não voltar ao tema roxo padrão. Dados exemplificativos do protótipo não são registros reais.
 - Funcionalidades finais online; preservar formulário em falhas de rede. Não implementar sincronização offline.
 - Autenticação usa PasswordHasher do ASP.NET Core Identity e tokens opacos revogáveis, guardados somente como hash no servidor. Não substituir por hash simples de senha ou sessão em Preferences.
 - Dois perfis: student (aluno) e teacher (professor/admin). Cadastro público sempre cria aluno; professor somente pelo comando administrativo documentado em docs/perfis-e-vinculos.md. O papel vem do MySQL a cada requisição, nunca de seleção no cliente. Professor acessa somente alunos vinculados; manter essa regra ao implementar fichas e treinos.
+- Fichas pertencem ao aluno. Edição cria revisão imutável; exclusão é lógica. Futuras sessões devem referenciar a revisão executada sem depender da versão atual. Seguir docs/fichas.md.
 - Não embutir credenciais ou dados pessoais. Somente dados fictícios nos testes automatizados.
 - Ler docs/backlog.md e docs/arquitetura.md antes de alterar o escopo. Usar GLOSSARY.md para os termos.
 - Não adicionar integrações sociais, wearables, prescrição clínica ou AI Coach ao MVP.

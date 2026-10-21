@@ -40,9 +40,11 @@ As imagens de tela em docs/design são referências de comparação, não compon
 
 ## Adaptação ao estágio atual
 
-O protótipo apresenta fichas, treino em andamento e histórico com exemplos de quantidade, carga e sequência. Esses recursos continuam no backlog. A tela inicial usa a composição de cartões do design com a conta real e acesso funcional ao catálogo; não exibe os valores fictícios de progresso nem botões sem função para esses recursos futuros. A navegação inferior para fichas/histórico será ligada quando os respectivos fluxos existirem.
+O protótipo apresenta fichas, treino em andamento e histórico com exemplos de quantidade, carga e sequência. Fichas estão implementadas em PlansPage/PlanPage/PlanExercisePickerPage; execução e histórico continuam no backlog. A tela inicial usa a composição de cartões do design com a conta real e acesso funcional ao catálogo; não exibe os valores fictícios de progresso nem botões sem função para esses recursos futuros. Minhas fichas está acessível no início; o professor abre as fichas pela lista de alunos. A navegação para histórico permanece pendente.
 
 O comando Conexão continua acessível no topo do acesso para configurar o serviço. Cadastro, erros, carregamento, privacidade e estados vazios foram adaptados à paleta; são estados necessários do aplicativo que não aparecem nos frames consultados.
+
+PlansPage usa o frame Minhas fichas (5:4), consultado novamente em 21/10/2026, com dados reais de nome, observações e quantidade de exercícios/séries. Durações e recomendações fictícias do protótipo não são apresentadas. Os formulários e seleção reutilizam os tokens e componentes nativos existentes; não há imagens estáticas nesse frame.
 
 ## Como conferir
 
