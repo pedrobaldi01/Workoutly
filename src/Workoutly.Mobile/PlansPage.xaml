@@ -13,10 +13,11 @@
         </Grid>
         <VerticalStackLayout Grid.Row="2" Spacing="6">
             <ActivityIndicator x:Name="Loading" IsVisible="False" />
+            <Label x:Name="ListStatus" Style="{StaticResource SecondaryText}" />
             <Label x:Name="ErrorText" TextColor="{StaticResource Error}" IsVisible="False" AutomationId="plans_error" />
         </VerticalStackLayout>
         <CollectionView Grid.Row="3" x:Name="PlansList" SelectionMode="None" AutomationId="plans_list">
-            <CollectionView.EmptyView><Label Text="Nenhuma ficha carregada. Crie sua primeira ficha ou atualize a lista." Style="{StaticResource SecondaryText}" /></CollectionView.EmptyView>
+            <CollectionView.EmptyView><Label Text="Ainda não há fichas. Toque em Nova ficha para organizar o próximo treino." Style="{StaticResource SecondaryText}" /></CollectionView.EmptyView>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="services:PlanItem">
                     <Border Style="{StaticResource SurfaceCard}" Margin="0,0,0,12">

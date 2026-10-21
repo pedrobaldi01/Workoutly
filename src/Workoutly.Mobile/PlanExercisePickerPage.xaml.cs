@@ -18,12 +18,22 @@ public partial class PlanExercisePickerPage : ContentPage
     {
         if (_busy) return;
         SetBusy(true); ErrorText.IsVisible = false;
-        try { _exercises = await _accounts.GetExercisesAsync(); ApplyFilter(); }
+        _exercises = []; ExerciseList.ItemsSource = null; ExerciseList.IsVisible = false;
+        ListStatus.Text = "Carregando exercícios…";
+        try
+        {
+            _exercises = await _accounts.GetExercisesAsync(); ApplyFilter(); ExerciseList.IsVisible = true;
+            RefreshButton.Text = "Atualizar"; ListStatus.Text = "Toque para incluir. Exercícios já adicionados ficam ocultos.";
+        }
         catch (SessionExpiredException exception)
         {
             await DisplayAlertAsync("Acesso", exception.Message, "OK"); await Navigation.PopToRootAsync();
         }
-        catch (AccountException exception) { ErrorText.Text = exception.Message; ErrorText.IsVisible = true; }
+        catch (AccountException exception)
+        {
+            ErrorText.Text = exception.Message; ErrorText.IsVisible = true;
+            ListStatus.Text = "Lista não carregada."; RefreshButton.Text = "Tentar novamente";
+        }
         finally { SetBusy(false); }
     }
     private void ApplyFilter()
@@ -52,5 +62,6 @@ public partial class PlanExercisePickerPage : ContentPage
     {
         _busy = busy; Loading.IsVisible = Loading.IsRunning = busy;
         ExerciseList.IsEnabled = CreateButton.IsEnabled = RefreshButton.IsEnabled = !busy;
+        Search.IsEnabled = !busy && ExerciseList.IsVisible;
     }
 }

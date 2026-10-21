@@ -2,7 +2,7 @@ using System.Globalization;
 using Workoutly.Mobile.Services;
 namespace Workoutly.Mobile;
 
-public partial class PlanPage : ContentPage
+public partial class PlanPage : ContentPage, IConfirmLeave
 {
     private sealed record Row(PlanExerciseItem Item, Border View, Label Order, Entry Sets, Entry Repetitions);
     private readonly AccountClient _accounts;
@@ -11,14 +11,27 @@ public partial class PlanPage : ContentPage
     private readonly List<Row> _rows = [];
     private int _version;
     private bool _busy;
+    private bool _allowLeave;
+    private string[] _baseline = [];
 
     public PlanPage(AccountClient accounts, string? studentId, PlanItem? plan)
     {
         InitializeComponent();
+        FormFeedback.FollowError(PageScroll, ErrorText);
         _accounts = accounts;
         _studentId = studentId;
         _id = plan?.Id ?? Guid.NewGuid().ToString();
         if (plan is not null) ShowPlan(plan);
+        _baseline = FormValues();
+    }
+    private string[] FormValues() => new[] { NameEntry.Text ?? "", NotesEntry.Text ?? "" }
+        .Concat(_rows.SelectMany(row => new[] { row.Item.ExerciseId, row.Sets.Text ?? "", row.Repetitions.Text ?? "" })).ToArray();
+    public Task<bool> CanLeaveAsync()
+    {
+        if (_allowLeave) return Task.FromResult(true);
+        if (_busy) return Task.FromResult(false);
+        return FormValues().SequenceEqual(_baseline) ? Task.FromResult(true) :
+            DisplayAlertAsync("Descartar alterações da ficha?", "Os campos ainda não salvos serão perdidos. Você pode continuar editando para salvar depois.", "Descartar e voltar", "Continuar editando");
     }
     private Style StyleFor(string key) => (Style)Application.Current!.Resources[key];
     private void ShowPlan(PlanItem plan)
@@ -31,6 +44,7 @@ public partial class PlanPage : ContentPage
         ItemsPanel.Children.Clear();
         foreach (var item in plan.Exercises) AddRow(item);
         ReloadButton.IsVisible = DeleteButton.IsVisible = true;
+        _baseline = FormValues();
     }
     private void AddRow(PlanExerciseItem item)
     {
@@ -52,7 +66,17 @@ public partial class PlanPage : ContentPage
         var row = new Row(item, view, order, sets, reps);
         up.Clicked += (_, _) => Move(row, -1);
         down.Clicked += (_, _) => Move(row, 1);
-        remove.Clicked += (_, _) => { if (_busy) return; _rows.Remove(row); ItemsPanel.Children.Remove(view); Renumber(); };
+        remove.Clicked += async (_, _) =>
+        {
+            if (_busy) return;
+            _busy = true;
+            try
+            {
+                if (!await DisplayAlertAsync("Remover exercício da ficha?", $"{item.Name} e suas metas sairão desta edição. A mudança só será aplicada ao salvar.", "Remover", "Cancelar")) return;
+                _rows.Remove(row); ItemsPanel.Children.Remove(view); Renumber();
+            }
+            finally { _busy = false; }
+        };
         actions.Add(up); actions.Add(down, 1); actions.Add(remove, 2);
         _rows.Add(row);
         ItemsPanel.Children.Add(view);
@@ -70,6 +94,7 @@ public partial class PlanPage : ContentPage
     }
     private void Renumber()
     {
+        ErrorText.IsVisible = false;
         for (var i = 0; i < _rows.Count; i++) _rows[i].Order.Text = $"EXERCÍCIO {i + 1:00}";
         CountText.Text = $"Exercícios ({_rows.Count})";
     }
@@ -98,6 +123,7 @@ public partial class PlanPage : ContentPage
             items.Add(new(row.Item.ExerciseId, sets, reps));
         }
         await _accounts.SavePlanAsync(_studentId, _id, _version, name, NotesEntry.Text ?? string.Empty, items.ToArray());
+        _allowLeave = true;
         await Navigation.PopAsync();
     });
     private async void OnReload(object? sender, EventArgs args) => await ExecuteAsync(async () =>
@@ -109,6 +135,7 @@ public partial class PlanPage : ContentPage
     {
         if (!await DisplayAlertAsync("Excluir ficha?", "A ficha sairá da lista. As versões salvas serão preservadas.", "Excluir", "Cancelar")) return;
         await _accounts.DeletePlanAsync(_studentId, _id, _version);
+        _allowLeave = true;
         await Navigation.PopAsync();
     });
     private async Task ExecuteAsync(Func<Task> action)
@@ -117,15 +144,21 @@ public partial class PlanPage : ContentPage
         _busy = true;
         Form.IsEnabled = false;
         Loading.IsVisible = Loading.IsRunning = true;
+        SaveButton.Text = "Aguarde…";
         ErrorText.IsVisible = false;
         try { await action(); }
         catch (SessionExpiredException exception)
         {
             await DisplayAlertAsync("Acesso", exception.Message, "OK");
+            _allowLeave = true;
             await Navigation.PopToRootAsync();
         }
         catch (AccountException exception) { ShowError(exception.Message); }
-        finally { _busy = false; Form.IsEnabled = true; Loading.IsVisible = Loading.IsRunning = false; }
+        finally
+        {
+            _busy = false; Form.IsEnabled = true; Loading.IsVisible = Loading.IsRunning = false; SaveButton.Text = "Salvar ficha";
+            if (ErrorText.IsVisible) await PageScroll.ScrollToAsync(ErrorText, ScrollToPosition.End, true);
+        }
     }
     private void ShowError(string message) { ErrorText.Text = message; ErrorText.IsVisible = true; }
 }

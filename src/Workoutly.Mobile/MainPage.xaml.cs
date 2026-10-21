@@ -12,23 +12,31 @@ public partial class MainPage : ContentPage
     public MainPage()
     {
         InitializeComponent();
+        FormFeedback.FollowError(PageScroll, ErrorText);
         AddressEntry.Text = _accounts.ApiUrl;
     }
 
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        await RestoreAccessAsync();
+    }
+
+    private async Task RestoreAccessAsync()
+    {
         if (_busy) return;
         SetBusy(true);
+        ErrorText.IsVisible = RetryAccessButton.IsVisible = false;
         try
         {
             var profile = await _accounts.RestoreAsync();
             if (profile is not null) ShowAccount(profile);
             else ShowSignedOut();
         }
-        catch (AccountException exception) { ShowError(exception.Message); }
+        catch (AccountException exception) { ShowError(exception.Message); RetryAccessButton.IsVisible = true; }
         finally { SetBusy(false); }
     }
+    private async void OnRetryAccess(object? sender, EventArgs args) => await RestoreAccessAsync();
 
     private async void OnSubmit(object? sender, EventArgs args)
     {
@@ -61,6 +69,7 @@ public partial class MainPage : ContentPage
         UpdateAccessCopy();
         PasswordEntry.Text = ConfirmEntry.Text = string.Empty;
         ErrorText.IsVisible = false;
+        RetryAccessButton.IsVisible = false;
     }
 
     private void OnConnection(object? sender, EventArgs args) => ConnectionPanel.IsVisible = !ConnectionPanel.IsVisible;
@@ -70,6 +79,7 @@ public partial class MainPage : ContentPage
         if (_busy) return;
         SetBusy(true);
         ErrorText.IsVisible = false;
+        RetryAccessButton.IsVisible = false;
         try
         {
             await _accounts.LogoutAsync();
@@ -81,6 +91,7 @@ public partial class MainPage : ContentPage
 
     private void ShowAccount(AccountProfile profile)
     {
+        RetryAccessButton.IsVisible = false;
         AccountName.Text = profile.Name;
         AccountEmail.Text = profile.Email;
         _isTeacher = profile.Role == "teacher";
@@ -100,22 +111,16 @@ public partial class MainPage : ContentPage
         ErrorText.IsVisible = false;
     }
 
-    private async void OnExercises(object? sender, EventArgs args)
-    {
-        if (_busy) return;
-        await Navigation.PushAsync(new ExercisesPage(_accounts));
-    }
+    private async void OnExercises(object? sender, EventArgs args) => await OpenAsync(() => new ExercisesPage(_accounts));
 
     private async void OnPlans(object? sender, EventArgs args)
     {
-        if (_busy) return;
-        await Navigation.PushAsync(_isTeacher ? new ConnectionsPage(_accounts, true) : new PlansPage(_accounts));
+        await OpenAsync(() => _isTeacher ? new ConnectionsPage(_accounts, true) : new PlansPage(_accounts));
     }
 
     private async void OnWorkouts(object? sender, EventArgs args)
     {
-        if (_busy || _isTeacher) return;
-        await Navigation.PushAsync(new WorkoutsPage(_accounts));
+        if (!_isTeacher) await OpenAsync(() => new WorkoutsPage(_accounts));
     }
 
     private void ShowSignedOut()
@@ -128,8 +133,15 @@ public partial class MainPage : ContentPage
 
     private async void OnConnections(object? sender, EventArgs args)
     {
+        await OpenAsync(() => new ConnectionsPage(_accounts, _isTeacher));
+    }
+
+    private async Task OpenAsync(Func<Page> createPage)
+    {
         if (_busy) return;
-        await Navigation.PushAsync(new ConnectionsPage(_accounts, _isTeacher));
+        SetBusy(true);
+        try { await Navigation.PushAsync(createPage()); }
+        finally { SetBusy(false); }
     }
 
     private void UpdateAccessCopy()
@@ -148,6 +160,7 @@ public partial class MainPage : ContentPage
     private void SetBusy(bool busy)
     {
         _busy = busy;
+        RetryAccessButton.IsEnabled = !busy;
         Loading.IsVisible = Loading.IsRunning = busy;
         AuthPanel.IsEnabled = !busy;
         LogoutButton.IsEnabled = !busy;

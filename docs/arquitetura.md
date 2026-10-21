@@ -30,6 +30,8 @@ WorkoutEditPage corrige as séries da revisão original, duração e observaçõ
 
 WorkoutsPage agora consulta /history por período e apresenta indicadores, frequência e evolução por exercício. WorkoutHistoryService lê sessões e séries em uma transação consistente, sem gravar totais ou gráficos em tabelas separadas. Professor acessa /teaching/students/{studentId}/history e detalhes das sessões somente enquanto existir o vínculo protegido na mesma transação. O esquema permanece na versão 7. Armazenamento local, fórmulas e contratos estão em historico-e-armazenamento.md.
 
+AppShell coordena a confirmação de saída nos retornos canceláveis das páginas que implementam IConfirmLeave. Cada página compara seus campos para decidir se precisa confirmar. FormFeedback acompanha o tamanho das mensagens e revela os erros no ScrollView; listas distinguem carregamento, falha e vazio. MainPage permite repetir a recuperação de sessão sem novo login em falha de conexão. Esses estados são da interface e não alteram a API ou o esquema. Detalhes em experiencia-de-uso.md.
+
 ## Aprendizado deste incremento
 
 - **Solução**: agrupa os projetos para a IDE; não é um servidor nem o aplicativo.

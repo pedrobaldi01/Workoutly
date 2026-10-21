@@ -4,7 +4,7 @@ using System.Net;
 using Workoutly.Mobile.Services;
 namespace Workoutly.Mobile;
 
-public partial class WorkoutPage : ContentPage
+public partial class WorkoutPage : ContentPage, IConfirmLeave
 {
     private sealed record SetRow(Grid View, Entry Repetitions, Entry Weight, CheckBox Done);
     private sealed record ExerciseRows(PlanExerciseItem Item, VerticalStackLayout SetsPanel, List<SetRow> Sets);
@@ -17,11 +17,12 @@ public partial class WorkoutPage : ContentPage
     private readonly List<ExerciseRows> _exercises = [];
     private CreateWorkoutPayload? _submission;
     private bool _busy;
-    private bool _leaving;
+    private bool _allowLeave;
 
     public WorkoutPage(AccountClient accounts, PlanItem plan)
     {
         InitializeComponent(); _accounts = accounts; _plan = plan;
+        FormFeedback.FollowError(PageScroll, ErrorText);
         PlanName.Text = plan.Name;
         PlanNotes.Text = plan.Notes;
         PlanNotes.IsVisible = !string.IsNullOrEmpty(plan.Notes);
@@ -29,21 +30,14 @@ public partial class WorkoutPage : ContentPage
         _timer = Dispatcher.CreateTimer();
         _timer.Interval = TimeSpan.FromSeconds(1);
         _timer.Tick += (_, _) => UpdateDuration();
-        Shell.SetBackButtonBehavior(this, new BackButtonBehavior { Command = new Command(async () => await LeaveAsync()) });
     }
     protected override void OnAppearing() { base.OnAppearing(); UpdateDuration(); if (_submission is null) _timer.Start(); }
     protected override void OnDisappearing() { _timer.Stop(); base.OnDisappearing(); }
-    protected override bool OnBackButtonPressed() { _ = LeaveAsync(); return true; }
-    private async Task LeaveAsync()
+    public Task<bool> CanLeaveAsync()
     {
-        if (_busy || _leaving) return;
-        _leaving = true;
-        try
-        {
-            if (await DisplayAlertAsync("Sair deste treino?", "Os dados que ainda não foram salvos serão descartados. Se houve falha no envio, confira os treinos salvos antes de registrar outra vez.", "Sair", "Continuar aqui"))
-                await Navigation.PopAsync();
-        }
-        finally { _leaving = false; }
+        if (_allowLeave) return Task.FromResult(true);
+        if (_busy) return Task.FromResult(false);
+        return DisplayAlertAsync("Sair deste treino?", "Os dados que ainda não foram salvos serão descartados. Se houve falha no envio, confira o histórico antes de registrar outra vez.", "Sair do treino", "Continuar treino");
     }
     private int ElapsedSeconds => (int)Math.Min(int.MaxValue, Math.Max(1, Stopwatch.GetElapsedTime(_startTimestamp).TotalSeconds));
     private void UpdateDuration() => DurationText.Text = WorkoutSummaryItem.FormatDuration(_submission?.DurationSeconds ?? ElapsedSeconds);
@@ -137,6 +131,7 @@ public partial class WorkoutPage : ContentPage
         }
         catch (SessionExpiredException exception)
         {
+            _allowLeave = true;
             await DisplayAlertAsync("Acesso", exception.Message, "OK"); await Navigation.PopToRootAsync();
         }
         catch (AccountException exception)

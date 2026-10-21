@@ -27,13 +27,24 @@ public partial class PlansPage : ContentPage
         ErrorText.IsVisible = false;
         // Não manter dados de um aluno visíveis após perder o vínculo.
         PlansList.ItemsSource = null;
-        try { PlansList.ItemsSource = await _accounts.GetPlansAsync(_studentId); }
+        PlansList.IsVisible = false;
+        try
+        {
+            var plans = await _accounts.GetPlansAsync(_studentId);
+            PlansList.ItemsSource = plans; PlansList.IsVisible = true;
+            ListStatus.Text = $"{plans.Length} ficha(s) • abra para editar";
+            RefreshButton.Text = "Atualizar";
+        }
         catch (SessionExpiredException exception)
         {
             await DisplayAlertAsync("Acesso", exception.Message, "OK");
             await Navigation.PopToRootAsync();
         }
-        catch (AccountException exception) { ErrorText.Text = exception.Message; ErrorText.IsVisible = true; }
+        catch (AccountException exception)
+        {
+            ErrorText.Text = exception.Message; ErrorText.IsVisible = true;
+            ListStatus.Text = "Lista não carregada."; RefreshButton.Text = "Tentar novamente";
+        }
         finally { SetBusy(false); }
     }
     private async void OnRefresh(object? sender, EventArgs args) => await LoadAsync();
@@ -70,6 +81,7 @@ public partial class PlansPage : ContentPage
     {
         _busy = busy;
         Loading.IsVisible = Loading.IsRunning = busy;
+        if (busy) ListStatus.Text = "Carregando fichas…";
         CreateButton.IsEnabled = RefreshButton.IsEnabled = PlansList.IsEnabled = !busy;
     }
 }

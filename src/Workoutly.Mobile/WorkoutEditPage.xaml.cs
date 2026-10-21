@@ -3,7 +3,7 @@ using System.Net;
 using Workoutly.Mobile.Services;
 namespace Workoutly.Mobile;
 
-public partial class WorkoutEditPage : ContentPage
+public partial class WorkoutEditPage : ContentPage, IConfirmLeave
 {
     private sealed record SetRow(VerticalStackLayout View, Label Order, Entry Repetitions, Entry Weight);
     private sealed record ExerciseRows(PlanExerciseItem Item, VerticalStackLayout Panel, Label Empty, List<SetRow> Sets);
@@ -14,14 +14,16 @@ public partial class WorkoutEditPage : ContentPage
     private string _editId = Guid.NewGuid().ToString();
     private UpdateWorkoutPayload? _pending;
     private bool _busy;
-    private bool _leaving;
+    private bool _allowLeave;
+    private string[] _baseline = [];
 
     public WorkoutEditPage(AccountClient accounts, WorkoutSessionItem session)
     {
         InitializeComponent(); _accounts = accounts; _id = session.Id; ShowSession(session);
-        Shell.SetBackButtonBehavior(this, new BackButtonBehavior { Command = new Command(async () => await LeaveAsync()) });
+        FormFeedback.FollowError(PageScroll, ErrorText);
     }
-    protected override bool OnBackButtonPressed() { _ = LeaveAsync(); return true; }
+    private string[] FormValues() => new[] { HoursEntry.Text ?? "", MinutesEntry.Text ?? "", SecondsEntry.Text ?? "", NotesEntry.Text ?? "" }
+        .Concat(_exercises.SelectMany(exercise => new[] { exercise.Item.ExerciseId }.Concat(exercise.Sets.SelectMany(set => new[] { set.Repetitions.Text ?? "", set.Weight.Text ?? "" })))).ToArray();
     private Style StyleFor(string key) => (Style)Application.Current!.Resources[key];
     private void ShowSession(WorkoutSessionItem session)
     {
@@ -54,6 +56,7 @@ public partial class WorkoutEditPage : ContentPage
                 new Label { Text = item.Name, FontFamily = "InterSemiBold", FontSize = 19 },
                 new Label { Text = $"{item.MuscleGroup} • {item.Equipment}", Style = StyleFor("SecondaryText") }, empty, panel, add } } });
         }
+        _baseline = FormValues();
     }
     private void AddSet(ExerciseRows exercise, WorkoutSetItem? set)
     {
@@ -119,9 +122,10 @@ public partial class WorkoutEditPage : ContentPage
             }
             Form.IsEnabled = false;
             await _accounts.UpdateWorkoutAsync(_id, _pending);
+            _allowLeave = true;
             await Navigation.PopAsync();
         }
-        catch (SessionExpiredException exception) { await DisplayAlertAsync("Acesso", exception.Message, "OK"); await Navigation.PopToRootAsync(); }
+        catch (SessionExpiredException exception) { _allowLeave = true; await DisplayAlertAsync("Acesso", exception.Message, "OK"); await Navigation.PopToRootAsync(); }
         catch (AccountException exception)
         {
             if (exception.StatusCode is HttpStatusCode.BadRequest or HttpStatusCode.Conflict) _pending = null;
@@ -143,21 +147,18 @@ public partial class WorkoutEditPage : ContentPage
             var session = await _accounts.GetWorkoutAsync(_id);
             ShowSession(session); ErrorText.IsVisible = false;
         }
-        catch (SessionExpiredException exception) { await DisplayAlertAsync("Acesso", exception.Message, "OK"); await Navigation.PopToRootAsync(); }
+        catch (SessionExpiredException exception) { _allowLeave = true; await DisplayAlertAsync("Acesso", exception.Message, "OK"); await Navigation.PopToRootAsync(); }
         catch (AccountException exception) { ShowError(exception.Message); }
         finally { SetBusy(false); }
     }
-    private async Task LeaveAsync()
+    public Task<bool> CanLeaveAsync()
     {
-        if (_busy || _leaving) return;
-        _leaving = true;
-        try
-        {
-            if (await DisplayAlertAsync("Sair da edição?", "Alterações ainda não salvas nesta tela serão descartadas. Se o envio falhou, recarregue o registro para conferir o resultado.", "Sair", "Continuar editando")) await Navigation.PopAsync();
-        }
-        finally { _leaving = false; }
+        if (_allowLeave) return Task.FromResult(true);
+        if (_busy) return Task.FromResult(false);
+        return _pending is null && FormValues().SequenceEqual(_baseline) ? Task.FromResult(true) :
+            DisplayAlertAsync("Descartar correção?", "Alterações ainda não salvas serão descartadas. Se o envio falhou, recarregue o registro para conferir o resultado.", "Descartar e voltar", "Continuar editando");
     }
-    private async void OnCancel(object? sender, EventArgs args) => await LeaveAsync();
+    private async void OnCancel(object? sender, EventArgs args) { if (!_busy) await Navigation.PopAsync(); }
     private void SetBusy(bool busy)
     {
         _busy = busy; Loading.IsVisible = Loading.IsRunning = busy;

@@ -12,7 +12,7 @@
             <Label x:Name="ErrorText" TextColor="{StaticResource Error}" IsVisible="False" AutomationId="connections_error" />
         </VerticalStackLayout>
         <Grid Grid.Row="2" x:Name="TeacherPanel" RowDefinitions="Auto,Auto,*" RowSpacing="14" IsVisible="False">
-            <Border Style="{StaticResource SurfaceCard}">
+            <Border x:Name="InvitationCard" Style="{StaticResource SurfaceCard}" IsVisible="False">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="CÓDIGO DE VÍNCULO" Style="{StaticResource Eyebrow}" />
                     <Label x:Name="InvitationCode" Text="Sem código ativo" FontFamily="InterBold" FontSize="24" TextColor="{StaticResource Accent}" AutomationId="teacher_invitation" />
@@ -24,7 +24,7 @@
                 <Label x:Name="StudentsCount" Text="Alunos vinculados" FontFamily="InterSemiBold" FontSize="17" VerticalOptions="Center" />
                 <Button Grid.Column="1" x:Name="RefreshButton" Text="Atualizar" Clicked="OnRefresh" Style="{StaticResource TextButton}" />
             </Grid>
-            <CollectionView Grid.Row="2" x:Name="StudentsList" SelectionMode="None" AutomationId="teacher_students">
+            <CollectionView Grid.Row="2" x:Name="StudentsList" SelectionMode="None" AutomationId="teacher_students" IsVisible="False">
                 <CollectionView.EmptyView><Label Text="Nenhum aluno vinculado. Compartilhe seu código para começar." Style="{StaticResource SecondaryText}" /></CollectionView.EmptyView>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="services:AccountProfile">

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Workoutly.Mobile.PlanPage" Title="Ficha de treino">
-    <ScrollView>
+    <ScrollView x:Name="PageScroll">
         <VerticalStackLayout Padding="20,16" Spacing="14" MaximumWidthRequest="600">
             <Label Text="PLANEJAMENTO" Style="{StaticResource Eyebrow}" />
             <Label x:Name="Heading" Text="Nova ficha" Style="{StaticResource PageTitle}" />
@@ -20,14 +20,15 @@
                     </VerticalStackLayout>
                 </Border>
                 <Label x:Name="CountText" Text="Exercícios (0)" FontFamily="InterSemiBold" FontSize="18" />
+                <Label Text="Adicione um exercício para definir as metas da ficha. Os campos permanecem nesta tela se o envio falhar." Style="{StaticResource SecondaryText}" />
                 <VerticalStackLayout x:Name="ItemsPanel" Spacing="12" />
                 <Button Text="Adicionar exercício" Clicked="OnAdd" Style="{StaticResource SecondaryButton}" AutomationId="plan_add_exercise" />
+                <Label x:Name="ErrorText" TextColor="{StaticResource Error}" IsVisible="False" AutomationId="plan_error" />
                 <Button x:Name="SaveButton" Text="Salvar ficha" Clicked="OnSave" AutomationId="plan_save" />
                 <Button x:Name="ReloadButton" Text="Recarregar ficha" Clicked="OnReload" Style="{StaticResource TextButton}" IsVisible="False" />
                 <Button x:Name="DeleteButton" Text="Excluir ficha" Clicked="OnDelete" Style="{StaticResource TextButton}" TextColor="{StaticResource Error}" IsVisible="False" AutomationId="plan_delete" />
             </VerticalStackLayout>
             <ActivityIndicator x:Name="Loading" IsVisible="False" />
-            <Label x:Name="ErrorText" TextColor="{StaticResource Error}" IsVisible="False" AutomationId="plan_error" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

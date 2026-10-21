@@ -104,6 +104,7 @@
                 <ActivityIndicator x:Name="Loading" IsVisible="False" />
                 <Label x:Name="ErrorText" IsVisible="False" TextColor="{StaticResource Error}" AutomationId="account_error"
                        Padding="0,4" />
+                <Button x:Name="RetryAccessButton" Text="Tentar recuperar acesso" Clicked="OnRetryAccess" IsVisible="False" Style="{StaticResource SecondaryButton}" AutomationId="account_retry" />
             </VerticalStackLayout>
         </Grid>
     </ScrollView>

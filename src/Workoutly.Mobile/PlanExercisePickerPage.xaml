@@ -14,10 +14,10 @@
         <VerticalStackLayout Grid.Row="2" Spacing="6">
             <ActivityIndicator x:Name="Loading" IsVisible="False" />
             <Label x:Name="ErrorText" TextColor="{StaticResource Error}" IsVisible="False" />
-            <Label Text="Toque em um exercício para incluir. Itens já adicionados ficam ocultos." Style="{StaticResource SecondaryText}" />
+            <Label x:Name="ListStatus" Text="Toque para incluir. Exercícios já adicionados ficam ocultos." Style="{StaticResource SecondaryText}" />
         </VerticalStackLayout>
         <CollectionView Grid.Row="3" x:Name="ExerciseList" SelectionMode="Single" SelectionChanged="OnSelected" AutomationId="plan_exercise_picker">
-            <CollectionView.EmptyView><Label Text="Nenhum exercício disponível para esta busca." Style="{StaticResource SecondaryText}" /></CollectionView.EmptyView>
+            <CollectionView.EmptyView><Label Text="Nenhum exercício disponível. Ajuste a busca, confira os itens já incluídos ou cadastre outro exercício." Style="{StaticResource SecondaryText}" /></CollectionView.EmptyView>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="services:ExerciseItem">
                     <Border Style="{StaticResource SurfaceCard}" Margin="0,0,0,10">

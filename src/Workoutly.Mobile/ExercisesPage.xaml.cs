@@ -27,10 +27,13 @@ public partial class ExercisesPage : ContentPage
         if (_busy) return;
         SetBusy(true);
         ErrorText.IsVisible = false;
+        _exercises = []; ExerciseList.ItemsSource = null; ExerciseList.IsVisible = false;
+        StatusText.Text = "Carregando exercícios…";
         try
         {
             _exercises = await _accounts.GetExercisesAsync();
             ApplyFilter();
+            ExerciseList.IsVisible = true; RefreshButton.Text = "Atualizar";
         }
         catch (SessionExpiredException exception)
         {
@@ -43,7 +46,7 @@ public partial class ExercisesPage : ContentPage
         {
             ErrorText.Text = exception.Message;
             ErrorText.IsVisible = true;
-            StatusText.Text = "Não foi possível atualizar. Tente novamente.";
+            StatusText.Text = "Lista não carregada."; RefreshButton.Text = "Tentar novamente";
         }
         finally { SetBusy(false); }
     }
@@ -84,5 +87,6 @@ public partial class ExercisesPage : ContentPage
         _busy = busy;
         Loading.IsVisible = Loading.IsRunning = busy;
         CreateButton.IsEnabled = RefreshButton.IsEnabled = ExerciseList.IsEnabled = !busy;
+        Search.IsEnabled = OnlyMine.IsEnabled = !busy && ExerciseList.IsVisible;
     }
 }

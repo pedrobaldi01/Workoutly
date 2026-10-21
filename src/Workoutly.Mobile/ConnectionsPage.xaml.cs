@@ -28,14 +28,19 @@ public partial class ConnectionsPage : ContentPage
 
     private async Task RefreshAsync()
     {
+        InvitationCard.IsVisible = StudentsList.IsVisible = CurrentTeacherCard.IsVisible = JoinCard.IsVisible = false;
+        StudentsList.ItemsSource = null; StudentsCount.Text = "Carregando alunos…";
         if (_teacher)
         {
-            ShowInvitation(await _accounts.GetInvitationAsync());
+            var invitation = await _accounts.GetInvitationAsync();
             var students = await _accounts.GetStudentsAsync();
+            ShowInvitation(invitation);
             StudentsList.ItemsSource = students;
+            StudentsList.IsVisible = true;
             StudentsCount.Text = $"Alunos vinculados ({students.Length})";
         }
         else ShowEnrollment(await _accounts.GetEnrollmentAsync());
+        RefreshButton.Text = StudentRefreshButton.Text = "Atualizar";
     }
 
     private void ShowInvitation(TeacherInvitation invitation)
@@ -44,6 +49,7 @@ public partial class ConnectionsPage : ContentPage
         InvitationCode.Text = invitation.Code ?? "Sem código ativo";
         InvitationExpiry.Text = invitation.ExpiresAt is { } expiry ? $"Válido até {expiry.ToLocalTime():dd/MM/yyyy HH:mm}" : "O código permite que o aluno se vincule à sua conta.";
         GenerateButton.Text = _hasCode ? "Renovar código" : "Gerar código";
+        InvitationCard.IsVisible = true;
     }
 
     private void ShowEnrollment(EnrollmentInfo enrollment)
@@ -69,6 +75,8 @@ public partial class ConnectionsPage : ContentPage
         {
             ErrorText.Text = exception.Message;
             ErrorText.IsVisible = true;
+            StudentsCount.Text = "Não foi possível atualizar.";
+            RefreshButton.Text = StudentRefreshButton.Text = "Tentar novamente";
         }
         finally { SetBusy(false); }
     }
@@ -78,6 +86,7 @@ public partial class ConnectionsPage : ContentPage
     private async void OnGenerate(object? sender, EventArgs args) => await ExecuteAsync(async () =>
     {
         if (_hasCode && !await DisplayAlertAsync("Renovar código?", "O código anterior deixará de aceitar novos vínculos. Os alunos já vinculados permanecem na sua lista.", "Renovar", "Cancelar")) return;
+        InvitationCard.IsVisible = false;
         ShowInvitation(await _accounts.CreateInvitationAsync());
     });
 

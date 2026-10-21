@@ -2,16 +2,19 @@ using Workoutly.Mobile.Services;
 
 namespace Workoutly.Mobile;
 
-public partial class ExercisePage : ContentPage
+public partial class ExercisePage : ContentPage, IConfirmLeave
 {
     private readonly AccountClient _accounts;
     private bool _busy;
     private bool _saved;
+    private readonly bool _readOnly;
 
     public ExercisePage(AccountClient accounts, ExerciseItem? exercise = null)
     {
         InitializeComponent();
+        FormFeedback.FollowError(PageScroll, ErrorText);
         _accounts = accounts;
+        _readOnly = exercise is not null;
         if (exercise is null) return;
         Title = "Detalhes do exercício";
         Heading.Text = exercise.Name;
@@ -23,6 +26,14 @@ public partial class ExercisePage : ContentPage
         NameEntry.IsReadOnly = GroupEntry.IsReadOnly = EquipmentEntry.IsReadOnly = DescriptionEditor.IsReadOnly = true;
         SaveButton.IsVisible = false;
         PrivacyNote.IsVisible = !exercise.IsShared;
+    }
+
+    public Task<bool> CanLeaveAsync()
+    {
+        if (_saved || _readOnly) return Task.FromResult(true);
+        if (_busy) return Task.FromResult(false);
+        var changed = new[] { NameEntry.Text, GroupEntry.Text, EquipmentEntry.Text, DescriptionEditor.Text }.Any(value => !string.IsNullOrEmpty(value));
+        return !changed ? Task.FromResult(true) : DisplayAlertAsync("Descartar novo exercício?", "Os campos ainda não salvos serão perdidos.", "Descartar e voltar", "Continuar editando");
     }
 
     private async void OnSave(object? sender, EventArgs args)
@@ -40,6 +51,7 @@ public partial class ExercisePage : ContentPage
         catch (SessionExpiredException exception)
         {
             await DisplayAlertAsync("Acesso", exception.Message, "OK");
+            _saved = true;
             await Navigation.PopToRootAsync();
         }
         catch (AccountException exception)
@@ -47,7 +59,11 @@ public partial class ExercisePage : ContentPage
             ErrorText.Text = exception.Message;
             ErrorText.IsVisible = true;
         }
-        finally { SetBusy(false); }
+        finally
+        {
+            SetBusy(false);
+            if (ErrorText.IsVisible) await PageScroll.ScrollToAsync(ErrorText, ScrollToPosition.End, true);
+        }
     }
 
     private void SetBusy(bool busy)
@@ -55,5 +71,6 @@ public partial class ExercisePage : ContentPage
         _busy = busy;
         Loading.IsVisible = Loading.IsRunning = busy;
         Fields.IsEnabled = SaveButton.IsEnabled = !busy && !_saved;
+        SaveButton.Text = busy ? "Salvando exercício…" : "Salvar exercício";
     }
 }
