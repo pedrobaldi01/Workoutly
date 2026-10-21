@@ -13,12 +13,15 @@ public sealed record EnrollmentInfo(AccountProfile? Teacher);
 public sealed record JoinTeacherPayload(string Code);
 public sealed record AccountSession(string AccessToken, DateTimeOffset ExpiresAt, AccountProfile User);
 public sealed record LoginPayload(string Email, string Password);
-public sealed record RegisterPayload(string Name, string Email, string Password);
+public sealed record RegisterPayload(string Name, string Email, string Password, string Role);
 public sealed record StoredSession(string ApiUrl, string Token);
 public sealed record ExerciseItem(string Id, string Name, string MuscleGroup, string Equipment, string Description, bool IsShared)
 {
     public string Origin => IsShared ? "Catálogo inicial" : "Meu exercício";
     public string Summary => $"{MuscleGroup} • {Equipment}";
+    public ExerciseVisual? Visual => ExerciseVisuals.Find(Id);
+    public string? ImageSource => Visual?.ImageSource;
+    public string? QuickInstruction => Visual?.QuickInstruction;
 }
 public sealed record CreateExercisePayload(string Name, string MuscleGroup, string Equipment, string Description);
 
@@ -139,9 +142,9 @@ public sealed class AccountClient
         return await StoreSessionAsync(session);
     }
 
-    public async Task<AccountProfile> RegisterAsync(string name, string email, string password)
+    public async Task<AccountProfile> RegisterAsync(string name, string email, string password, string role)
     {
-        using var content = JsonContent.Create(new RegisterPayload(name.Trim(), email.Trim(), password), AccountJson.Default.RegisterPayload);
+        using var content = JsonContent.Create(new RegisterPayload(name.Trim(), email.Trim(), password, role), AccountJson.Default.RegisterPayload);
         var session = await SendAsync(HttpMethod.Post, "auth/register", content, AccountJson.Default.AccountSession, false);
         return await StoreSessionAsync(session);
     }

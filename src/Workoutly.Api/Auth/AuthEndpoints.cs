@@ -13,9 +13,12 @@ public static class AuthEndpoints
             var errors = Validate(request.Email, request.Password, registration: true);
             if (string.IsNullOrWhiteSpace(request.Name) || request.Name.Trim().Length is < 2 or > 120)
                 errors["name"] = ["Informe um nome entre 2 e 120 caracteres."];
+            var role = request.Role is null ? "student" : request.Role.Trim().ToLowerInvariant();
+            if (role is not ("student" or "teacher"))
+                errors["role"] = ["Escolha o perfil de aluno ou professor."];
             if (errors.Count > 0)
                 return Results.ValidationProblem(errors);
-            var session = await auth.RegisterAsync(request.Name!, request.Email!, request.Password!, cancellationToken);
+            var session = await auth.RegisterAsync(request.Name!, request.Email!, request.Password!, role, cancellationToken);
             return session is null ? Results.Conflict(new { message = "Este e-mail já está cadastrado." })
                 : Results.Json(session, statusCode: StatusCodes.Status201Created);
         }).RequireRateLimiting("account");
@@ -53,6 +56,6 @@ public static class AuthEndpoints
         return errors;
     }
 
-    public sealed record RegisterRequest(string? Name, string? Email, string? Password);
+    public sealed record RegisterRequest(string? Name, string? Email, string? Password, string? Role);
     public sealed record LoginRequest(string? Email, string? Password);
 }

@@ -8,6 +8,7 @@ public partial class MainPage : ContentPage
     private bool _registering;
     private bool _busy;
     private bool _isTeacher;
+    private string? _selectedRole;
 
     public MainPage()
     {
@@ -51,7 +52,8 @@ public partial class MainPage : ContentPage
             if (_registering && password != ConfirmEntry.Text)
                 throw new AccountException("As senhas não coincidem.");
             var profile = _registering
-                ? await _accounts.RegisterAsync(NameEntry.Text ?? string.Empty, email, password)
+                ? await _accounts.RegisterAsync(NameEntry.Text ?? string.Empty, email, password,
+                    _selectedRole ?? throw new AccountException("Escolha se deseja criar uma conta de aluno ou professor."))
                 : await _accounts.LoginAsync(email, password);
             PasswordEntry.Text = ConfirmEntry.Text = string.Empty;
             ShowAccount(profile);
@@ -60,6 +62,31 @@ public partial class MainPage : ContentPage
         finally { SetBusy(false); }
     }
 
+    private void OnChooseStudent(object? sender, EventArgs args) => BeginAccess("student");
+
+    private void OnChooseTeacher(object? sender, EventArgs args) => BeginAccess("teacher");
+
+    private void BeginAccess(string role)
+    {
+        if (_busy) return;
+        _selectedRole = role;
+        _registering = false;
+        RoleChoicePanel.IsVisible = false;
+        AuthPanel.IsVisible = true;
+        NamePanel.IsVisible = ConfirmPanel.IsVisible = false;
+        PasswordEntry.Text = ConfirmEntry.Text = string.Empty;
+        ErrorText.IsVisible = RetryAccessButton.IsVisible = false;
+        UpdateAccessCopy();
+    }
+
+    private void OnBackToRoles(object? sender, EventArgs args)
+    {
+        if (_busy) return;
+        _selectedRole = null;
+        _registering = false;
+        PasswordEntry.Text = ConfirmEntry.Text = string.Empty;
+        ShowSignedOut();
+    }
     private void OnToggle(object? sender, EventArgs args)
     {
         if (_busy) return;
@@ -95,7 +122,7 @@ public partial class MainPage : ContentPage
         AccountName.Text = profile.Name;
         AccountEmail.Text = profile.Email;
         _isTeacher = profile.Role == "teacher";
-        AccountRole.Text = _isTeacher ? "Professor / admin" : "Aluno";
+        AccountRole.Text = _isTeacher ? "Professor" : "Aluno";
         HomeTitle.Text = _isTeacher ? "Área do professor" : "Pronto para treinar?";
         ConnectionsTitle.Text = _isTeacher ? "Seus alunos" : "Seu acompanhamento";
         ConnectionsDescription.Text = _isTeacher ? "Compartilhe seu código para receber os vínculos dos alunos." : "Use o código do seu professor para se vincular a ele.";
@@ -106,6 +133,7 @@ public partial class MainPage : ContentPage
         WorkoutsButton.IsVisible = !_isTeacher;
         Greeting.Text = $"Olá, {profile.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()}";
         Intro.IsVisible = false;
+        RoleChoicePanel.IsVisible = false;
         AuthPanel.IsVisible = false;
         AccountPanel.IsVisible = true;
         ErrorText.IsVisible = false;
@@ -125,8 +153,12 @@ public partial class MainPage : ContentPage
 
     private void ShowSignedOut()
     {
+        _selectedRole = null;
+        _registering = false;
         AccountPanel.IsVisible = false;
-        AuthPanel.IsVisible = true;
+        AuthPanel.IsVisible = false;
+        RoleChoicePanel.IsVisible = true;
+        NamePanel.IsVisible = ConfirmPanel.IsVisible = false;
         Intro.IsVisible = true;
         UpdateAccessCopy();
     }
@@ -146,8 +178,19 @@ public partial class MainPage : ContentPage
 
     private void UpdateAccessCopy()
     {
-        Heading.Text = _registering ? "Seu próximo treino\ncomeça aqui." : "Treinos claros.\nProgresso visível.";
-        Subtitle.Text = _registering ? "Crie sua conta para organizar suas fichas e acompanhar sua evolução." : "Organize suas fichas e acompanhe sua evolução em um só lugar.";
+        if (_selectedRole is null)
+        {
+            Heading.Text = "Treinos claros.\nProgresso visível.";
+            Subtitle.Text = "Escolha como deseja acessar para entrar ou criar sua conta.";
+            return;
+        }
+
+        var roleName = _selectedRole == "teacher" ? "professor" : "aluno";
+        Heading.Text = _registering ? $"Sua conta de {roleName}\ncomeça aqui." : $"Acesse como {roleName}.";
+        Subtitle.Text = _registering
+            ? $"Crie sua conta de {roleName} para começar a usar o Workoutly."
+            : $"Use seu e-mail e senha para entrar como {roleName}.";
+        RegisterHint.Text = $"Use entre 10 e 128 caracteres. O cadastro cria uma conta de {roleName}.";
         ToggleButton.Text = _registering ? "Já tem conta?  Entre" : "Ainda não tem conta?  Cadastre-se";
     }
 
@@ -162,6 +205,7 @@ public partial class MainPage : ContentPage
         _busy = busy;
         RetryAccessButton.IsEnabled = !busy;
         Loading.IsVisible = Loading.IsRunning = busy;
+        RoleChoicePanel.IsEnabled = !busy;
         AuthPanel.IsEnabled = !busy;
         LogoutButton.IsEnabled = !busy;
         ExercisesButton.IsEnabled = !busy;

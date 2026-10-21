@@ -25,9 +25,11 @@ Fonte: Roteiro Workoutly e Roteiro Fase 2 na pasta superior. A Fase 2 descreve u
 
 **EX-01 — concluído:** dez exercícios iniciais compartilhados, cadastro privado com validação, busca, filtro de exercícios próprios e detalhes no app. Selecionar um item abre seus detalhes; a inclusão em fichas depende de FICHA-01. Quinze testes HTTP passaram em MySQL real. Cadastro, validação, ausência de conexão e recuperação após reabrir foram verificados no iPhone Simulator. Evidências em docs/evidencias/exercicios.md.
 
+**EX-02 — concluído:** ilustrações SVG locais do projeto Workout Guide (CC BY-SA 4.0) nos detalhes do catálogo, com atribuição versionada. Os dez movimentos iniciais recebem uma referência visual e uma dica curta associadas por ID estável; exercícios privados não recebem imagem ou instrução inferida. Não cria armazenamento ou rota de mídia no servidor.
+
 ## Próximos incrementos
 
-**AUTH-03 — concluído:** dois perfis, aluno e professor/admin. Cadastro público limitado a aluno, professor criado por comando administrativo, papel fornecido pela API e validado no servidor. As contas anteriores permanecem como aluno.
+**AUTH-03 — concluído:** dois perfis, aluno e professor. A primeira tela permite escolher o perfil e o cadastro público aceita student ou teacher; valores fora dessa lista são recusados pela API. O papel é persistido e fornecido pelo MySQL em cada requisição. As contas anteriores permanecem como aluno.
 
 **VINC-01 — concluído:** código de vínculo com validade de sete dias, renovação, confirmação pelo aluno, consulta dos alunos vinculados e remoção da relação por qualquer parte. Um professor ativo por aluno. Autorização testada com dois professores; evidências em docs/evidencias/perfis-e-vinculos.md. O vínculo autoriza fichas e acompanhamento somente de leitura das sessões e indicadores em HIST-01.
 

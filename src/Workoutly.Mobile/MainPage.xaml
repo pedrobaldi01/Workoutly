@@ -17,7 +17,13 @@
                 <Label x:Name="Subtitle" Text="Organize suas fichas e acompanhe sua evolução em um só lugar." FontSize="15"
                        TextColor="{StaticResource TextSecondary}" LineHeight="1.4" />
             </VerticalStackLayout>
-            <Grid x:Name="AuthPanel" Grid.Row="1" RowDefinitions="Auto,*,Auto" RowSpacing="18">
+            <VerticalStackLayout x:Name="RoleChoicePanel" Grid.Row="1" Spacing="14">
+                <Label Text="Como deseja acessar?" FontFamily="InterBold" FontSize="24" SemanticProperties.HeadingLevel="Level2" />
+                <Label Text="Escolha seu perfil para entrar ou criar uma conta." Style="{StaticResource SecondaryText}" />
+                <Button Text="Acessar como aluno" Clicked="OnChooseStudent" HeightRequest="54" FontSize="16" AutomationId="choose_student" />
+                <Button Text="Acessar como professor" Clicked="OnChooseTeacher" HeightRequest="54" FontSize="16" Style="{StaticResource SecondaryButton}" AutomationId="choose_teacher" />
+            </VerticalStackLayout>
+            <Grid x:Name="AuthPanel" Grid.Row="1" RowDefinitions="Auto,*,Auto" RowSpacing="18" IsVisible="False">
                 <VerticalStackLayout Spacing="18">
                     <Border x:Name="NamePanel" Style="{StaticResource InputBorder}" IsVisible="False">
                         <VerticalStackLayout Spacing="0">
@@ -44,7 +50,7 @@
                                 <Entry x:Name="ConfirmEntry" Placeholder="Repita sua senha" IsPassword="True" MaxLength="128" AutomationId="account_confirm" />
                             </VerticalStackLayout>
                         </Border>
-                        <Label Text="Use entre 10 e 128 caracteres. O cadastro cria uma conta de aluno." Style="{StaticResource SecondaryText}" />
+                        <Label x:Name="RegisterHint" Style="{StaticResource SecondaryText}" />
                     </VerticalStackLayout>
                     <Border x:Name="ConnectionPanel" Style="{StaticResource InputBorder}" IsVisible="False">
                         <VerticalStackLayout Spacing="0">
@@ -54,6 +60,7 @@
                     </Border>
                 </VerticalStackLayout>
                 <VerticalStackLayout Grid.Row="2" Spacing="8" Margin="0,16,0,0">
+                    <Button x:Name="BackToRolesButton" Text="Trocar perfil" Clicked="OnBackToRoles" Style="{StaticResource TextButton}" HorizontalOptions="Start" Padding="0" />
                     <Button x:Name="SubmitButton" Text="Entrar" Clicked="OnSubmit" HeightRequest="54" FontSize="16" AutomationId="account_submit" />
                     <Button x:Name="ToggleButton" Text="Ainda não tem conta?  Cadastre-se" Clicked="OnToggle" Style="{StaticResource TextButton}" HorizontalOptions="Start" Padding="0" />
                 </VerticalStackLayout>

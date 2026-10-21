@@ -19,3 +19,4 @@
 artifacts/
 .scratch/
 .local/
+src/Workoutly.Mobile/Resources/Images/Exercises/*.png

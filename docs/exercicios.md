@@ -7,10 +7,16 @@ O catálogo identifica os movimentos que serão usados nas fichas. Cada exercíc
 1. Inicie o ambiente com `Executar-local.command` e abra o app no simulador.
 2. Entre na conta e toque em **Explorar exercícios**.
 3. Busque por nome, grupo ou equipamento. A busca ignora diferenças de maiúsculas e acentos e filtra os dados carregados; **Atualizar** consulta novamente a API.
-4. Toque em um exercício para consultar os detalhes. O catálogo inicial tem dez movimentos; a indicação **Meu exercício** identifica registros da própria conta.
+4. Toque em um exercício para consultar os detalhes. O catálogo inicial tem dez movimentos; a indicação **Meu exercício** identifica registros da própria conta. Os dez itens iniciais exibem uma ilustração e uma referência rápida de movimento.
 5. Use **Novo exercício**, preencha os campos e toque em **Salvar exercício**. A lista é recarregada após salvar; **Somente meus exercícios** permite conferir os registros privados.
 
 Os valores do catálogo servem para identificar registros, sem gerar treinos ou prescrições. A seleção para compor uma ficha será implementada em FICHA-01. Edição e exclusão de exercícios não fazem parte deste incremento.
+
+## Ilustrações e referências rápidas
+
+As ilustrações SVG são recursos locais, sem download durante o uso e sem vínculo com dados pessoais. Elas vêm do projeto aberto [Workout Guide](https://github.com/bryllim/workout-guide), de Bryl Lim, sob [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/); as atribuições e os links de cada arquivo estão em [THIRD-PARTY-NOTICES.md](../THIRD-PARTY-NOTICES.md). `Services/ExerciseVisuals.cs` associa cada um dos dez IDs estáveis do catálogo inicial à sua imagem e a uma dica curta. Exercícios privados não ganham instruções nem ilustrações automáticas: a descrição continua sendo o texto informado por quem os cadastrou.
+
+As referências são apenas apoio visual para identificar o movimento. Não representam prescrição, carga, amplitude adequada para cada pessoa nem substituem orientação profissional.
 
 ## Contrato HTTP
 
@@ -42,6 +48,7 @@ Nome: 2–120 caracteres; grupo: 1–60; equipamento: 1–80; descrição opcion
 - **Catálogo compartilhado e propriedade:** `Data/Migrations/003_exercises.sql` cria a tabela `exercises`. `owner_id` nulo identifica um exercício inicial; nos privados, a chave estrangeira referencia `users`. Seeds com IDs fixos evitam duplicação ao reaplicar a migração. As migrações 001 e 002 permanecem preservadas.
 - **Autorização:** `Exercises/ExerciseEndpoints.cs` exige sessão; `ExerciseService.cs` filtra cada consulta por catálogo compartilhado ou proprietário autenticado. A consulta de detalhes usa o mesmo filtro da listagem. Um ID conhecido não concede acesso aos dados de outro usuário.
 - **Interface e comunicação:** `ExercisesPage.xaml` apresenta a lista e a busca; `ExercisePage.xaml` exibe detalhes ou cadastro. Seus code-behinds controlam carregamento e navegação. `Services/AccountClient.cs` usa a sessão segura já existente para enviar HTTP e serialização gerada para compatibilidade com o app nativo.
+- **Mídia local:** os SVGs licenciados em `Resources/Images/Exercises/` são empacotados no MAUI. A imagem é escolhida apenas no cliente a partir do ID já retornado pela API; não foi necessário acrescentar coluna, migração ou rota de mídia.
 - **Validação no servidor:** os limites são aplicados na API mesmo que o cliente seja outro. Uma falha de conexão mantém os campos preenchidos para nova tentativa; não há fila nem sincronização offline.
 
 Os caminhos acima são relativos a `src/Workoutly.Api` e `src/Workoutly.Mobile`, conforme o componente. A separação permite testar acesso e persistência pela API sem depender do simulador.

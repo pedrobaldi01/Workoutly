@@ -11,7 +11,7 @@ public sealed class RoleTests(MySqlFixture mysql) : IClassFixture<MySqlFixture>
 {
     [MySqlFact]
     [Trait("Category", "MySql")]
-    public async Task Public_signup_always_creates_student_and_teacher_is_created_only_by_operator_command()
+    public async Task Public_signup_creates_the_selected_role_and_the_server_authorizes_using_the_persisted_role()
     {
         await using var app = new DatabaseApplication(mysql.ConnectionString);
         using var student = app.CreateClient();
@@ -19,7 +19,7 @@ public sealed class RoleTests(MySqlFixture mysql) : IClassFixture<MySqlFixture>
         var studentEmail = $"{Guid.NewGuid():N}@example.test";
         var registered = await student.PostAsJsonAsync("/auth/register", new
         {
-            name = "Aluno Perfil", email = studentEmail, password = Password, role = "teacher", isAdmin = true
+            name = "Aluno Perfil", email = studentEmail, password = Password, role = "student"
         });
         Assert.Equal(HttpStatusCode.Created, registered.StatusCode);
         var session = (await registered.Content.ReadFromJsonAsync<SessionBody>())!;
@@ -29,19 +29,22 @@ public sealed class RoleTests(MySqlFixture mysql) : IClassFixture<MySqlFixture>
         Assert.Equal(HttpStatusCode.Forbidden, (await student.GetAsync("/teaching/students")).StatusCode);
 
         var teacherEmail = $"{Guid.NewGuid():N}@example.test";
-        Assert.Equal(0, await CreateTeacher(teacherEmail));
         using var teacher = app.CreateClient();
-        var login = await teacher.PostAsJsonAsync("/auth/login", new { email = teacherEmail, password = Password });
-        Assert.Equal(HttpStatusCode.OK, login.StatusCode);
-        var teacherSession = (await login.Content.ReadFromJsonAsync<SessionBody>())!;
+        var teacherRegistration = await teacher.PostAsJsonAsync("/auth/register", new
+        {
+            name = "Professor Perfil", email = teacherEmail, password = Password, role = "teacher"
+        });
+        Assert.Equal(HttpStatusCode.Created, teacherRegistration.StatusCode);
+        var teacherSession = (await teacherRegistration.Content.ReadFromJsonAsync<SessionBody>())!;
         Assert.Equal("teacher", teacherSession.User.Role);
         teacher.DefaultRequestHeaders.Authorization = new("Bearer", teacherSession.AccessToken);
         Assert.Equal("teacher", (await teacher.GetFromJsonAsync<UserBody>("/auth/me"))?.Role);
         Assert.Empty((await teacher.GetFromJsonAsync<UserBody[]>("/teaching/students"))!);
-        Assert.Equal(1, await CreateTeacher(studentEmail));
-        Assert.Equal("student", (await student.GetFromJsonAsync<UserBody>("/auth/me"))?.Role);
-        await app.Services.GetRequiredService<MySqlDatabase>().MigrateAsync();
-        Assert.Equal("teacher", (await teacher.GetFromJsonAsync<UserBody>("/auth/me"))?.Role);
+
+        await using var restarted = new DatabaseApplication(mysql.ConnectionString);
+        using var restoredTeacher = restarted.CreateClient();
+        restoredTeacher.DefaultRequestHeaders.Authorization = new("Bearer", teacherSession.AccessToken);
+        Assert.Equal("teacher", (await restoredTeacher.GetFromJsonAsync<UserBody>("/auth/me"))?.Role);
         using var anonymous = app.CreateClient();
         Assert.Equal(HttpStatusCode.Unauthorized, (await anonymous.GetAsync("/teaching/students")).StatusCode);
     }

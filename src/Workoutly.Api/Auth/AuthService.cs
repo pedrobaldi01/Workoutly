@@ -15,8 +15,8 @@ public sealed class AuthService(MySqlDatabase database, IPasswordHasher<AccountP
     private readonly AccountProfile _dummy = new("", "", "");
     private readonly string _dummyHash = passwords.HashPassword(new("", "", ""), "timing-placeholder-only");
 
-    public async Task<AccountSession?> RegisterAsync(string name, string email, string password, CancellationToken cancellationToken) =>
-        (await CreateAccountAsync(name, email, password, "student", true, cancellationToken))?.Session;
+    public async Task<AccountSession?> RegisterAsync(string name, string email, string password, string role, CancellationToken cancellationToken) =>
+        (await CreateAccountAsync(name, email, password, role, true, cancellationToken))?.Session;
 
     public async Task<AccountProfile?> CreateTeacherAsync(string name, string email, string password, CancellationToken cancellationToken) =>
         (await CreateAccountAsync(name, email, password, "teacher", false, cancellationToken))?.Profile;

@@ -19,6 +19,14 @@ public partial class ExercisePage : ContentPage, IConfirmLeave
         Title = "Detalhes do exercício";
         Heading.Text = exercise.Name;
         OriginText.Text = exercise.Origin;
+        if (exercise.Visual is { } visual)
+        {
+            IllustrationCard.IsVisible = true;
+            ExerciseIllustration.Source = visual.ImageSource;
+            SemanticProperties.SetDescription(ExerciseIllustration, $"Ilustração de {exercise.Name}");
+            InstructionCard.IsVisible = !string.IsNullOrWhiteSpace(visual.QuickInstruction);
+            InstructionText.Text = visual.QuickInstruction;
+        }
         NameEntry.Text = exercise.Name;
         GroupEntry.Text = exercise.MuscleGroup;
         EquipmentEntry.Text = exercise.Equipment;
@@ -72,5 +80,12 @@ public partial class ExercisePage : ContentPage, IConfirmLeave
         Loading.IsVisible = Loading.IsRunning = busy;
         Fields.IsEnabled = SaveButton.IsEnabled = !busy && !_saved;
         SaveButton.Text = busy ? "Salvando exercício…" : "Salvar exercício";
+    }
+
+    private async void OnOpenIllustrationLicense(object? sender, TappedEventArgs args)
+    {
+        var opened = await Launcher.Default.OpenAsync(new Uri("https://github.com/bryllim/workout-guide/blob/main/LICENSES.md"));
+        if (!opened)
+            await DisplayAlertAsync("Licença das ilustrações", "Não foi possível abrir a página da licença agora.", "OK");
     }
 }

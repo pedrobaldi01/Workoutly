@@ -26,6 +26,21 @@ public sealed class AccountValidationTests
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
+    [Theory]
+    [InlineData("admin")]
+    [InlineData("coach")]
+    [InlineData("")]
+    public async Task Registration_rejects_an_unknown_role_before_accessing_database(string role)
+    {
+        await using var application = new DatabaseApplication(null);
+        using var client = application.CreateClient();
+        var response = await client.PostAsJsonAsync("/auth/register", new
+        {
+            name = "Perfil Teste", email = "perfil@example.test", password = "Treino2026!seguro", role
+        });
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
     [Fact]
     public async Task Profile_requires_a_session_and_repeated_attempts_are_limited()
     {

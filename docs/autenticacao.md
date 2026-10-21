@@ -4,7 +4,7 @@ Este incremento liga o aplicativo MAUI à API e ao MySQL para cadastro, login, p
 
 ## Como funciona
 
-1. O app envia nome, e-mail e senha para a API no cadastro. Os dados são validados novamente no servidor.
+1. O app primeiro permite escolher aluno ou professor e envia nome, e-mail, senha e role para a API no cadastro. Os dados e o papel são validados novamente no servidor.
 2. A API armazena a senha com o PasswordHasher do ASP.NET Core Identity: PBKDF2, salt aleatório e 210.000 iterações. Não é um hash simples nem senha em texto.
 3. O servidor emite um token aleatório de 32 bytes, válido por sete dias. O MySQL guarda somente seu SHA-256, associado ao usuário e à expiração.
 4. O celular guarda token e endereço do serviço no SecureStorage. Somente o endereço do serviço, sem token, também fica nas preferências. A senha não é salva.
@@ -17,12 +17,12 @@ São tokens opacos, não JWT: o conteúdo não carrega dados do usuário e a rev
 
 | Método e rota | Entrada | Sucesso | Falhas previstas |
 | --- | --- | --- | --- |
-| POST /auth/register | name, email, password | 201 com accessToken, expiresAt e user | 400 dados inválidos; 409 e-mail existente; 429 limite; 503 banco indisponível. |
+| POST /auth/register | name, email, password, role (`student` ou `teacher`) | 201 com accessToken, expiresAt e user | 400 dados/papel inválidos; 409 e-mail existente; 429 limite; 503 banco indisponível. |
 | POST /auth/login | email, password | 200 com a mesma estrutura de sessão | 400 formato; 401 e-mail ou senha inválidos; 429 limite; 503 indisponível. |
 | GET /auth/me | Authorization: Bearer token | 200 com id, name e email da própria conta | 401 sem sessão válida; 503 indisponível. |
 | POST /auth/logout | Authorization: Bearer token | 204 sem corpo | 401 sessão inválida; 503 indisponível. |
 
-Nome: 2–120 caracteres, após remover espaços nas extremidades. E-mail: formato válido, até 254 caracteres, sem distinção de maiúsculas para identificação. Senha de cadastro: 10–128 caracteres, não composta só de espaços; a senha não é aparada ou normalizada. E-mails repetidos também são impedidos por restrição única do MySQL.
+Nome: 2–120 caracteres, após remover espaços nas extremidades. E-mail: formato válido, até 254 caracteres, sem distinção de maiúsculas para identificação. Senha de cadastro: 10–128 caracteres, não composta só de espaços; a senha não é aparada ou normalizada. O papel de cadastro é obrigatoriamente `student` ou `teacher`; qualquer outro valor é recusado. E-mails repetidos também são impedidos por restrição única do MySQL.
 
 Login inválido usa uma mensagem genérica. Cadastro e login têm limite de 20 requisições por minuto por IP. Respostas de conta usam Cache-Control: no-store. A API exige HTTPS para /auth fora de Development. Não há confirmação de e-mail, recuperação de senha, MFA ou edição de conta nesta entrega; nenhuma ação dessas é apresentada como pronta.
 

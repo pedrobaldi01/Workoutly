@@ -8,6 +8,24 @@
                 <Label x:Name="Heading" Text="Novo exercício" Style="{StaticResource PageTitle}" />
                 <Label x:Name="OriginText" Text="Um movimento só seu, organizado do seu jeito." Style="{StaticResource SecondaryText}" />
             </VerticalStackLayout>
+            <Border x:Name="IllustrationCard" IsVisible="False" Style="{StaticResource SurfaceCard}" BackgroundColor="{StaticResource SurfaceRaised}" Padding="12">
+                <VerticalStackLayout Spacing="8">
+                    <Image x:Name="ExerciseIllustration" HeightRequest="230" Aspect="AspectFit" />
+                    <Label Text="Ilustração: Workout Guide por Bryl Lim • CC BY-SA 4.0" Style="{StaticResource SecondaryText}" FontSize="12" HorizontalOptions="Center" />
+                    <Label Text="Ver atribuição e licença" TextColor="{StaticResource Mint}" FontSize="12" TextDecorations="Underline" HorizontalOptions="Center" AutomationId="exercise_illustration_license">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnOpenIllustrationLicense" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </VerticalStackLayout>
+            </Border>
+            <Border x:Name="InstructionCard" IsVisible="False" Style="{StaticResource SurfaceCard}" Padding="16">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="REFERÊNCIA RÁPIDA" Style="{StaticResource Eyebrow}" />
+                    <Label x:Name="InstructionText" Style="{StaticResource SecondaryText}" />
+                    <Label Text="Use como apoio visual; ajuste o movimento com orientação profissional." Style="{StaticResource SecondaryText}" FontSize="12" />
+                </VerticalStackLayout>
+            </Border>
             <ActivityIndicator x:Name="Loading" IsVisible="False" />
             <VerticalStackLayout x:Name="Fields" Spacing="12">
                 <Border Style="{StaticResource InputBorder}">
