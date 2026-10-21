@@ -21,11 +21,14 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="services:ExerciseItem">
                     <Border Style="{StaticResource SurfaceCard}" Margin="0,0,0,10">
-                        <VerticalStackLayout Spacing="8">
+                        <Grid ColumnDefinitions="76,*" ColumnSpacing="12">
+                            <Image Source="{Binding ImageSource}" WidthRequest="76" HeightRequest="90" Aspect="AspectFit" />
+                        <VerticalStackLayout Grid.Column="1" Spacing="8">
                             <Label Text="{Binding Name}" FontFamily="InterSemiBold" FontSize="18" />
                             <Label Text="{Binding Summary}" Style="{StaticResource SecondaryText}" />
                             <Label Text="{Binding Origin}" TextColor="{StaticResource Mint}" FontSize="12" />
                         </VerticalStackLayout>
+                        </Grid>
                     </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>

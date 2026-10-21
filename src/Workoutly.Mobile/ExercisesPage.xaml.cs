@@ -54,7 +54,7 @@ public partial class ExercisesPage : ContentPage
     private void ApplyFilter()
     {
         var query = Search.Text?.Trim() ?? string.Empty;
-        var filtered = _exercises.Where(item => (!OnlyMine.IsToggled || !item.IsShared) &&
+        var filtered = _exercises.Where(item => (!OnlyMine.IsToggled || item.IsMine) &&
             (CultureInfo.CurrentCulture.CompareInfo.IndexOf($"{item.Name} {item.MuscleGroup} {item.Equipment}", query,
                 CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace) >= 0)).ToArray();
         ExerciseList.ItemsSource = filtered;

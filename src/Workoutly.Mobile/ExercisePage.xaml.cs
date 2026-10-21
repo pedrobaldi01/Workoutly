@@ -34,6 +34,8 @@ public partial class ExercisePage : ContentPage, IConfirmLeave
         NameEntry.IsReadOnly = GroupEntry.IsReadOnly = EquipmentEntry.IsReadOnly = DescriptionEditor.IsReadOnly = true;
         SaveButton.IsVisible = false;
         PrivacyNote.IsVisible = !exercise.IsShared;
+        if (!exercise.IsOwned && exercise.IsInPlan)
+            PrivacyText.Text = "Exercício disponibilizado nas suas fichas. Os demais exercícios privados do professor não são compartilhados.";
     }
 
     public Task<bool> CanLeaveAsync()
@@ -84,8 +86,13 @@ public partial class ExercisePage : ContentPage, IConfirmLeave
 
     private async void OnOpenIllustrationLicense(object? sender, TappedEventArgs args)
     {
-        var opened = await Launcher.Default.OpenAsync(new Uri("https://github.com/bryllim/workout-guide/blob/main/LICENSES.md"));
-        if (!opened)
-            await DisplayAlertAsync("Licença das ilustrações", "Não foi possível abrir a página da licença agora.", "OK");
+        await using var stream = await FileSystem.OpenAppPackageFileAsync("THIRD-PARTY-NOTICES.md");
+        using var reader = new StreamReader(stream);
+        var credits = await reader.ReadToEndAsync();
+        await Navigation.PushAsync(new ContentPage
+        {
+            Title = "Créditos e licenças",
+            Content = new ScrollView { Content = new Label { Text = credits, Padding = 20, FontSize = 13 } }
+        });
     }
 }

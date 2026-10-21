@@ -15,11 +15,12 @@ public sealed record AccountSession(string AccessToken, DateTimeOffset ExpiresAt
 public sealed record LoginPayload(string Email, string Password);
 public sealed record RegisterPayload(string Name, string Email, string Password, string Role);
 public sealed record StoredSession(string ApiUrl, string Token);
-public sealed record ExerciseItem(string Id, string Name, string MuscleGroup, string Equipment, string Description, bool IsShared)
+public sealed record ExerciseItem(string Id, string Name, string MuscleGroup, string Equipment, string Description, bool IsShared, bool IsOwned = false, bool IsInPlan = false)
 {
-    public string Origin => IsShared ? "Catálogo inicial" : "Meu exercício";
+    public string Origin => IsOwned ? "Meu exercício" : IsInPlan ? "Na minha ficha" : "Catálogo";
+    public bool IsMine => IsOwned || IsInPlan;
     public string Summary => $"{MuscleGroup} • {Equipment}";
-    public ExerciseVisual? Visual => ExerciseVisuals.Find(Id);
+    public ExerciseVisual Visual => ExerciseVisuals.Find(Id, Name);
     public string? ImageSource => Visual?.ImageSource;
     public string? QuickInstruction => Visual?.QuickInstruction;
 }

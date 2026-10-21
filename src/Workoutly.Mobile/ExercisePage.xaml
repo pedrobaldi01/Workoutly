@@ -11,8 +11,7 @@
             <Border x:Name="IllustrationCard" IsVisible="False" Style="{StaticResource SurfaceCard}" BackgroundColor="{StaticResource SurfaceRaised}" Padding="12">
                 <VerticalStackLayout Spacing="8">
                     <Image x:Name="ExerciseIllustration" HeightRequest="230" Aspect="AspectFit" />
-                    <Label Text="Ilustração: Workout Guide por Bryl Lim • CC BY-SA 4.0" Style="{StaticResource SecondaryText}" FontSize="12" HorizontalOptions="Center" />
-                    <Label Text="Ver atribuição e licença" TextColor="{StaticResource Mint}" FontSize="12" TextDecorations="Underline" HorizontalOptions="Center" AutomationId="exercise_illustration_license">
+                    <Label Text="Créditos e licenças" TextColor="{StaticResource Mint}" FontSize="12" TextDecorations="Underline" HorizontalOptions="Center" AutomationId="exercise_illustration_license">
                         <Label.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnOpenIllustrationLicense" />
                         </Label.GestureRecognizers>
@@ -54,7 +53,7 @@
                 </Border>
             </VerticalStackLayout>
             <Border x:Name="PrivacyNote" Style="{StaticResource SurfaceCard}" BackgroundColor="{StaticResource SurfaceRaised}" Padding="14">
-                <Label Text="Este exercício fica disponível somente na sua conta." TextColor="{StaticResource Mint}" FontSize="12" />
+                <Label x:Name="PrivacyText" Text="Este exercício fica disponível somente na sua conta." TextColor="{StaticResource Mint}" FontSize="12" />
             </Border>
             <Label x:Name="ErrorText" TextColor="{StaticResource Error}" IsVisible="False" AutomationId="exercise_form_error" />
             <Button x:Name="SaveButton" Text="Salvar exercício" Clicked="OnSave" AutomationId="exercise_save" />

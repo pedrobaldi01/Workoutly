@@ -69,7 +69,7 @@ O banco e o usuário devem existir antes da migração; no caminho local o Compo
 Exemplo de prontidão:
 
 ```json
-{"status":"ready","database":"ready","schemaVersion":7}
+{"status":"ready","database":"ready","schemaVersion":9}
 ```
 
 Estados sem prontidão: `not_configured`, `invalid_configuration`, `unreachable` ou `schema_pending`. A sondagem tem limite de 3 segundos. A resposta não revela conexão, usuário, senha ou detalhes do driver. Ela não executa DDL e não comprova requisitos futuros de autenticação ou treino.

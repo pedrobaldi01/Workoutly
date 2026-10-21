@@ -32,13 +32,16 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="services:ExerciseItem">
                     <Border Style="{StaticResource SurfaceCard}" Margin="0,0,0,12">
-                        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="10" ColumnSpacing="12">
+                        <Grid ColumnDefinitions="76,*" ColumnSpacing="12">
+                            <Image Source="{Binding ImageSource}" WidthRequest="76" HeightRequest="90" Aspect="AspectFit" />
+                        <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="10" ColumnSpacing="12">
                             <Border BackgroundColor="{StaticResource SurfaceRaised}" StrokeThickness="0" StrokeShape="RoundRectangle 99" Padding="10,6" HorizontalOptions="Start">
                                 <Label Text="{Binding Origin}" FontFamily="InterSemiBold" FontSize="11" TextColor="{StaticResource Accent}" />
                             </Border>
                             <Label Grid.Row="1" Text="{Binding Name}" FontFamily="InterSemiBold" FontSize="19" />
                             <Label Grid.Row="2" Text="{Binding Summary}" Style="{StaticResource SecondaryText}" />
                             <Label Grid.RowSpan="3" Grid.Column="1" Text="›" TextColor="{StaticResource Mint}" FontSize="24" VerticalOptions="Center" />
+                        </Grid>
                         </Grid>
                     </Border>
                 </DataTemplate>

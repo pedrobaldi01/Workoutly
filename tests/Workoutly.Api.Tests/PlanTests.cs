@@ -88,7 +88,7 @@ public sealed class PlanTests(MySqlFixture mysql) : IClassFixture<MySqlFixture>
         var plan = (await student.GetFromJsonAsync<PlanBody>($"/plans/{id}"))!;
         Assert.Equal(studentId, plan.StudentId);
         Assert.Equal("Movimento privado do professor", plan.Exercises[0].Name);
-        Assert.Equal(HttpStatusCode.NotFound, (await student.GetAsync($"/exercises/{exerciseId}")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await student.GetAsync($"/exercises/{exerciseId}")).StatusCode);
         Assert.Empty((await stranger.GetFromJsonAsync<PlanBody[]>("/plans"))!);
         Assert.Equal(HttpStatusCode.NotFound, (await otherTeacher.GetAsync(path)).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await otherTeacher.PostAsJsonAsync(path, payload)).StatusCode);

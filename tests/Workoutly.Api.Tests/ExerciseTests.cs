@@ -20,11 +20,22 @@ public sealed class ExerciseTests(MySqlFixture mysql) : IClassFixture<MySqlFixtu
         await SignIn(client);
         var catalog = await client.GetFromJsonAsync<ExerciseBody[]>("/exercises");
         Assert.NotNull(catalog);
-        Assert.Equal(10, catalog.Length);
+        Assert.Equal(30, catalog.Length);
         Assert.All(catalog, exercise => Assert.True(exercise.IsShared));
+        Assert.All(catalog, exercise =>
+        {
+            Assert.Contains("Músculos trabalhados:", exercise.Description);
+            Assert.InRange(exercise.Description.Length, 30, 1000);
+        });
         Assert.Equal(catalog.Length, catalog.Select(exercise => exercise.Id).Distinct().Count());
         var squat = Assert.Single(catalog, exercise => exercise.Name == "Agachamento livre");
         Assert.Equal("Pernas", squat.MuscleGroup);
+        Assert.Contains("quadríceps", squat.Description);
+        Assert.Contains("glúteo máximo", squat.Description);
+        Assert.Contains("sóleo", Assert.Single(catalog, exercise => exercise.Name == "Panturrilha sentado").Description);
+        var hammer = Assert.Single(catalog, exercise => exercise.Name == "Rosca martelo");
+        Assert.Equal("Braços e antebraços", hammer.MuscleGroup);
+        Assert.Contains("braquiorradial", hammer.Description);
         var detail = await client.GetFromJsonAsync<ExerciseBody>($"/exercises/{squat.Id}");
         Assert.Equal(squat, detail);
     }
@@ -86,7 +97,7 @@ public sealed class ExerciseTests(MySqlFixture mysql) : IClassFixture<MySqlFixtu
         };
         foreach (var payload in invalid)
             Assert.Equal(HttpStatusCode.BadRequest, (await client.PostAsJsonAsync("/exercises", payload)).StatusCode);
-        Assert.Equal(10, (await client.GetFromJsonAsync<ExerciseBody[]>("/exercises"))?.Length);
+        Assert.Equal(30, (await client.GetFromJsonAsync<ExerciseBody[]>("/exercises"))?.Length);
         var boundary = await client.PostAsJsonAsync("/exercises", new
         {
             name = new string('n', 120), muscleGroup = new string('g', 60), equipment = new string('e', 80), description = new string('d', 1000)
