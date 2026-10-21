@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:services="clr-namespace:Workoutly.Mobile.Services" x:Class="Workoutly.Mobile.WorkoutsPage" Title="Treinos salvos">
+    <Grid Padding="20,16" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="12">
+        <VerticalStackLayout Spacing="4">
+            <Label Text="SEUS REGISTROS" Style="{StaticResource Eyebrow}" />
+            <Label Text="Treinos salvos" Style="{StaticResource PageTitle}" />
+            <Label Text="Confira os exercícios e as séries que você realizou." Style="{StaticResource SecondaryText}" />
+        </VerticalStackLayout>
+        <Button Grid.Row="1" x:Name="RefreshButton" Text="Atualizar" Clicked="OnRefresh" Style="{StaticResource SecondaryButton}" />
+        <VerticalStackLayout Grid.Row="2" Spacing="6">
+            <ActivityIndicator x:Name="Loading" IsVisible="False" />
+            <Label x:Name="ErrorText" TextColor="{StaticResource Error}" IsVisible="False" />
+        </VerticalStackLayout>
+        <CollectionView Grid.Row="3" x:Name="WorkoutsList" SelectionMode="None" AutomationId="saved_workouts">
+            <CollectionView.EmptyView><Label Text="Nenhum treino carregado. Para registrar, abra Minhas fichas e toque em Iniciar treino." Style="{StaticResource SecondaryText}" /></CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="services:WorkoutSummaryItem">
+                    <Border Style="{StaticResource SurfaceCard}" Margin="0,0,0,12">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="{Binding DateLabel}" Style="{StaticResource Eyebrow}" />
+                            <Label Text="{Binding PlanName}" FontFamily="InterSemiBold" FontSize="19" />
+                            <Label Text="{Binding Summary}" Style="{StaticResource SecondaryText}" />
+                            <Button Text="Ver treino" CommandParameter="{Binding Id}" Clicked="OnOpen" Style="{StaticResource SecondaryButton}" />
+                        </VerticalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

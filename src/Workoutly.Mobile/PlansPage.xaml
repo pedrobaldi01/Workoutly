@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:services="clr-namespace:Workoutly.Mobile.Services" x:Class="Workoutly.Mobile.PlansPage" Title="Fichas">
+             xmlns:local="clr-namespace:Workoutly.Mobile" x:Name="PlansRoot" xmlns:services="clr-namespace:Workoutly.Mobile.Services" x:Class="Workoutly.Mobile.PlansPage" Title="Fichas">
     <Grid Padding="20,16" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="12">
         <VerticalStackLayout Spacing="4">
             <Label Text="ROTINA SEMANAL" Style="{StaticResource Eyebrow}" />
@@ -25,6 +25,7 @@
                             <Label Text="{Binding Name}" FontFamily="InterSemiBold" FontSize="19" />
                             <Label Text="{Binding Notes}" Style="{StaticResource SecondaryText}" MaxLines="3" LineBreakMode="TailTruncation" />
                             <Label Text="{Binding Summary}" Style="{StaticResource SecondaryText}" FontSize="12" />
+                            <Button Text="Iniciar treino" IsVisible="{Binding CanStartWorkout, Source={x:Reference PlansRoot}, x:DataType=local:PlansPage}" CommandParameter="{Binding .}" Clicked="OnStartWorkout" AutomationId="start_workout" />
                             <Button Text="Abrir ficha" CommandParameter="{Binding .}" Clicked="OnOpen" Style="{StaticResource SecondaryButton}" />
                         </VerticalStackLayout>
                     </Border>

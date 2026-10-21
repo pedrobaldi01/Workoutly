@@ -7,6 +7,7 @@ using Workoutly.Api.Data;
 using Workoutly.Api.Exercises;
 using Workoutly.Api.Teaching;
 using Workoutly.Api.Plans;
+using Workoutly.Api.Workouts;
 
 var migrateOnly = args.Contains("--migrate");
 var createTeacher = args.Contains("--create-teacher");
@@ -19,6 +20,7 @@ builder.Services.AddSingleton<AuthService>();
 builder.Services.AddSingleton<ExerciseService>();
 builder.Services.AddSingleton<TeachingService>();
 builder.Services.AddSingleton<PlanService>();
+builder.Services.AddSingleton<WorkoutService>();
 builder.Services.AddAuthentication("Session")
     .AddScheme<AuthenticationSchemeOptions, SessionAuthenticationHandler>("Session", _ => { });
 builder.Services.AddAuthorization(options =>
@@ -90,7 +92,7 @@ if (migrateOnly)
 app.Use(async (context, next) =>
 {
     var protectedResource = context.Request.Path.StartsWithSegments("/auth") || context.Request.Path.StartsWithSegments("/exercises") ||
-        context.Request.Path.StartsWithSegments("/teaching") || context.Request.Path.StartsWithSegments("/enrollment") || context.Request.Path.StartsWithSegments("/plans");
+        context.Request.Path.StartsWithSegments("/teaching") || context.Request.Path.StartsWithSegments("/enrollment") || context.Request.Path.StartsWithSegments("/plans") || context.Request.Path.StartsWithSegments("/sessions");
     if (protectedResource)
     {
         context.Response.Headers.CacheControl = "no-store";
@@ -116,6 +118,7 @@ app.MapAccountEndpoints();
 app.MapExerciseEndpoints();
 app.MapTeachingEndpoints();
 app.MapPlanEndpoints();
+app.MapWorkoutEndpoints();
 
 // Liveness não depende do banco. Readiness comprova acesso ao esquema preparado.
 app.MapGet("/health", (MySqlDatabase database) => Results.Ok(new

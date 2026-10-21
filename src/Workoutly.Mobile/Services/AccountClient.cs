@@ -31,7 +31,22 @@ public sealed record PlanExercisePayload(string ExerciseId, int Sets, int Repeti
 public sealed record CreatePlanPayload(string Id, string Name, string Notes, PlanExercisePayload[] Exercises);
 public sealed record UpdatePlanPayload(int Version, string Name, string Notes, PlanExercisePayload[] Exercises);
 
+public sealed record WorkoutSetItem(int Repetitions, decimal WeightKg);
+public sealed record WorkoutExercisePayload(string ExerciseId, WorkoutSetItem[] Sets);
+public sealed record CreateWorkoutPayload(string Id, string PlanId, int PlanVersion, DateTimeOffset StartedAt, int DurationSeconds, string Notes, WorkoutExercisePayload[] Exercises);
+public sealed record WorkoutExerciseItem(string ExerciseId, string Name, string MuscleGroup, string Equipment, string Description, int PlannedSets, int PlannedRepetitions, WorkoutSetItem[] Sets);
+public sealed record WorkoutSessionItem(string Id, string StudentId, string PlanId, int PlanVersion, string PlanName, DateTimeOffset StartedAt, int DurationSeconds, string Notes, WorkoutExerciseItem[] Exercises);
+public sealed record WorkoutSummaryItem(string Id, string PlanName, DateTimeOffset StartedAt, int DurationSeconds, int ExerciseCount, int SetCount)
+{
+    public string DateLabel => StartedAt.ToLocalTime().ToString("dd/MM/yyyy 'às' HH:mm");
+    public string Summary => $"{ExerciseCount} exercício(s) • {SetCount} série(s) • {FormatDuration(DurationSeconds)}";
+    public static string FormatDuration(int seconds) => $"{seconds / 3600:00}:{seconds / 60 % 60:00}:{seconds % 60:00}";
+}
+
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
+[JsonSerializable(typeof(CreateWorkoutPayload))]
+[JsonSerializable(typeof(WorkoutSessionItem))]
+[JsonSerializable(typeof(WorkoutSummaryItem[]))]
 [JsonSerializable(typeof(PlanItem))]
 [JsonSerializable(typeof(PlanItem[]))]
 [JsonSerializable(typeof(CreatePlanPayload))]
@@ -165,6 +180,14 @@ public sealed class AccountClient
         using var response = await RequestAsync(HttpMethod.Delete, $"{PlansPath(studentId)}/{Uri.EscapeDataString(id)}?version={version}", null, true);
     }
 
+    public Task<WorkoutSummaryItem[]> GetWorkoutsAsync() => SendAsync(HttpMethod.Get, "sessions", null, AccountJson.Default.WorkoutSummaryItemArray, true);
+    public Task<WorkoutSessionItem> GetWorkoutAsync(string id) => SendAsync(HttpMethod.Get, $"sessions/{Uri.EscapeDataString(id)}", null, AccountJson.Default.WorkoutSessionItem, true);
+    public async Task<WorkoutSessionItem> SaveWorkoutAsync(CreateWorkoutPayload payload)
+    {
+        using var content = JsonContent.Create(payload, AccountJson.Default.CreateWorkoutPayload);
+        return await SendAsync(HttpMethod.Post, "sessions", content, AccountJson.Default.WorkoutSessionItem, true);
+    }
+
     public async Task LogoutAsync()
     {
         try
@@ -231,7 +254,7 @@ public sealed class AccountClient
                 throw new AccountException("E-mail ou senha inválidos.");
             }
             if (response.StatusCode == HttpStatusCode.Conflict)
-                throw new AccountException(path == "auth/register" ? "Este e-mail já está cadastrado. Use Entrar." : path == "enrollment" ? "Você já tem um professor vinculado. Remova o vínculo atual antes de trocar." : "A ficha já foi salva, alterada ou excluída. Seus campos foram preservados. Volte à lista ou recarregue a ficha para abrir a versão atual.");
+                throw new AccountException(path == "auth/register" ? "Este e-mail já está cadastrado. Use Entrar." : path == "enrollment" ? "Você já tem um professor vinculado. Remova o vínculo atual antes de trocar." : path == "sessions" ? "Esta tentativa já corresponde a outro conteúdo salvo. Consulte os treinos salvos antes de registrar novamente." : "A ficha já foi salva, alterada ou excluída. Seus campos foram preservados. Volte à lista ou recarregue a ficha para abrir a versão atual.");
             if (response.StatusCode == HttpStatusCode.Forbidden)
                 throw new AccountException("Seu perfil não tem permissão para esta ação. Volte à sua conta e atualize o acesso.");
             if (response.StatusCode == HttpStatusCode.NotFound)
@@ -244,15 +267,18 @@ public sealed class AccountClient
                 {
                     using var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
                     if (body.RootElement.TryGetProperty("errors", out var errors))
-                        throw new AccountException(string.Join("\n", errors.EnumerateObject().SelectMany(field => field.Value.EnumerateArray()).Select(value => value.GetString())));
+                        throw new AccountException(string.Join("\n", errors.EnumerateObject().SelectMany(field => field.Value.EnumerateArray()).Select(value => value.GetString())), HttpStatusCode.BadRequest);
                 }
                 catch (JsonException) { }
-                throw new AccountException("Revise os dados informados e o endereço do serviço.");
+                throw new AccountException("Revise os dados informados e o endereço do serviço.", HttpStatusCode.BadRequest);
             }
             throw new AccountException("Serviço indisponível. Tente novamente em instantes.");
         }
     }
 }
 
-public class AccountException(string message) : Exception(message);
+public class AccountException(string message, HttpStatusCode? statusCode = null) : Exception(message)
+{
+    public HttpStatusCode? StatusCode { get; } = statusCode;
+}
 public sealed class SessionExpiredException() : AccountException("Sua sessão expirou. Entre novamente.");

@@ -1,6 +1,6 @@
 # Fichas de treino
 
-FICHA-01 implementa o planejamento do treino, integrado ao MySQL pela API. Aluno cria e gerencia as próprias fichas; professor/admin gerencia as fichas dos alunos atualmente vinculados. A execução com cargas, duração e observações de uma sessão pertence a TREINO-01, ainda pendente.
+FICHA-01 implementa o planejamento do treino, integrado ao MySQL pela API. Aluno cria e gerencia as próprias fichas; professor/admin gerencia as fichas dos alunos atualmente vinculados. A execução com cargas, duração e observações foi implementada em TREINO-01; veja treinos.md.
 
 ## Como usar
 
@@ -27,7 +27,7 @@ Se a conexão falhar, a tela conserva os campos e permite tentar novamente. Isso
 | workout_plan_versions | Nome, observações, autor e data de cada revisão. |
 | workout_plan_items | Ordem, séries, repetições e cópia dos dados dos exercícios em cada revisão. |
 
-Editar insere uma revisão e seus itens em uma única transação; revisões anteriores não são reescritas. Excluir preenche deleted_at e retira a ficha das rotas de uso, preservando revisões e itens no banco. Sessões ainda não existem: a integração futura deverá referenciar a revisão executada, inclusive depois de excluir a ficha. Essa etapa prepara a preservação; não comprova um histórico de sessões pronto.
+Editar insere uma revisão e seus itens em uma única transação; revisões anteriores não são reescritas. Excluir preenche deleted_at e retira a ficha das rotas de uso, preservando revisões e itens no banco. As sessões de TREINO-01 referenciam a revisão executada, inclusive depois de excluir a ficha. O registro preserva os exercícios e metas originais; indicadores e acompanhamento pelo professor permanecem pendentes.
 
 **Exercícios privados e cópia na ficha.** Uma inclusão nova aceita somente catálogo compartilhado ou exercício do autor autenticado. Se o professor inclui um exercício próprio, o aluno recebe nome, grupo, equipamento e descrição desse movimento dentro da ficha; o catálogo privado do professor permanece fechado. Itens já presentes podem ser mantidos ou ajustados pelo aluno/professor vinculado sem consultar o catálogo privado alheio. Remover esse item e depois tentar adicioná-lo novamente exige acesso ao catálogo de origem; a lista de seleção não expõe os exercícios privados de outras contas. As cópias existentes não mudam com futuras alterações do catálogo.
 

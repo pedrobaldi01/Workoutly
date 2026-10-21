@@ -92,6 +92,7 @@ public partial class MainPage : ContentPage
         PlansTitle.Text = _isTeacher ? "Planeje para seus alunos" : "Suas fichas de treino";
         PlansDescription.Text = _isTeacher ? "Abra um aluno vinculado para montar ou ajustar suas fichas." : "Organize exercícios, séries e repetições para o próximo treino.";
         PlansButton.Text = _isTeacher ? "Montar fichas" : "Minhas fichas";
+        WorkoutsButton.IsVisible = !_isTeacher;
         Greeting.Text = $"Olá, {profile.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()}";
         Intro.IsVisible = false;
         AuthPanel.IsVisible = false;
@@ -109,6 +110,12 @@ public partial class MainPage : ContentPage
     {
         if (_busy) return;
         await Navigation.PushAsync(_isTeacher ? new ConnectionsPage(_accounts, true) : new PlansPage(_accounts));
+    }
+
+    private async void OnWorkouts(object? sender, EventArgs args)
+    {
+        if (_busy || _isTeacher) return;
+        await Navigation.PushAsync(new WorkoutsPage(_accounts));
     }
 
     private void ShowSignedOut()
@@ -147,6 +154,6 @@ public partial class MainPage : ContentPage
         ExercisesButton.IsEnabled = !busy;
         ConnectionButton.IsEnabled = !busy;
         ConnectionsButton.IsEnabled = !busy;
-        PlansButton.IsEnabled = !busy;
+        PlansButton.IsEnabled = WorkoutsButton.IsEnabled = !busy;
     }
 }

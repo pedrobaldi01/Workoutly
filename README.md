@@ -4,13 +4,13 @@ Aplicativo acadêmico de acompanhamento de treinos, criado do zero para o Projet
 
 ## Situação atual
 
-O app já permite **cadastro, login, recuperação de sessão, logout e catálogo de exercícios**, integrado à API e ao MySQL. Há dez exercícios iniciais compartilhados e cadastro de exercícios privados da conta, com busca e detalhes. A sessão fica no armazenamento seguro do aparelho e é revogada no servidor ao sair. Fichas já permitem criar, consultar, editar, ordenar exercícios e excluir com revisões preservadas. Sessões de treino e indicadores ainda serão implementados; o MVP completo permanece pendente.
+O app já permite **cadastro, login, recuperação de sessão, logout e catálogo de exercícios**, integrado à API e ao MySQL. Há dez exercícios iniciais compartilhados e cadastro de exercícios privados da conta, com busca e detalhes. A sessão fica no armazenamento seguro do aparelho e é revogada no servidor ao sair. Fichas já permitem criar, consultar, editar, ordenar exercícios e excluir com revisões preservadas. O aluno também registra séries realizadas, cargas, duração e observações e recupera seus treinos salvos. Correção de registros, indicadores e acompanhamento das sessões pelo professor ainda serão implementados; o MVP completo permanece pendente.
 
 Nenhum código do aplicativo anterior foi reutilizado. Os roteiros enviados ao professor permanecem na pasta superior, sem alterações.
 
 A interface segue a identidade visual do Figma do grupo: fundo escuro, verde-lima, detalhes turquesa, fonte Inter, marca e cartões arredondados. A aplicação às telas atuais e as referências estão em [Identidade visual](docs/identidade-visual.md).
 
-Há dois perfis: **aluno** e **professor/admin**. O login é o mesmo, por e-mail e senha; a API identifica o perfil. Cadastre-se pelo app para criar aluno. Para criar professor no ambiente nativo já iniciado, use `python3 scripts/dev.py create-teacher --native`: o comando pede nome, e-mail e senha sem exibi-la. Professor gera um código em Meus alunos; aluno informa esse código em Meu professor e confirma o vínculo. Detalhes em [Perfis e vínculos](docs/perfis-e-vinculos.md). O aluno acessa Minhas fichas; professor usa Montar fichas → Fichas do aluno. Veja [Fichas](docs/fichas.md). Acompanhamento de sessões continua pendente.
+Há dois perfis: **aluno** e **professor/admin**. O login é o mesmo, por e-mail e senha; a API identifica o perfil. Cadastre-se pelo app para criar aluno. Para criar professor no ambiente nativo já iniciado, use `python3 scripts/dev.py create-teacher --native`: o comando pede nome, e-mail e senha sem exibi-la. Professor gera um código em Meus alunos; aluno informa esse código em Meu professor e confirma o vínculo. Detalhes em [Perfis e vínculos](docs/perfis-e-vinculos.md). O aluno acessa Minhas fichas; professor usa Montar fichas → Fichas do aluno. Veja [Fichas](docs/fichas.md). Aluno inicia pela ficha e recupera em Treinos salvos; veja [Registro de treinos](docs/treinos.md). O acompanhamento de sessões pelo professor continua pendente.
 
 ## Componentes
 
@@ -101,7 +101,7 @@ A solução inclui o projeto mobile: compilar a solução inteira exige os workl
 
 ## Como vamos desenvolver
 
-Leia `docs/backlog.md` para a sequência e critérios de aceite, `docs/arquitetura.md` para a separação de responsabilidades e `docs/skills.md` para usar as skills instaladas. A persistência MySQL foi implementada na API. Prepare e verifique seu ambiente seguindo `docs/mysql.md`. Conta, acesso, exercícios, vínculos e fichas estão implementados. O próximo incremento é registrar sessões de treino a partir de uma revisão da ficha (TREINO-01).
+Leia `docs/backlog.md` para a sequência e critérios de aceite, `docs/arquitetura.md` para a separação de responsabilidades e `docs/skills.md` para usar as skills instaladas. A persistência MySQL foi implementada na API. Prepare e verifique seu ambiente seguindo `docs/mysql.md`. Conta, acesso, exercícios, vínculos e fichas estão implementados. Registro e consulta de sessões próprias também estão implementados. O próximo incremento é corrigir registros próprios (TREINO-02); indicadores e acompanhamento pelo professor vêm em HIST-01.
 
 Ao concluir cada incremento serão registrados o conceito, a decisão, onde aparece no código e a forma de testar. Slides e avaliação com participantes permanecem para as etapas correspondentes.
 

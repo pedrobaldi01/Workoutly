@@ -20,3 +20,5 @@
 | Vínculo | Associação voluntária do aluno com um professor por código; neste MVP, um professor ativo por aluno. Pode ser removida sem apagar contas ou registros. |
 | Revisão da ficha | Versão imutável do planejamento, com cópia dos exercícios, séries e repetições previstas. |
 | Exclusão lógica | Retira a ficha do uso sem apagar versões e itens necessários à preservação dos registros. |
+| Série realizada | Repetições e carga efetivamente informadas pelo aluno; só entra no registro se marcada como feita. |
+| Idempotência | Repetir o mesmo ID e conteúdo de uma tentativa recupera o registro existente, sem duplicar ou sobrescrever o treino. |
