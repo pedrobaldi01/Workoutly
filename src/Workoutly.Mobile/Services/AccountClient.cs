@@ -7,7 +7,7 @@ using System.Text.Json.Serialization.Metadata;
 
 namespace Workoutly.Mobile.Services;
 
-public sealed record AccountProfile(string Id, string Name, string Email, string Role = "student");
+public sealed record AccountProfile(string Id, string Name, string Email, string Role);
 public sealed record TeacherInvitation(string? Code, DateTimeOffset? ExpiresAt);
 public sealed record EnrollmentInfo(AccountProfile? Teacher);
 public sealed record JoinTeacherPayload(string Code);
@@ -122,11 +122,21 @@ public sealed class AccountClient
         catch (SessionExpiredException) { return null; }
     }
 
-    public async Task<AccountProfile> LoginAsync(string email, string password)
+    public async Task<AccountProfile> LoginAsync(string email, string password, string expectedRole)
     {
         using var content = JsonContent.Create(new LoginPayload(email.Trim(), password), AccountJson.Default.LoginPayload);
         var session = await SendAsync(HttpMethod.Post, "auth/login", content, AccountJson.Default.AccountSession, false);
-        return await StoreSessionAsync(session);
+        var actualRole = session.User?.Role;
+        if (actualRole == expectedRole)
+            return await StoreSessionAsync(session);
+
+        await RevokeRejectedSessionAsync(session.AccessToken);
+        throw new AccountException(actualRole switch
+        {
+            "student" => "Esta conta é de aluno. Toque em Trocar perfil e escolha Acessar como aluno.",
+            "teacher" => "Esta conta é de professor. Toque em Trocar perfil e escolha Acessar como professor.",
+            _ => "O serviço não informou um perfil de acesso válido para esta conta."
+        }, HttpStatusCode.Forbidden);
     }
 
     public async Task<AccountProfile> RegisterAsync(string name, string email, string password, string role)
@@ -229,6 +239,20 @@ public sealed class AccountClient
         }
         catch (SessionExpiredException) { }
         ClearSession();
+    }
+
+    private async Task RevokeRejectedSessionAsync(string token)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Post, "auth/logout");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        try
+        {
+            using var response = await _http.SendAsync(request);
+        }
+        catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException)
+        {
+            // A rejeição local continua valendo se o servidor estiver indisponível.
+        }
     }
 
     private async Task<AccountProfile> StoreSessionAsync(AccountSession session)

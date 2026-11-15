@@ -46,14 +46,14 @@ public partial class MainPage : ContentPage
         ErrorText.IsVisible = false;
         try
         {
+            var role = _selectedRole ?? throw new AccountException("Escolha se deseja acessar como aluno ou professor.");
             var email = EmailEntry.Text ?? string.Empty;
             var password = PasswordEntry.Text ?? string.Empty;
             if (_registering && password != ConfirmEntry.Text)
                 throw new AccountException("As senhas não coincidem.");
             var profile = _registering
-                ? await _accounts.RegisterAsync(NameEntry.Text ?? string.Empty, email, password,
-                    _selectedRole ?? throw new AccountException("Escolha se deseja criar uma conta de aluno ou professor."))
-                : await _accounts.LoginAsync(email, password);
+                ? await _accounts.RegisterAsync(NameEntry.Text ?? string.Empty, email, password, role)
+                : await _accounts.LoginAsync(email, password, role);
             PasswordEntry.Text = ConfirmEntry.Text = string.Empty;
             ShowAccount(profile);
         }
@@ -72,7 +72,6 @@ public partial class MainPage : ContentPage
         _registering = false;
         RoleChoicePanel.IsVisible = false;
         AuthPanel.IsVisible = true;
-        NamePanel.IsVisible = ConfirmPanel.IsVisible = false;
         PasswordEntry.Text = ConfirmEntry.Text = string.Empty;
         ErrorText.IsVisible = RetryAccessButton.IsVisible = false;
         UpdateAccessCopy();
@@ -81,8 +80,6 @@ public partial class MainPage : ContentPage
     private void OnBackToRoles(object? sender, EventArgs args)
     {
         if (_busy) return;
-        _selectedRole = null;
-        _registering = false;
         PasswordEntry.Text = ConfirmEntry.Text = string.Empty;
         ShowSignedOut();
     }
@@ -90,8 +87,6 @@ public partial class MainPage : ContentPage
     {
         if (_busy) return;
         _registering = !_registering;
-        NamePanel.IsVisible = ConfirmPanel.IsVisible = _registering;
-        SubmitButton.Text = _registering ? "Criar conta" : "Entrar";
         UpdateAccessCopy();
         PasswordEntry.Text = ConfirmEntry.Text = string.Empty;
         ErrorText.IsVisible = false;
@@ -157,7 +152,6 @@ public partial class MainPage : ContentPage
         AccountPanel.IsVisible = false;
         AuthPanel.IsVisible = false;
         RoleChoicePanel.IsVisible = true;
-        NamePanel.IsVisible = ConfirmPanel.IsVisible = false;
         Intro.IsVisible = true;
         UpdateAccessCopy();
     }
@@ -183,6 +177,9 @@ public partial class MainPage : ContentPage
 
     private void UpdateAccessCopy()
     {
+        NamePanel.IsVisible = ConfirmPanel.IsVisible = _registering;
+        SubmitButton.Text = _registering ? "Criar conta" : "Entrar";
+
         if (_selectedRole is null)
         {
             Heading.Text = "Treinos claros.\nProgresso visível.";

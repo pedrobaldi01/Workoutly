@@ -37,3 +37,11 @@ Ambiente visual: iPhone 18 Pro, iOS 27.0 Simulator. Instalação, lançamento, c
 Não foram testados execução Android, Windows, telefones físicos ou build Release. O cenário de tela utilizou HTTP apenas no loopback em Debug; a conexão entre API e MySQL foi posteriormente reiniciada com TLS. Não há evidência de usabilidade com participantes, nem fichas ou exercícios implementados. AUTH-02 cobre somente identidade/perfil nesta etapa; a autorização do domínio continua pendente.
 
 Não foram alterados os documentos acadêmicos enviados ao professor. Senhas, .env, tokens e dados .local/ não fazem parte do Git. A imagem contém somente dados fictícios de teste.
+
+## Botão de login e cadastro
+
+A verificação do code-behind com controles simulados reproduziu o botão **Criar conta** ao voltar do cadastro e escolher o perfil novamente. Após a correção, entrar, abrir o cadastro, voltar ao login e trocar de perfil passaram para aluno e professor. A compilação C#/XAML para `net10.0-ios` e `iossimulator-arm64` passou sem erros. A execução visual dessa correção no aparelho está pendente.
+
+## Perfil escolhido no login
+
+O app confirma o perfil retornado pelo Render antes de gravar a sessão. Com HTTP e armazenamento seguro simulados, aluno no acesso de aluno e professor no acesso de professor foram aceitos. As duas combinações trocadas e a resposta sem perfil foram bloqueadas. A falha de rede durante a revogação manteve o bloqueio. A compilação C#/XAML para `iossimulator-arm64` passou sem erros. A execução com o Render em aparelho físico está pendente.
