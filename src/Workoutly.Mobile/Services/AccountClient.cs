@@ -8,6 +8,8 @@ using System.Text.Json.Serialization.Metadata;
 namespace Workoutly.Mobile.Services;
 
 public sealed record AccountProfile(string Id, string Name, string Email, string Role);
+public sealed record StudentProfile(string Name, string? FirstName, string? LastName, decimal? BodyWeightKg, int? HeightCm);
+public sealed record StudentProfilePayload(string FirstName, string? LastName, decimal? BodyWeightKg, int? HeightCm);
 public sealed record TeacherInvitation(string? Code, DateTimeOffset? ExpiresAt);
 public sealed record EnrollmentInfo(AccountProfile? Teacher);
 public sealed record JoinTeacherPayload(string Code);
@@ -70,6 +72,8 @@ public sealed record WorkoutHistoryItem(DateOnly From, DateOnly To, int OffsetMi
 [JsonSerializable(typeof(CreatePlanPayload))]
 [JsonSerializable(typeof(UpdatePlanPayload))]
 [JsonSerializable(typeof(AccountProfile))]
+[JsonSerializable(typeof(StudentProfile))]
+[JsonSerializable(typeof(StudentProfilePayload))]
 [JsonSerializable(typeof(AccountProfile[]))]
 [JsonSerializable(typeof(TeacherInvitation))]
 [JsonSerializable(typeof(EnrollmentInfo))]
@@ -148,6 +152,15 @@ public sealed class AccountClient
     }
 
     public Task<AccountProfile> GetProfileAsync() => SendAsync(HttpMethod.Get, "auth/me", null, AccountJson.Default.AccountProfile, true);
+
+    public Task<StudentProfile> GetStudentProfileAsync() =>
+        SendAsync(HttpMethod.Get, "auth/me/student-profile", null, AccountJson.Default.StudentProfile, true);
+
+    public async Task<StudentProfile> UpdateStudentProfileAsync(StudentProfilePayload profile)
+    {
+        using var content = JsonContent.Create(profile, AccountJson.Default.StudentProfilePayload);
+        return await SendAsync(HttpMethod.Put, "auth/me/student-profile", content, AccountJson.Default.StudentProfile, true);
+    }
 
     public async Task<AccountProfile> UpdateProfileAsync(string name, string email, string? currentPassword)
     {
@@ -314,7 +327,8 @@ public sealed class AccountClient
             if (response.StatusCode == HttpStatusCode.Forbidden)
                 throw new AccountException("Seu perfil não tem permissão para esta ação. Volte à sua conta e atualize o acesso.");
             if ((response.StatusCode is HttpStatusCode.NotFound or HttpStatusCode.MethodNotAllowed)
-                && authenticated && method != HttpMethod.Get && path.StartsWith("auth/me", StringComparison.Ordinal))
+                && authenticated && (path == "auth/me/student-profile" ||
+                    (method != HttpMethod.Get && path.StartsWith("auth/me", StringComparison.Ordinal))))
                 throw new AccountException("O serviço conectado ainda precisa ser atualizado para gerenciar contas.");
             if (response.StatusCode == HttpStatusCode.NotFound)
                 throw new AccountException("Registro não encontrado ou não disponível para sua conta. Atualize a tela.");

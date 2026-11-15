@@ -13,3 +13,9 @@
 - O empacotamento iOS foi bloqueado no host de tarefas do linker do MSBuild. A execução no simulador e no iPhone não foi verificada.
 - O runner VSTest foi bloqueado ao abrir seu socket e a instância temporária de MySQL encerrou durante a inicialização. Os testes de integração foram preparados para ambiente isolado e sua execução está pendente.
 - O patch PostgreSQL passou em `git apply --check --whitespace=error-all` contra os arquivos da branch `main` de `JoaoAza/Workoutly-API`. A migração e o deploy do Render estão pendentes.
+
+## Meu perfil do aluno
+
+- O cartão **Meu perfil** aparece no topo de **Gerenciar conta** para alunos. Mostra nome, e-mail, peso e altura. Peso e altura são opcionais e preenchidos após o cadastro.
+- O aluno consulta e edita seu perfil em `GET /auth/me/student-profile` e `PUT /auth/me/student-profile`. O PostgreSQL recebe os campos na migração 12. Contas anteriores mantêm o nome já cadastrado.
+- A API, o projeto de testes e C#/XAML do app para o simulador iOS compilaram sem erros em macOS Apple Silicon. O teste com PostgreSQL foi bloqueado ao abrir o socket local do VSTest. A execução no aparelho e a aplicação da migração no Render estão pendentes.

@@ -6,6 +6,18 @@
         <VerticalStackLayout Padding="24" Spacing="14" MaximumWidthRequest="560">
             <Label Text="Gerenciar conta" Style="{StaticResource PageTitle}" />
             <VerticalStackLayout x:Name="Actions" Spacing="10">
+                <Border x:Name="StudentCard" Style="{StaticResource SurfaceCard}" IsVisible="False">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Meu perfil" FontFamily="InterBold" FontSize="22" />
+                        <Label x:Name="StudentName" FontFamily="InterSemiBold" FontSize="18" />
+                        <Label x:Name="StudentEmail" Style="{StaticResource SecondaryText}" LineBreakMode="CharacterWrap" />
+                        <Label x:Name="StudentWeight" Style="{StaticResource SecondaryText}" />
+                        <Label x:Name="StudentHeight" Style="{StaticResource SecondaryText}" />
+                        <Label x:Name="StudentStatus" Style="{StaticResource SecondaryText}" IsVisible="False" />
+                        <Button x:Name="EditStudentButton" Text="Editar perfil" Clicked="OnStudentProfile"
+                                Style="{StaticResource SecondaryButton}" AutomationId="edit_student_profile" />
+                    </VerticalStackLayout>
+                </Border>
                 <Button Text="Editar nome e e-mail" Clicked="OnProfile" Style="{StaticResource SecondaryButton}" AutomationId="manage_profile" />
                 <Button Text="Alterar senha" Clicked="OnPassword" Style="{StaticResource SecondaryButton}" AutomationId="manage_password" />
                 <Button Text="Excluir conta" Clicked="OnDelete" Style="{StaticResource TextButton}" TextColor="{StaticResource Error}" AutomationId="manage_delete" />
@@ -28,6 +40,32 @@
                             </VerticalStackLayout>
                         </Border>
                         <Label x:Name="EmailError" IsVisible="False" TextColor="{StaticResource Error}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout x:Name="StudentFields" Spacing="10" IsVisible="False">
+                        <Border Style="{StaticResource InputBorder}">
+                            <VerticalStackLayout>
+                                <Label Text="Nome" Style="{StaticResource FieldLabel}" />
+                                <Entry x:Name="StudentFirstNameEntry" MaxLength="120" AutomationId="student_first_name" />
+                            </VerticalStackLayout>
+                        </Border>
+                        <Border Style="{StaticResource InputBorder}">
+                            <VerticalStackLayout>
+                                <Label Text="Sobrenome" Style="{StaticResource FieldLabel}" />
+                                <Entry x:Name="StudentLastNameEntry" MaxLength="120" AutomationId="student_last_name" />
+                            </VerticalStackLayout>
+                        </Border>
+                        <Border Style="{StaticResource InputBorder}">
+                            <VerticalStackLayout>
+                                <Label Text="Peso atual (kg, opcional)" Style="{StaticResource FieldLabel}" />
+                                <Entry x:Name="StudentWeightEntry" Keyboard="Numeric" MaxLength="7" AutomationId="student_weight" />
+                            </VerticalStackLayout>
+                        </Border>
+                        <Border Style="{StaticResource InputBorder}">
+                            <VerticalStackLayout>
+                                <Label Text="Altura (cm, opcional)" Style="{StaticResource FieldLabel}" />
+                                <Entry x:Name="StudentHeightEntry" Keyboard="Numeric" MaxLength="3" AutomationId="student_height" />
+                            </VerticalStackLayout>
+                        </Border>
                     </VerticalStackLayout>
                     <Border x:Name="CurrentPasswordField" Style="{StaticResource InputBorder}">
                         <VerticalStackLayout>
