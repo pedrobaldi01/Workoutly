@@ -37,6 +37,35 @@ public static class AuthEndpoints
             user.FindFirstValue(ClaimTypes.NameIdentifier)!, user.FindFirstValue(ClaimTypes.Name)!, user.FindFirstValue(ClaimTypes.Email)!, user.FindFirstValue(ClaimTypes.Role)!)))
             .RequireAuthorization();
 
+        accounts.MapPatch("/me", async (ProfileUpdateRequest request, HttpRequest http, ClaimsPrincipal user, AuthService auth, CancellationToken ct) =>
+        {
+            var errors = new Dictionary<string, string[]>();
+            if (!ValidEmail(request.Email)) errors["email"] = ["Informe um e-mail válido com até 254 caracteres."];
+            if (string.IsNullOrWhiteSpace(request.Name) || request.Name.Trim().Length is < 2 or > 120)
+                errors["name"] = ["Informe um nome entre 2 e 120 caracteres."];
+            if (request.CurrentPassword?.Length > 128)
+                errors["currentPassword"] = ["Informe sua senha atual (até 128 caracteres)."];
+            if (errors.Count > 0) return Results.ValidationProblem(errors);
+            var result = await auth.UpdateProfileAsync(CurrentId(user), CurrentToken(http), request, ct);
+            return result.Status == "ok" ? Results.Ok(result.Profile) : AccountChangeResponse(result.Status);
+        }).RequireAuthorization().RequireRateLimiting("account");
+
+        accounts.MapPost("/me/password", async (PasswordChangeRequest request, HttpRequest http, ClaimsPrincipal user, AuthService auth, CancellationToken ct) =>
+        {
+            if (!ValidCurrentPassword(request.CurrentPassword)) return InvalidCurrentPassword();
+            if (string.IsNullOrWhiteSpace(request.NewPassword) || request.NewPassword.Length is < 10 or > 128)
+                return Results.ValidationProblem(new Dictionary<string, string[]> { ["newPassword"] = ["Use uma senha entre 10 e 128 caracteres."] });
+            if (request.CurrentPassword == request.NewPassword)
+                return Results.ValidationProblem(new Dictionary<string, string[]> { ["newPassword"] = ["Escolha uma senha diferente da atual."] });
+            return AccountChangeResponse(await auth.ChangePasswordAsync(CurrentId(user), CurrentToken(http), request.CurrentPassword!, request.NewPassword, ct));
+        }).RequireAuthorization().RequireRateLimiting("account");
+
+        accounts.MapPost("/me/delete", async (AccountDeleteRequest request, HttpRequest http, ClaimsPrincipal user, AuthService auth, CancellationToken ct) =>
+        {
+            if (!ValidCurrentPassword(request.CurrentPassword)) return InvalidCurrentPassword();
+            return AccountChangeResponse(await auth.DeleteAccountAsync(CurrentId(user), CurrentToken(http), request.CurrentPassword!, ct));
+        }).RequireAuthorization().RequireRateLimiting("account");
+
         accounts.MapPost("/logout", async (HttpRequest request, AuthService auth, CancellationToken cancellationToken) =>
         {
             await auth.RevokeAsync(SessionAuthenticationHandler.ReadToken(request)!, cancellationToken);
@@ -47,15 +76,39 @@ public static class AuthEndpoints
     internal static Dictionary<string, string[]> Validate(string? email, string? password, bool registration)
     {
         var errors = new Dictionary<string, string[]>();
-        var address = email?.Trim();
-        if (string.IsNullOrWhiteSpace(address) || address.Length > 254 ||
-            !MailAddress.TryCreate(address, out var parsed) || !string.Equals(parsed.Address, address, StringComparison.OrdinalIgnoreCase))
+        if (!ValidEmail(email))
             errors["email"] = ["Informe um e-mail válido com até 254 caracteres."];
         if (string.IsNullOrWhiteSpace(password) || password.Length > 128 || (registration && password.Length < 10))
             errors["password"] = [registration ? "Use uma senha entre 10 e 128 caracteres." : "Informe sua senha (até 128 caracteres)."];
         return errors;
     }
 
+    private static bool ValidEmail(string? email)
+    {
+        var address = email?.Trim();
+        return !string.IsNullOrWhiteSpace(address) && address.Length <= 254 &&
+            MailAddress.TryCreate(address, out var parsed) && string.Equals(parsed.Address, address, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string CurrentId(ClaimsPrincipal user) => user.FindFirstValue(ClaimTypes.NameIdentifier)!;
+    private static string CurrentToken(HttpRequest request) => SessionAuthenticationHandler.ReadToken(request)!;
+    private static bool ValidCurrentPassword(string? value) => !string.IsNullOrWhiteSpace(value) && value.Length <= 128;
+    private static IResult InvalidCurrentPassword() => Results.ValidationProblem(new Dictionary<string, string[]>
+    {
+        ["currentPassword"] = ["Informe a senha atual correta."]
+    });
+
+    private static IResult AccountChangeResponse(string status) => status switch
+    {
+        "ok" => Results.NoContent(),
+        "password" => InvalidCurrentPassword(),
+        "email_taken" => Results.Conflict(new { message = "Este e-mail já está cadastrado." }),
+        _ => Results.Unauthorized()
+    };
+
     public sealed record RegisterRequest(string? Name, string? Email, string? Password, string? Role);
     public sealed record LoginRequest(string? Email, string? Password);
+    public sealed record ProfileUpdateRequest(string? Name, string? Email, string? CurrentPassword);
+    public sealed record PasswordChangeRequest(string? CurrentPassword, string? NewPassword);
+    public sealed record AccountDeleteRequest(string? CurrentPassword);
 }

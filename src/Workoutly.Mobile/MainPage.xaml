@@ -5,13 +5,10 @@
         <Grid Padding="24,24" RowDefinitions="Auto,*,Auto" RowSpacing="18" MaximumWidthRequest="560"
               MinimumHeightRequest="{Binding Height, Source={x:Reference PageScroll}}">
             <VerticalStackLayout x:Name="Intro" Spacing="18">
-                <Grid ColumnDefinitions="*,Auto">
-                    <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
-                        <Image Source="workoutly_logo.png" WidthRequest="42" HeightRequest="42" Aspect="AspectFit" SemanticProperties.Description="Marca Workoutly" />
-                        <Label Text="WORKOUTLY" FontFamily="InterBold" FontSize="16" CharacterSpacing="2" VerticalOptions="Center" />
-                    </HorizontalStackLayout>
-                    <Button Grid.Column="1" x:Name="ConnectionButton" Text="Conexão" Clicked="OnConnection" Style="{StaticResource TextButton}" FontSize="11" Padding="4,0" />
-                </Grid>
+                <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+                    <Image Source="workoutly_logo.png" WidthRequest="42" HeightRequest="42" Aspect="AspectFit" SemanticProperties.Description="Marca Workoutly" />
+                    <Label Text="WORKOUTLY" FontFamily="InterBold" FontSize="16" CharacterSpacing="2" VerticalOptions="Center" />
+                </HorizontalStackLayout>
                 <Label x:Name="Heading" Text="Treinos claros.&#10;Progresso visível." FontFamily="InterBold" FontSize="34"
                        LineHeight="1.15" SemanticProperties.HeadingLevel="Level1" />
                 <Label x:Name="Subtitle" Text="Organize suas fichas e acompanhe sua evolução em um só lugar." FontSize="15"
@@ -52,12 +49,6 @@
                         </Border>
                         <Label x:Name="RegisterHint" Style="{StaticResource SecondaryText}" />
                     </VerticalStackLayout>
-                    <Border x:Name="ConnectionPanel" Style="{StaticResource InputBorder}" IsVisible="False">
-                        <VerticalStackLayout Spacing="0">
-                            <Label Text="Endereço do serviço" Style="{StaticResource FieldLabel}" />
-                            <Entry x:Name="AddressEntry" Placeholder="https://seu-servidor" Keyboard="Url" AutomationId="account_server" />
-                        </VerticalStackLayout>
-                    </Border>
                 </VerticalStackLayout>
                 <VerticalStackLayout Grid.Row="2" Spacing="8" Margin="0,16,0,0">
                     <Button x:Name="BackToRolesButton" Text="Trocar perfil" Clicked="OnBackToRoles" Style="{StaticResource TextButton}" HorizontalOptions="Start" Padding="0" />
@@ -71,7 +62,10 @@
                         <Label x:Name="Greeting" Style="{StaticResource SecondaryText}" FontSize="15" LineBreakMode="TailTruncation" />
                         <Label x:Name="HomeTitle" Text="Pronto para treinar?" FontFamily="InterBold" FontSize="22" SemanticProperties.HeadingLevel="Level1" />
                     </VerticalStackLayout>
-                    <Image Grid.Column="1" Source="figma_avatar.png" WidthRequest="46" HeightRequest="46" Aspect="AspectFit" VerticalOptions="Center" />
+                    <ImageButton Grid.Column="1" x:Name="ManageAccountButton" Source="figma_avatar.png"
+                                 WidthRequest="46" HeightRequest="46" Aspect="AspectFit" VerticalOptions="Center"
+                                 BackgroundColor="Transparent" BorderWidth="0" Padding="0" Clicked="OnManageAccount"
+                                 SemanticProperties.Description="Gerenciar conta" AutomationId="open_account_management" />
                 </Grid>
                 <Border Grid.Row="1" Style="{StaticResource SurfaceCard}">
                     <VerticalStackLayout Spacing="10">

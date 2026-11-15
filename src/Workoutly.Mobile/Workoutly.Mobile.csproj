@@ -19,9 +19,6 @@
     <CodesignEntitlements>Platforms/iOS/Entitlements.plist</CodesignEntitlements>
     <CodesignKey>-</CodesignKey>
   </PropertyGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-ios' And '$(Configuration)' == 'Debug'">
-    <PartialAppManifest Include="Platforms/iOS/Debug.plist" />
-  </ItemGroup>
   <ItemGroup>
     <MauiIcon Include="Resources\AppIcon\appicon.png" Color="#C5F67A" />
     <MauiSplashScreen Include="Resources\Splash\splash.png" Color="#0A0A0A" BaseSize="42,42" />

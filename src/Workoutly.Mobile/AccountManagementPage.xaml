@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Workoutly.Mobile.AccountManagementPage" Title="Gerenciar conta">
+    <ScrollView x:Name="PageScroll">
+        <VerticalStackLayout Padding="24" Spacing="14" MaximumWidthRequest="560">
+            <Label Text="Gerenciar conta" Style="{StaticResource PageTitle}" />
+            <VerticalStackLayout x:Name="Actions" Spacing="10">
+                <Button Text="Editar nome e e-mail" Clicked="OnProfile" Style="{StaticResource SecondaryButton}" AutomationId="manage_profile" />
+                <Button Text="Alterar senha" Clicked="OnPassword" Style="{StaticResource SecondaryButton}" AutomationId="manage_password" />
+                <Button Text="Excluir conta" Clicked="OnDelete" Style="{StaticResource TextButton}" TextColor="{StaticResource Error}" AutomationId="manage_delete" />
+            </VerticalStackLayout>
+            <Border x:Name="Form" Style="{StaticResource SurfaceCard}" IsVisible="False">
+                <VerticalStackLayout Spacing="12">
+                    <Label x:Name="FormHeading" FontFamily="InterBold" FontSize="22" />
+                    <Label x:Name="Hint" Style="{StaticResource SecondaryText}" />
+                    <VerticalStackLayout x:Name="ProfileFields" Spacing="10">
+                        <Border Style="{StaticResource InputBorder}">
+                            <VerticalStackLayout>
+                                <Label Text="Nome" Style="{StaticResource FieldLabel}" />
+                                <Entry x:Name="NameEntry" MaxLength="120" AutomationId="manage_name" />
+                            </VerticalStackLayout>
+                        </Border>
+                        <Border Style="{StaticResource InputBorder}">
+                            <VerticalStackLayout>
+                                <Label Text="E-mail" Style="{StaticResource FieldLabel}" />
+                                <Entry x:Name="EmailEntry" Keyboard="Email" MaxLength="254" TextChanged="OnEmailChanged" AutomationId="manage_email" />
+                            </VerticalStackLayout>
+                        </Border>
+                        <Label x:Name="EmailError" IsVisible="False" TextColor="{StaticResource Error}" />
+                    </VerticalStackLayout>
+                    <Border x:Name="CurrentPasswordField" Style="{StaticResource InputBorder}">
+                        <VerticalStackLayout>
+                            <Label Text="Senha atual" Style="{StaticResource FieldLabel}" />
+                            <Entry x:Name="CurrentPasswordEntry" IsPassword="True" MaxLength="128" AutomationId="manage_current_password" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <VerticalStackLayout x:Name="NewPasswordFields" Spacing="10">
+                        <Border Style="{StaticResource InputBorder}">
+                            <VerticalStackLayout>
+                                <Label Text="Nova senha" Style="{StaticResource FieldLabel}" />
+                                <Entry x:Name="NewPasswordEntry" IsPassword="True" MaxLength="128" AutomationId="manage_new_password" />
+                            </VerticalStackLayout>
+                        </Border>
+                        <Border Style="{StaticResource InputBorder}">
+                            <VerticalStackLayout>
+                                <Label Text="Confirme a nova senha" Style="{StaticResource FieldLabel}" />
+                                <Entry x:Name="ConfirmPasswordEntry" IsPassword="True" MaxLength="128" AutomationId="manage_confirm_password" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </VerticalStackLayout>
+                    <Label x:Name="ErrorText" IsVisible="False" TextColor="{StaticResource Error}" AutomationId="manage_error" />
+                    <Button x:Name="SubmitButton" Clicked="OnSubmit" AutomationId="manage_submit" />
+                    <Button Text="Cancelar" Clicked="OnCancel" Style="{StaticResource TextButton}" />
+                </VerticalStackLayout>
+            </Border>
+            <Label x:Name="SuccessText" IsVisible="False" TextColor="{StaticResource Mint}" AutomationId="manage_status" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

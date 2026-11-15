@@ -39,7 +39,7 @@ public sealed class MySqlBootstrapTests : IClassFixture<MySqlFixture>
         Assert.NotNull(body);
         Assert.Equal("ready", body.Status);
         Assert.Equal("ready", body.Database);
-        Assert.Equal(9, body.SchemaVersion);
+        Assert.Equal(10, body.SchemaVersion);
     }
 
     private sealed record ReadinessBody(string Status, string Database, int? SchemaVersion);

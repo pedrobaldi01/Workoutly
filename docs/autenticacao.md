@@ -44,11 +44,9 @@ Também é possível abrir Executar-local.command. O helper compila a API, inici
 
 A API usa o usuário workoutly, limitado ao próprio banco, com senha do .env e TLS. O helper verifica essa credencial sem imprimi-la nem alterá-la. Não regenere o .env quando já houver dados. Para o ambiente Docker, seguir mysql.md; o modelo agora também exige TLS entre a API e o MySQL.
 
-No simulador iOS, o endereço padrão de Debug é http://localhost:5080/. No emulador Android, http://10.0.2.2:5080/. A tela **Conexão** permite selecionar outro serviço. Trocar de serviço limpa a sessão local e não envia o token ao novo endereço. Em Release, só HTTPS é aceito, inclusive na restauração da sessão. Não há desativação da validação de certificados no cliente HTTP.
+O app usa https://workoutly-api.onrender.com/ em todas as configurações e plataformas. Na atualização, uma sessão válida do Render pode ser restaurada. Uma sessão de outro servidor é descartada e o app volta à tela de acesso. A preferência de endereço de versões antigas deixou de ser usada.
 
-HTTP é permitido apenas em builds Debug para desenvolvimento local. A exceção iOS está em um manifesto parcial incluído somente em Debug; no Android, o atributo UsesCleartextTraffic também é condicionado a Debug. O entitlement de Keychain e a assinatura ad hoc se aplicam somente ao simulador iOS; aparelho físico continua exigindo assinatura/provisionamento Apple.
-
-Telefones físicos não usam o localhost do computador. Exigem configurar um endereço HTTPS acessível e certificado confiável. Esse cenário não foi validado nesta etapa.
+O entitlement de Keychain e a assinatura ad hoc se aplicam somente ao simulador iOS. Aparelho físico exige assinatura e provisionamento Apple.
 
 ## Verificações e reprodução
 
@@ -59,5 +57,7 @@ python3 scripts/test-native-mysql.py
 O teste cria bancos e usuários restritos aleatórios em um MySQL temporário. Verifica dados inválidos, cadastro, login incorreto/correto, e-mail duplicado, perfil, logout, revogação, token adulterado, expiração simulada pelo relógio do servidor, duas contas e restauração por outra instância da API. O teste não simula persistência com SQLite.
 
 No iPhone Simulator foram exercitados cadastro com dados fictícios, reabertura com sessão restaurada, logout, senha incorreta, novo login e falha de conexão com campos preservados. Detalhes e imagens em evidencias/autenticacao.md. Android foi compilado; sua execução e os aparelhos físicos continuam sem validação nesta etapa.
+
+Na mudança para o endereço fixo do Render, o código C# e a geração XAML compilaram para o simulador iOS `iossimulator-arm64`. Uma verificação com HTTP e armazenamento simulados confirmou primeira abertura, descarte de token local, restauração de token do Render, cadastro, login e expiração de sessão. A mudança ainda precisa ser validada em execução no aparelho.
 
 Referências dos componentes: [PasswordHasherOptions](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity-configuration?view=aspnetcore-10.0) e [SecureStorage do MAUI](https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/storage/secure-storage?view=net-maui-10.0).

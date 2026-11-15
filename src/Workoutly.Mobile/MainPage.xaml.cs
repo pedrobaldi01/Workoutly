@@ -8,13 +8,13 @@ public partial class MainPage : ContentPage
     private bool _registering;
     private bool _busy;
     private bool _isTeacher;
+    private AccountProfile? _profile;
     private string? _selectedRole;
 
     public MainPage()
     {
         InitializeComponent();
         FormFeedback.FollowError(PageScroll, ErrorText);
-        AddressEntry.Text = _accounts.ApiUrl;
     }
 
     protected override async void OnAppearing()
@@ -46,7 +46,6 @@ public partial class MainPage : ContentPage
         ErrorText.IsVisible = false;
         try
         {
-            _accounts.ConfigureServer(AddressEntry.Text ?? string.Empty);
             var email = EmailEntry.Text ?? string.Empty;
             var password = PasswordEntry.Text ?? string.Empty;
             if (_registering && password != ConfirmEntry.Text)
@@ -99,8 +98,6 @@ public partial class MainPage : ContentPage
         RetryAccessButton.IsVisible = false;
     }
 
-    private void OnConnection(object? sender, EventArgs args) => ConnectionPanel.IsVisible = !ConnectionPanel.IsVisible;
-
     private async void OnLogout(object? sender, EventArgs args)
     {
         if (_busy) return;
@@ -118,6 +115,7 @@ public partial class MainPage : ContentPage
 
     private void ShowAccount(AccountProfile profile)
     {
+        _profile = profile;
         RetryAccessButton.IsVisible = false;
         AccountName.Text = profile.Name;
         AccountEmail.Text = profile.Email;
@@ -153,6 +151,7 @@ public partial class MainPage : ContentPage
 
     private void ShowSignedOut()
     {
+        _profile = null;
         _selectedRole = null;
         _registering = false;
         AccountPanel.IsVisible = false;
@@ -166,6 +165,12 @@ public partial class MainPage : ContentPage
     private async void OnConnections(object? sender, EventArgs args)
     {
         await OpenAsync(() => new ConnectionsPage(_accounts, _isTeacher));
+    }
+
+    private async void OnManageAccount(object? sender, EventArgs args)
+    {
+        if (_profile is { } profile)
+            await OpenAsync(() => new AccountManagementPage(_accounts, profile));
     }
 
     private async Task OpenAsync(Func<Page> createPage)
@@ -208,8 +213,8 @@ public partial class MainPage : ContentPage
         RoleChoicePanel.IsEnabled = !busy;
         AuthPanel.IsEnabled = !busy;
         LogoutButton.IsEnabled = !busy;
+        ManageAccountButton.IsEnabled = !busy;
         ExercisesButton.IsEnabled = !busy;
-        ConnectionButton.IsEnabled = !busy;
         ConnectionsButton.IsEnabled = !busy;
         PlansButton.IsEnabled = WorkoutsButton.IsEnabled = !busy;
     }

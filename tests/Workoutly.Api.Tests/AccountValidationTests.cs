@@ -5,6 +5,19 @@ namespace Workoutly.Api.Tests;
 
 public sealed class AccountValidationTests
 {
+    [Theory]
+    [InlineData("PATCH", "/auth/me")]
+    [InlineData("POST", "/auth/me/password")]
+    [InlineData("POST", "/auth/me/delete")]
+    public async Task Account_changes_require_a_session(string method, string route)
+    {
+        await using var application = new DatabaseApplication(null);
+        using var client = application.CreateClient();
+        using var request = new HttpRequestMessage(new HttpMethod(method), route) { Content = JsonContent.Create(new { }) };
+        using var response = await client.SendAsync(request);
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
     [Fact]
     public async Task Liveness_does_not_consult_database_even_if_client_sends_an_old_token()
     {

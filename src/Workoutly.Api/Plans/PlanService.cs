@@ -107,7 +107,7 @@ public sealed class PlanService(MySqlDatabase database)
             }
             await using var lookup = connection.CreateCommand();
             lookup.Transaction = transaction;
-            lookup.CommandText = "SELECT name,muscle_group,equipment,description FROM exercises WHERE id=@exercise AND (owner_id IS NULL OR owner_id=@actor)";
+            lookup.CommandText = "SELECT name,muscle_group,equipment,description FROM exercises WHERE id=@exercise AND NOT archived AND (owner_id IS NULL OR owner_id=@actor)";
             lookup.Parameters.AddWithValue("@exercise", item.ExerciseId.ToString());
             lookup.Parameters.AddWithValue("@actor", actor);
             await using var reader = await lookup.ExecuteReaderAsync(ct);

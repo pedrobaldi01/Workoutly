@@ -68,7 +68,7 @@ Abra http://localhost:5080/health. Resposta esperada:
 
 Sem conexão configurada, `/health` continua respondendo 200 com `databaseConfigured=false`, e `/health/ready` retorna 503. Para preparar o MySQL e executar os testes reais, leia [MySQL no Workoutly](docs/mysql.md).
 
-A API de desenvolvimento escuta somente no computador local. O simulador de iPhone usa http://localhost:5080/ e o emulador Android usa http://10.0.2.2:5080/. Em builds Release, o app exige um endereço HTTPS. Telefones físicos precisam de um serviço HTTPS acessível; não usam o localhost do Mac.
+A API de desenvolvimento escuta somente no computador local e pode ser exercitada pelos testes HTTP. O app usa a API hospedada em https://workoutly-api.onrender.com/ em Debug e Release, tanto em aparelhos físicos quanto em simuladores e emuladores.
 
 ```sh
 dotnet build src/Workoutly.Api/Workoutly.Api.csproj

@@ -1,0 +1,1245 @@
+{
+  "database": "workoutly",
+  "schemaVersion": 9,
+  "verifiedAt": "2026-10-21",
+  "columns": [
+    {
+      "key": "PRI",
+      "name": "user_id",
+      "type": "char(36)",
+      "table": "account_roles",
+      "default": null,
+      "nullable": false,
+      "position": 1
+    },
+    {
+      "key": "",
+      "name": "role",
+      "type": "varchar(20)",
+      "table": "account_roles",
+      "default": null,
+      "nullable": false,
+      "position": 2
+    },
+    {
+      "key": "PRI",
+      "name": "id",
+      "type": "char(36)",
+      "table": "exercises",
+      "default": null,
+      "nullable": false,
+      "position": 1
+    },
+    {
+      "key": "MUL",
+      "name": "owner_id",
+      "type": "char(36)",
+      "table": "exercises",
+      "default": null,
+      "nullable": true,
+      "position": 2
+    },
+    {
+      "key": "",
+      "name": "name",
+      "type": "varchar(120)",
+      "table": "exercises",
+      "default": null,
+      "nullable": false,
+      "position": 3
+    },
+    {
+      "key": "",
+      "name": "muscle_group",
+      "type": "varchar(60)",
+      "table": "exercises",
+      "default": null,
+      "nullable": false,
+      "position": 4
+    },
+    {
+      "key": "",
+      "name": "equipment",
+      "type": "varchar(80)",
+      "table": "exercises",
+      "default": null,
+      "nullable": false,
+      "position": 5
+    },
+    {
+      "key": "",
+      "name": "description",
+      "type": "varchar(1000)",
+      "table": "exercises",
+      "default": "",
+      "nullable": false,
+      "position": 6
+    },
+    {
+      "key": "",
+      "name": "created_at",
+      "type": "datetime(6)",
+      "table": "exercises",
+      "default": "CURRENT_TIMESTAMP(6)",
+      "nullable": false,
+      "position": 7
+    },
+    {
+      "key": "PRI",
+      "name": "version",
+      "type": "int",
+      "table": "schema_migrations",
+      "default": null,
+      "nullable": false,
+      "position": 1
+    },
+    {
+      "key": "",
+      "name": "name",
+      "type": "varchar(120)",
+      "table": "schema_migrations",
+      "default": null,
+      "nullable": false,
+      "position": 2
+    },
+    {
+      "key": "",
+      "name": "applied_at",
+      "type": "datetime(6)",
+      "table": "schema_migrations",
+      "default": "CURRENT_TIMESTAMP(6)",
+      "nullable": false,
+      "position": 3
+    },
+    {
+      "key": "PRI",
+      "name": "student_id",
+      "type": "char(36)",
+      "table": "student_teachers",
+      "default": null,
+      "nullable": false,
+      "position": 1
+    },
+    {
+      "key": "MUL",
+      "name": "teacher_id",
+      "type": "char(36)",
+      "table": "student_teachers",
+      "default": null,
+      "nullable": false,
+      "position": 2
+    },
+    {
+      "key": "",
+      "name": "created_at",
+      "type": "datetime(6)",
+      "table": "student_teachers",
+      "default": "CURRENT_TIMESTAMP(6)",
+      "nullable": false,
+      "position": 3
+    },
+    {
+      "key": "PRI",
+      "name": "teacher_id",
+      "type": "char(36)",
+      "table": "teacher_invitations",
+      "default": null,
+      "nullable": false,
+      "position": 1
+    },
+    {
+      "key": "UNI",
+      "name": "code",
+      "type": "char(12)",
+      "table": "teacher_invitations",
+      "default": null,
+      "nullable": false,
+      "position": 2
+    },
+    {
+      "key": "",
+      "name": "expires_at",
+      "type": "datetime(6)",
+      "table": "teacher_invitations",
+      "default": null,
+      "nullable": false,
+      "position": 3
+    },
+    {
+      "key": "PRI",
+      "name": "token_hash",
+      "type": "char(64)",
+      "table": "user_sessions",
+      "default": null,
+      "nullable": false,
+      "position": 1
+    },
+    {
+      "key": "MUL",
+      "name": "user_id",
+      "type": "char(36)",
+      "table": "user_sessions",
+      "default": null,
+      "nullable": false,
+      "position": 2
+    },
+    {
+      "key": "",
+      "name": "created_at",
+      "type": "datetime(6)",
+      "table": "user_sessions",
+      "default": null,
+      "nullable": false,
+      "position": 3
+    },
+    {
+      "key": "MUL",
+      "name": "expires_at",
+      "type": "datetime(6)",
+      "table": "user_sessions",
+      "default": null,
+      "nullable": false,
+      "position": 4
+    },
+    {
+      "key": "PRI",
+      "name": "id",
+      "type": "char(36)",
+      "table": "users",
+      "default": null,
+      "nullable": false,
+      "position": 1
+    },
+    {
+      "key": "",
+      "name": "name",
+      "type": "varchar(120)",
+      "table": "users",
+      "default": null,
+      "nullable": false,
+      "position": 2
+    },
+    {
+      "key": "",
+      "name": "email",
+      "type": "varchar(254)",
+      "table": "users",
+      "default": null,
+      "nullable": false,
+      "position": 3
+    },
+    {
+      "key": "UNI",
+      "name": "normalized_email",
+      "type": "varchar(254)",
+      "table": "users",
+      "default": null,
+      "nullable": false,
+      "position": 4
+    },
+    {
+      "key": "",
+      "name": "password_hash",
+      "type": "varchar(512)",
+      "table": "users",
+      "default": null,
+      "nullable": false,
+      "position": 5
+    },
+    {
+      "key": "",
+      "name": "created_at",
+      "type": "datetime(6)",
+      "table": "users",
+      "default": null,
+      "nullable": false,
+      "position": 6
+    },
+    {
+      "key": "PRI",
+      "name": "plan_id",
+      "type": "char(36)",
+      "table": "workout_plan_items",
+      "default": null,
+      "nullable": false,
+      "position": 1
+    },
+    {
+      "key": "PRI",
+      "name": "version",
+      "type": "int",
+      "table": "workout_plan_items",
+      "default": null,
+      "nullable": false,
+      "position": 2
+    },
+    {
+      "key": "PRI",
+      "name": "position",
+      "type": "int",
+      "table": "workout_plan_items",
+      "default": null,
+      "nullable": false,
+      "position": 3
+    },
+    {
+      "key": "MUL",
+      "name": "exercise_id",
+      "type": "char(36)",
+      "table": "workout_plan_items",
+      "default": null,
+      "nullable": false,
+      "position": 4
+    },
+    {
+      "key": "",
+      "name": "name",
+      "type": "varchar(120)",
+      "table": "workout_plan_items",
+      "default": null,
+      "nullable": false,
+      "position": 5
+    },
+    {
+      "key": "",
+      "name": "muscle_group",
+      "type": "varchar(60)",
+      "table": "workout_plan_items",
+      "default": null,
+      "nullable": false,
+      "position": 6
+    },
+    {
+      "key": "",
+      "name": "equipment",
+      "type": "varchar(80)",
+      "table": "workout_plan_items",
+      "default": null,
+      "nullable": false,
+      "position": 7
+    },
+    {
+      "key": "",
+      "name": "description",
+      "type": "varchar(1000)",
+      "table": "workout_plan_items",
+      "default": null,
+      "nullable": false,
+      "position": 8
+    },
+    {
+      "key": "",
+      "name": "set_count",
+      "type": "int",
+      "table": "workout_plan_items",
+      "default": null,
+      "nullable": false,
+      "position": 9
+    },
+    {
+      "key": "",
+      "name": "repetitions",
+      "type": "int",
+      "table": "workout_plan_items",
+      "default": null,
+      "nullable": false,
+      "position": 10
+    },
+    {
+      "key": "PRI",
+      "name": "plan_id",
+      "type": "char(36)",
+      "table": "workout_plan_versions",
+      "default": null,
+      "nullable": false,
+      "position": 1
+    },
+    {
+      "key": "PRI",
+      "name": "version",
+      "type": "int",
+      "table": "workout_plan_versions",
+      "default": null,
+      "nullable": false,
+      "position": 2
+    },
+    {
+      "key": "",
+      "name": "name",
+      "type": "varchar(120)",
+      "table": "workout_plan_versions",
+      "default": null,
+      "nullable": false,
+      "position": 3
+    },
+    {
+      "key": "",
+      "name": "notes",
+      "type": "varchar(1000)",
+      "table": "workout_plan_versions",
+      "default": null,
+      "nullable": false,
+      "position": 4
+    },
+    {
+      "key": "MUL",
+      "name": "author_id",
+      "type": "char(36)",
+      "table": "workout_plan_versions",
+      "default": null,
+      "nullable": false,
+      "position": 5
+    },
+    {
+      "key": "",
+      "name": "created_at",
+      "type": "datetime(6)",
+      "table": "workout_plan_versions",
+      "default": "CURRENT_TIMESTAMP(6)",
+      "nullable": false,
+      "position": 6
+    },
+    {
+      "key": "PRI",
+      "name": "id",
+      "type": "char(36)",
+      "table": "workout_plans",
+      "default": null,
+      "nullable": false,
+      "position": 1
+    },
+    {
+      "key": "MUL",
+      "name": "student_id",
+      "type": "char(36)",
+      "table": "workout_plans",
+      "default": null,
+      "nullable": false,
+      "position": 2
+    },
+    {
+      "key": "",
+      "name": "current_version",
+      "type": "int",
+      "table": "workout_plans",
+      "default": null,
+      "nullable": false,
+      "position": 3
+    },
+    {
+      "key": "",
+      "name": "deleted_at",
+      "type": "datetime(6)",
+      "table": "workout_plans",
+      "default": null,
+      "nullable": true,
+      "position": 4
+    },
+    {
+      "key": "PRI",
+      "name": "session_id",
+      "type": "char(36)",
+      "table": "workout_session_changes",
+      "default": null,
+      "nullable": false,
+      "position": 1
+    },
+    {
+      "key": "PRI",
+      "name": "version",
+      "type": "int",
+      "table": "workout_session_changes",
+      "default": null,
+      "nullable": false,
+      "position": 2
+    },
+    {
+      "key": "UNI",
+      "name": "operation_id",
+      "type": "char(36)",
+      "table": "workout_session_changes",
+      "default": null,
+      "nullable": false,
+      "position": 3
+    },
+    {
+      "key": "",
+      "name": "request_hash",
+      "type": "char(64)",
+      "table": "workout_session_changes",
+      "default": null,
+      "nullable": false,
+      "position": 4
+    },
+    {
+      "key": "",
+      "name": "changed_at",
+      "type": "datetime(6)",
+      "table": "workout_session_changes",
+      "default": "CURRENT_TIMESTAMP(6)",
+      "nullable": false,
+      "position": 5
+    },
+    {
+      "key": "PRI",
+      "name": "session_id",
+      "type": "char(36)",
+      "table": "workout_session_sets",
+      "default": null,
+      "nullable": false,
+      "position": 1
+    },
+    {
+      "key": "MUL",
+      "name": "plan_id",
+      "type": "char(36)",
+      "table": "workout_session_sets",
+      "default": null,
+      "nullable": false,
+      "position": 2
+    },
+    {
+      "key": "",
+      "name": "plan_version",
+      "type": "int",
+      "table": "workout_session_sets",
+      "default": null,
+      "nullable": false,
+      "position": 3
+    },
+    {
+      "key": "PRI",
+      "name": "exercise_id",
+      "type": "char(36)",
+      "table": "workout_session_sets",
+      "default": null,
+      "nullable": false,
+      "position": 4
+    },
+    {
+      "key": "PRI",
+      "name": "set_position",
+      "type": "int",
+      "table": "workout_session_sets",
+      "default": null,
+      "nullable": false,
+      "position": 5
+    },
+    {
+      "key": "",
+      "name": "repetitions",
+      "type": "int",
+      "table": "workout_session_sets",
+      "default": null,
+      "nullable": false,
+      "position": 6
+    },
+    {
+      "key": "",
+      "name": "weight_kg",
+      "type": "decimal(6,2)",
+      "table": "workout_session_sets",
+      "default": null,
+      "nullable": false,
+      "position": 7
+    },
+    {
+      "key": "PRI",
+      "name": "id",
+      "type": "char(36)",
+      "table": "workout_sessions",
+      "default": null,
+      "nullable": false,
+      "position": 1
+    },
+    {
+      "key": "MUL",
+      "name": "student_id",
+      "type": "char(36)",
+      "table": "workout_sessions",
+      "default": null,
+      "nullable": false,
+      "position": 2
+    },
+    {
+      "key": "MUL",
+      "name": "plan_id",
+      "type": "char(36)",
+      "table": "workout_sessions",
+      "default": null,
+      "nullable": false,
+      "position": 3
+    },
+    {
+      "key": "",
+      "name": "plan_version",
+      "type": "int",
+      "table": "workout_sessions",
+      "default": null,
+      "nullable": false,
+      "position": 4
+    },
+    {
+      "key": "",
+      "name": "started_at",
+      "type": "datetime(6)",
+      "table": "workout_sessions",
+      "default": null,
+      "nullable": false,
+      "position": 5
+    },
+    {
+      "key": "",
+      "name": "duration_seconds",
+      "type": "int",
+      "table": "workout_sessions",
+      "default": null,
+      "nullable": false,
+      "position": 6
+    },
+    {
+      "key": "",
+      "name": "notes",
+      "type": "varchar(1000)",
+      "table": "workout_sessions",
+      "default": null,
+      "nullable": false,
+      "position": 7
+    },
+    {
+      "key": "",
+      "name": "request_hash",
+      "type": "char(64)",
+      "table": "workout_sessions",
+      "default": null,
+      "nullable": false,
+      "position": 8
+    },
+    {
+      "key": "",
+      "name": "created_at",
+      "type": "datetime(6)",
+      "table": "workout_sessions",
+      "default": "CURRENT_TIMESTAMP(6)",
+      "nullable": false,
+      "position": 9
+    }
+  ],
+  "foreignKeys": [
+    {
+      "table": "account_roles",
+      "column": "user_id",
+      "onDelete": "CASCADE",
+      "onUpdate": "NO ACTION",
+      "position": 1,
+      "constraint": "fk_role_user",
+      "referencesTable": "users",
+      "referencesColumn": "id"
+    },
+    {
+      "table": "exercises",
+      "column": "owner_id",
+      "onDelete": "CASCADE",
+      "onUpdate": "NO ACTION",
+      "position": 1,
+      "constraint": "fk_exercises_owner",
+      "referencesTable": "users",
+      "referencesColumn": "id"
+    },
+    {
+      "table": "student_teachers",
+      "column": "student_id",
+      "onDelete": "CASCADE",
+      "onUpdate": "NO ACTION",
+      "position": 1,
+      "constraint": "fk_enrollment_student",
+      "referencesTable": "users",
+      "referencesColumn": "id"
+    },
+    {
+      "table": "student_teachers",
+      "column": "teacher_id",
+      "onDelete": "CASCADE",
+      "onUpdate": "NO ACTION",
+      "position": 1,
+      "constraint": "fk_enrollment_teacher",
+      "referencesTable": "users",
+      "referencesColumn": "id"
+    },
+    {
+      "table": "teacher_invitations",
+      "column": "teacher_id",
+      "onDelete": "CASCADE",
+      "onUpdate": "NO ACTION",
+      "position": 1,
+      "constraint": "fk_invitation_teacher",
+      "referencesTable": "users",
+      "referencesColumn": "id"
+    },
+    {
+      "table": "user_sessions",
+      "column": "user_id",
+      "onDelete": "CASCADE",
+      "onUpdate": "NO ACTION",
+      "position": 1,
+      "constraint": "fk_sessions_user",
+      "referencesTable": "users",
+      "referencesColumn": "id"
+    },
+    {
+      "table": "workout_plan_items",
+      "column": "exercise_id",
+      "onDelete": "NO ACTION",
+      "onUpdate": "NO ACTION",
+      "position": 1,
+      "constraint": "fk_item_exercise",
+      "referencesTable": "exercises",
+      "referencesColumn": "id"
+    },
+    {
+      "table": "workout_plan_items",
+      "column": "plan_id",
+      "onDelete": "NO ACTION",
+      "onUpdate": "NO ACTION",
+      "position": 1,
+      "constraint": "fk_item_version",
+      "referencesTable": "workout_plan_versions",
+      "referencesColumn": "plan_id"
+    },
+    {
+      "table": "workout_plan_items",
+      "column": "version",
+      "onDelete": "NO ACTION",
+      "onUpdate": "NO ACTION",
+      "position": 2,
+      "constraint": "fk_item_version",
+      "referencesTable": "workout_plan_versions",
+      "referencesColumn": "version"
+    },
+    {
+      "table": "workout_plan_versions",
+      "column": "author_id",
+      "onDelete": "NO ACTION",
+      "onUpdate": "NO ACTION",
+      "position": 1,
+      "constraint": "fk_version_author",
+      "referencesTable": "users",
+      "referencesColumn": "id"
+    },
+    {
+      "table": "workout_plan_versions",
+      "column": "plan_id",
+      "onDelete": "NO ACTION",
+      "onUpdate": "NO ACTION",
+      "position": 1,
+      "constraint": "fk_version_plan",
+      "referencesTable": "workout_plans",
+      "referencesColumn": "id"
+    },
+    {
+      "table": "workout_plans",
+      "column": "student_id",
+      "onDelete": "NO ACTION",
+      "onUpdate": "NO ACTION",
+      "position": 1,
+      "constraint": "fk_plan_student",
+      "referencesTable": "users",
+      "referencesColumn": "id"
+    },
+    {
+      "table": "workout_session_changes",
+      "column": "session_id",
+      "onDelete": "NO ACTION",
+      "onUpdate": "NO ACTION",
+      "position": 1,
+      "constraint": "fk_change_session",
+      "referencesTable": "workout_sessions",
+      "referencesColumn": "id"
+    },
+    {
+      "table": "workout_session_sets",
+      "column": "plan_id",
+      "onDelete": "NO ACTION",
+      "onUpdate": "NO ACTION",
+      "position": 1,
+      "constraint": "fk_set_plan_exercise",
+      "referencesTable": "workout_plan_items",
+      "referencesColumn": "plan_id"
+    },
+    {
+      "table": "workout_session_sets",
+      "column": "plan_version",
+      "onDelete": "NO ACTION",
+      "onUpdate": "NO ACTION",
+      "position": 2,
+      "constraint": "fk_set_plan_exercise",
+      "referencesTable": "workout_plan_items",
+      "referencesColumn": "version"
+    },
+    {
+      "table": "workout_session_sets",
+      "column": "exercise_id",
+      "onDelete": "NO ACTION",
+      "onUpdate": "NO ACTION",
+      "position": 3,
+      "constraint": "fk_set_plan_exercise",
+      "referencesTable": "workout_plan_items",
+      "referencesColumn": "exercise_id"
+    },
+    {
+      "table": "workout_session_sets",
+      "column": "session_id",
+      "onDelete": "NO ACTION",
+      "onUpdate": "NO ACTION",
+      "position": 1,
+      "constraint": "fk_set_session_revision",
+      "referencesTable": "workout_sessions",
+      "referencesColumn": "id"
+    },
+    {
+      "table": "workout_session_sets",
+      "column": "plan_id",
+      "onDelete": "NO ACTION",
+      "onUpdate": "NO ACTION",
+      "position": 2,
+      "constraint": "fk_set_session_revision",
+      "referencesTable": "workout_sessions",
+      "referencesColumn": "plan_id"
+    },
+    {
+      "table": "workout_session_sets",
+      "column": "plan_version",
+      "onDelete": "NO ACTION",
+      "onUpdate": "NO ACTION",
+      "position": 3,
+      "constraint": "fk_set_session_revision",
+      "referencesTable": "workout_sessions",
+      "referencesColumn": "plan_version"
+    },
+    {
+      "table": "workout_sessions",
+      "column": "plan_id",
+      "onDelete": "NO ACTION",
+      "onUpdate": "NO ACTION",
+      "position": 1,
+      "constraint": "fk_session_plan_version",
+      "referencesTable": "workout_plan_versions",
+      "referencesColumn": "plan_id"
+    },
+    {
+      "table": "workout_sessions",
+      "column": "plan_version",
+      "onDelete": "NO ACTION",
+      "onUpdate": "NO ACTION",
+      "position": 2,
+      "constraint": "fk_session_plan_version",
+      "referencesTable": "workout_plan_versions",
+      "referencesColumn": "version"
+    },
+    {
+      "table": "workout_sessions",
+      "column": "student_id",
+      "onDelete": "NO ACTION",
+      "onUpdate": "NO ACTION",
+      "position": 1,
+      "constraint": "fk_session_student",
+      "referencesTable": "users",
+      "referencesColumn": "id"
+    }
+  ],
+  "indexes": [
+    {
+      "index": "PRIMARY",
+      "table": "account_roles",
+      "column": "user_id",
+      "unique": true,
+      "position": 1
+    },
+    {
+      "index": "ix_exercises_owner_name",
+      "table": "exercises",
+      "column": "owner_id",
+      "unique": false,
+      "position": 1
+    },
+    {
+      "index": "ix_exercises_owner_name",
+      "table": "exercises",
+      "column": "name",
+      "unique": false,
+      "position": 2
+    },
+    {
+      "index": "PRIMARY",
+      "table": "exercises",
+      "column": "id",
+      "unique": true,
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "schema_migrations",
+      "column": "version",
+      "unique": true,
+      "position": 1
+    },
+    {
+      "index": "ix_student_teacher",
+      "table": "student_teachers",
+      "column": "teacher_id",
+      "unique": false,
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "student_teachers",
+      "column": "student_id",
+      "unique": true,
+      "position": 1
+    },
+    {
+      "index": "code",
+      "table": "teacher_invitations",
+      "column": "code",
+      "unique": true,
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "teacher_invitations",
+      "column": "teacher_id",
+      "unique": true,
+      "position": 1
+    },
+    {
+      "index": "ix_sessions_expiry",
+      "table": "user_sessions",
+      "column": "expires_at",
+      "unique": false,
+      "position": 1
+    },
+    {
+      "index": "ix_sessions_user",
+      "table": "user_sessions",
+      "column": "user_id",
+      "unique": false,
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "user_sessions",
+      "column": "token_hash",
+      "unique": true,
+      "position": 1
+    },
+    {
+      "index": "normalized_email",
+      "table": "users",
+      "column": "normalized_email",
+      "unique": true,
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "users",
+      "column": "id",
+      "unique": true,
+      "position": 1
+    },
+    {
+      "index": "fk_item_exercise",
+      "table": "workout_plan_items",
+      "column": "exercise_id",
+      "unique": false,
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "workout_plan_items",
+      "column": "plan_id",
+      "unique": true,
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "workout_plan_items",
+      "column": "version",
+      "unique": true,
+      "position": 2
+    },
+    {
+      "index": "PRIMARY",
+      "table": "workout_plan_items",
+      "column": "position",
+      "unique": true,
+      "position": 3
+    },
+    {
+      "index": "uq_plan_exercise",
+      "table": "workout_plan_items",
+      "column": "plan_id",
+      "unique": true,
+      "position": 1
+    },
+    {
+      "index": "uq_plan_exercise",
+      "table": "workout_plan_items",
+      "column": "version",
+      "unique": true,
+      "position": 2
+    },
+    {
+      "index": "uq_plan_exercise",
+      "table": "workout_plan_items",
+      "column": "exercise_id",
+      "unique": true,
+      "position": 3
+    },
+    {
+      "index": "fk_version_author",
+      "table": "workout_plan_versions",
+      "column": "author_id",
+      "unique": false,
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "workout_plan_versions",
+      "column": "plan_id",
+      "unique": true,
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "workout_plan_versions",
+      "column": "version",
+      "unique": true,
+      "position": 2
+    },
+    {
+      "index": "ix_plans_student",
+      "table": "workout_plans",
+      "column": "student_id",
+      "unique": false,
+      "position": 1
+    },
+    {
+      "index": "ix_plans_student",
+      "table": "workout_plans",
+      "column": "deleted_at",
+      "unique": false,
+      "position": 2
+    },
+    {
+      "index": "PRIMARY",
+      "table": "workout_plans",
+      "column": "id",
+      "unique": true,
+      "position": 1
+    },
+    {
+      "index": "operation_id",
+      "table": "workout_session_changes",
+      "column": "operation_id",
+      "unique": true,
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "workout_session_changes",
+      "column": "session_id",
+      "unique": true,
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "workout_session_changes",
+      "column": "version",
+      "unique": true,
+      "position": 2
+    },
+    {
+      "index": "fk_set_plan_exercise",
+      "table": "workout_session_sets",
+      "column": "plan_id",
+      "unique": false,
+      "position": 1
+    },
+    {
+      "index": "fk_set_plan_exercise",
+      "table": "workout_session_sets",
+      "column": "plan_version",
+      "unique": false,
+      "position": 2
+    },
+    {
+      "index": "fk_set_plan_exercise",
+      "table": "workout_session_sets",
+      "column": "exercise_id",
+      "unique": false,
+      "position": 3
+    },
+    {
+      "index": "fk_set_session_revision",
+      "table": "workout_session_sets",
+      "column": "session_id",
+      "unique": false,
+      "position": 1
+    },
+    {
+      "index": "fk_set_session_revision",
+      "table": "workout_session_sets",
+      "column": "plan_id",
+      "unique": false,
+      "position": 2
+    },
+    {
+      "index": "fk_set_session_revision",
+      "table": "workout_session_sets",
+      "column": "plan_version",
+      "unique": false,
+      "position": 3
+    },
+    {
+      "index": "PRIMARY",
+      "table": "workout_session_sets",
+      "column": "session_id",
+      "unique": true,
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "workout_session_sets",
+      "column": "exercise_id",
+      "unique": true,
+      "position": 2
+    },
+    {
+      "index": "PRIMARY",
+      "table": "workout_session_sets",
+      "column": "set_position",
+      "unique": true,
+      "position": 3
+    },
+    {
+      "index": "fk_session_plan_version",
+      "table": "workout_sessions",
+      "column": "plan_id",
+      "unique": false,
+      "position": 1
+    },
+    {
+      "index": "fk_session_plan_version",
+      "table": "workout_sessions",
+      "column": "plan_version",
+      "unique": false,
+      "position": 2
+    },
+    {
+      "index": "ix_sessions_student_started",
+      "table": "workout_sessions",
+      "column": "student_id",
+      "unique": false,
+      "position": 1
+    },
+    {
+      "index": "ix_sessions_student_started",
+      "table": "workout_sessions",
+      "column": "started_at",
+      "unique": false,
+      "position": 2
+    },
+    {
+      "index": "ix_sessions_student_started",
+      "table": "workout_sessions",
+      "column": "id",
+      "unique": false,
+      "position": 3
+    },
+    {
+      "index": "PRIMARY",
+      "table": "workout_sessions",
+      "column": "id",
+      "unique": true,
+      "position": 1
+    },
+    {
+      "index": "uq_session_revision",
+      "table": "workout_sessions",
+      "column": "id",
+      "unique": true,
+      "position": 1
+    },
+    {
+      "index": "uq_session_revision",
+      "table": "workout_sessions",
+      "column": "plan_id",
+      "unique": true,
+      "position": 2
+    },
+    {
+      "index": "uq_session_revision",
+      "table": "workout_sessions",
+      "column": "plan_version",
+      "unique": true,
+      "position": 3
+    }
+  ],
+  "checks": [
+    {
+      "name": "ck_account_role",
+      "table": "account_roles",
+      "clause": "(`role` in (_utf8mb4\\\\'student\\\\',_utf8mb4\\\\'teacher\\\\'))"
+    },
+    {
+      "name": "ck_distinct_student_teacher",
+      "table": "student_teachers",
+      "clause": "(`student_id` <> `teacher_id`)"
+    },
+    {
+      "name": "ck_plan_position",
+      "table": "workout_plan_items",
+      "clause": "(`position` between 0 and 49)"
+    },
+    {
+      "name": "ck_plan_reps",
+      "table": "workout_plan_items",
+      "clause": "(`repetitions` between 1 and 200)"
+    },
+    {
+      "name": "ck_plan_sets",
+      "table": "workout_plan_items",
+      "clause": "(`set_count` between 1 and 20)"
+    },
+    {
+      "name": "ck_plan_version",
+      "table": "workout_plans",
+      "clause": "(`current_version` > 0)"
+    },
+    {
+      "name": "ck_change_version",
+      "table": "workout_session_changes",
+      "clause": "(`version` > 0)"
+    },
+    {
+      "name": "ck_session_repetitions",
+      "table": "workout_session_sets",
+      "clause": "(`repetitions` between 1 and 200)"
+    },
+    {
+      "name": "ck_session_set_position",
+      "table": "workout_session_sets",
+      "clause": "(`set_position` between 0 and 19)"
+    },
+    {
+      "name": "ck_session_weight",
+      "table": "workout_session_sets",
+      "clause": "(`weight_kg` between 0 and 2000)"
+    },
+    {
+      "name": "ck_session_duration",
+      "table": "workout_sessions",
+      "clause": "(`duration_seconds` between 1 and 86400)"
+    }
+  ]
+}

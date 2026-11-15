@@ -5,7 +5,7 @@ namespace Workoutly.Api.Data;
 /// <summary>Acesso ao banco somente na API. Abrir a API não executa DDL.</summary>
 public sealed class MySqlDatabase(IConfiguration configuration)
 {
-    public const int CurrentSchemaVersion = 9;
+    public const int CurrentSchemaVersion = 10;
 
     private string? ConnectionString => configuration.GetConnectionString("Workoutly");
     public bool IsConfigured => !string.IsNullOrWhiteSpace(ConnectionString);
@@ -50,7 +50,7 @@ public sealed class MySqlDatabase(IConfiguration configuration)
 
     public async Task MigrateAsync(CancellationToken cancellationToken = default)
     {
-        await using var connection = CreateConnection();
+        await using var connection = CreateConnection(allowUserVariables: true);
         await connection.OpenAsync(cancellationToken);
 
         // Scripts idempotentes e ordenados, disponíveis também no assembly publicado.
@@ -83,7 +83,7 @@ public sealed class MySqlDatabase(IConfiguration configuration)
         }
     }
 
-    private MySqlConnection CreateConnection()
+    private MySqlConnection CreateConnection(bool allowUserVariables = false)
     {
         var connectionString = ConnectionString;
         if (string.IsNullOrWhiteSpace(connectionString))
@@ -93,6 +93,7 @@ public sealed class MySqlDatabase(IConfiguration configuration)
         if (string.IsNullOrWhiteSpace(options.Database))
             throw new ArgumentException("A conexão deve indicar um banco de dados.");
         options.PersistSecurityInfo = false;
+        options.AllowUserVariables = allowUserVariables;
         options.ConnectionTimeout = 3;
         options.DefaultCommandTimeout = 5;
         return new MySqlConnection(options.ConnectionString);

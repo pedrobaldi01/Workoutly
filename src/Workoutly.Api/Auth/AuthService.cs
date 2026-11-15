@@ -10,7 +10,7 @@ namespace Workoutly.Api.Auth;
 public sealed record AccountProfile(string Id, string Name, string Email, string Role = "student");
 public sealed record AccountSession(string AccessToken, DateTimeOffset ExpiresAt, AccountProfile User);
 
-public sealed class AuthService(MySqlDatabase database, IPasswordHasher<AccountProfile> passwords, TimeProvider time)
+public sealed partial class AuthService(MySqlDatabase database, IPasswordHasher<AccountProfile> passwords, TimeProvider time)
 {
     private readonly AccountProfile _dummy = new("", "", "");
     private readonly string _dummyHash = passwords.HashPassword(new("", "", ""), "timing-placeholder-only");
@@ -57,11 +57,13 @@ public sealed class AuthService(MySqlDatabase database, IPasswordHasher<AccountP
     public async Task<AccountSession?> LoginAsync(string email, string password, CancellationToken cancellationToken)
     {
         await using var connection = await database.OpenConnectionAsync(cancellationToken);
+        await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
         AccountProfile? profile = null;
         string hash = _dummyHash;
         await using (var command = connection.CreateCommand())
         {
-            command.CommandText = "SELECT u.id, u.name, u.email, u.password_hash, r.role FROM users u JOIN account_roles r ON r.user_id = u.id WHERE u.normalized_email = @email LIMIT 1";
+            command.Transaction = transaction;
+            command.CommandText = "SELECT u.id, u.name, u.email, u.password_hash, r.role FROM users u JOIN account_roles r ON r.user_id = u.id WHERE u.normalized_email = @email LIMIT 1 FOR UPDATE";
             command.Parameters.AddWithValue("email", email.Trim().ToUpperInvariant());
             await using var reader = await command.ExecuteReaderAsync(cancellationToken);
             if (await reader.ReadAsync(cancellationToken))
@@ -76,12 +78,15 @@ public sealed class AuthService(MySqlDatabase database, IPasswordHasher<AccountP
         if (verification == PasswordVerificationResult.SuccessRehashNeeded)
         {
             await using var command = connection.CreateCommand();
+            command.Transaction = transaction;
             command.CommandText = "UPDATE users SET password_hash = @hash WHERE id = @id";
             command.Parameters.AddWithValue("hash", passwords.HashPassword(profile, password));
             command.Parameters.AddWithValue("id", profile.Id);
             await command.ExecuteNonQueryAsync(cancellationToken);
         }
-        return await CreateSessionAsync(profile, connection, null, cancellationToken);
+        var session = await CreateSessionAsync(profile, connection, transaction, cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+        return session;
     }
 
     public async Task<AccountProfile?> GetCurrentAsync(string token, CancellationToken cancellationToken)

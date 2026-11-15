@@ -14,6 +14,9 @@ public sealed record JoinTeacherPayload(string Code);
 public sealed record AccountSession(string AccessToken, DateTimeOffset ExpiresAt, AccountProfile User);
 public sealed record LoginPayload(string Email, string Password);
 public sealed record RegisterPayload(string Name, string Email, string Password, string Role);
+public sealed record ProfileUpdatePayload(string Name, string Email, string? CurrentPassword);
+public sealed record PasswordChangePayload(string CurrentPassword, string NewPassword);
+public sealed record AccountDeletePayload(string CurrentPassword);
 public sealed record StoredSession(string ApiUrl, string Token);
 public sealed record ExerciseItem(string Id, string Name, string MuscleGroup, string Equipment, string Description, bool IsShared, bool IsOwned = false, bool IsInPlan = false)
 {
@@ -73,6 +76,9 @@ public sealed record WorkoutHistoryItem(DateOnly From, DateOnly To, int OffsetMi
 [JsonSerializable(typeof(AccountSession))]
 [JsonSerializable(typeof(LoginPayload))]
 [JsonSerializable(typeof(RegisterPayload))]
+[JsonSerializable(typeof(ProfileUpdatePayload))]
+[JsonSerializable(typeof(PasswordChangePayload))]
+[JsonSerializable(typeof(AccountDeletePayload))]
 [JsonSerializable(typeof(StoredSession))]
 [JsonSerializable(typeof(ExerciseItem))]
 [JsonSerializable(typeof(ExerciseItem[]))]
@@ -81,43 +87,18 @@ internal partial class AccountJson : JsonSerializerContext;
 
 public sealed class AccountClient
 {
+    private const string ApiUrl = "https://workoutly-api.onrender.com/";
     private const string SessionKey = "workoutly.account.session";
-    private readonly HttpClient _http = new(new HttpClientHandler { AllowAutoRedirect = false }) { Timeout = TimeSpan.FromSeconds(10) };
+    private readonly HttpClient _http = new(new HttpClientHandler { AllowAutoRedirect = false })
+    {
+        BaseAddress = new Uri(ApiUrl),
+        Timeout = TimeSpan.FromSeconds(10)
+    };
     private string? _token;
-    public string ApiUrl { get; private set; } = Preferences.Default.Get("workoutly.api_url", DefaultApiUrl);
-
-    private static string DefaultApiUrl
-    {
-        get
-        {
-#if DEBUG
-            return DeviceInfo.Platform == DevicePlatform.Android ? "http://10.0.2.2:5080/" : "http://localhost:5080/";
-#else
-            return string.Empty;
-#endif
-        }
-    }
-
-    public void ConfigureServer(string address)
-    {
-        if (!Uri.TryCreate(address.Trim(), UriKind.Absolute, out var uri) ||
-            (uri.Scheme != "https" && uri.Scheme != "http") || !string.IsNullOrEmpty(uri.UserInfo) ||
-            !string.IsNullOrEmpty(uri.Query) || !string.IsNullOrEmpty(uri.Fragment))
-            throw new AccountException("Informe um endereço válido para o serviço.");
-#if !DEBUG
-        if (uri.Scheme != "https")
-            throw new AccountException("A conexão com sua conta precisa usar HTTPS.");
-#endif
-        var normalized = uri.AbsoluteUri.TrimEnd('/') + "/";
-        if (normalized != ApiUrl)
-            ClearSession();
-        ApiUrl = normalized;
-        Preferences.Default.Set("workoutly.api_url", normalized);
-    }
 
     public async Task<AccountProfile?> RestoreAsync()
     {
-        if (!string.IsNullOrWhiteSpace(ApiUrl)) ConfigureServer(ApiUrl);
+        _token = null;
         StoredSession? stored;
         try
         {
@@ -129,8 +110,13 @@ public sealed class AccountClient
             ClearSession();
             throw new AccountException("Não foi possível recuperar a sessão protegida. Entre novamente.");
         }
-        if (stored is null || stored.ApiUrl != ApiUrl)
+        if (stored is null)
             return null;
+        if (stored.ApiUrl != ApiUrl)
+        {
+            ClearSession();
+            return null;
+        }
         _token = stored.Token;
         try { return await GetProfileAsync(); }
         catch (SessionExpiredException) { return null; }
@@ -151,6 +137,26 @@ public sealed class AccountClient
     }
 
     public Task<AccountProfile> GetProfileAsync() => SendAsync(HttpMethod.Get, "auth/me", null, AccountJson.Default.AccountProfile, true);
+
+    public async Task<AccountProfile> UpdateProfileAsync(string name, string email, string? currentPassword)
+    {
+        using var content = JsonContent.Create(new ProfileUpdatePayload(name, email, currentPassword), AccountJson.Default.ProfileUpdatePayload);
+        return await SendAsync(HttpMethod.Patch, "auth/me", content, AccountJson.Default.AccountProfile, true);
+    }
+
+    public async Task ChangePasswordAsync(string currentPassword, string newPassword)
+    {
+        using var content = JsonContent.Create(new PasswordChangePayload(currentPassword, newPassword), AccountJson.Default.PasswordChangePayload);
+        using var response = await RequestAsync(HttpMethod.Post, "auth/me/password", content, true);
+        ClearSession();
+    }
+
+    public async Task DeleteAccountAsync(string currentPassword)
+    {
+        using var content = JsonContent.Create(new AccountDeletePayload(currentPassword), AccountJson.Default.AccountDeletePayload);
+        using var response = await RequestAsync(HttpMethod.Post, "auth/me/delete", content, true);
+        ClearSession();
+    }
 
     public Task<AccountProfile[]> GetStudentsAsync() => SendAsync(HttpMethod.Get, "teaching/students", null, AccountJson.Default.AccountProfileArray, true);
     public Task<TeacherInvitation> GetInvitationAsync() => SendAsync(HttpMethod.Get, "teaching/invitation", null, AccountJson.Default.TeacherInvitation, true);
@@ -260,9 +266,7 @@ public sealed class AccountClient
 
     private async Task<HttpResponseMessage> RequestAsync(HttpMethod method, string path, HttpContent? content, bool authenticated)
     {
-        if (string.IsNullOrWhiteSpace(ApiUrl))
-            throw new AccountException("Configure o endereço do serviço em Conexão.");
-        using var request = new HttpRequestMessage(method, new Uri(new Uri(ApiUrl), path)) { Content = content };
+        using var request = new HttpRequestMessage(method, path) { Content = content };
         if (authenticated && _token is not null)
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
         HttpResponseMessage response;
@@ -281,9 +285,12 @@ public sealed class AccountClient
                 throw new AccountException("E-mail ou senha inválidos.");
             }
             if (response.StatusCode == HttpStatusCode.Conflict)
-                throw new AccountException(path == "auth/register" ? "Este e-mail já está cadastrado. Use Entrar." : path == "enrollment" ? "Você já tem um professor vinculado. Remova o vínculo atual antes de trocar." : path.StartsWith("sessions/", StringComparison.Ordinal) ? "Este treino já foi alterado. Seus campos foram preservados. Recarregue o registro para corrigir a versão atual." : path == "sessions" ? "Esta tentativa já corresponde a outro conteúdo salvo. Consulte os treinos salvos antes de registrar novamente." : "A ficha já foi salva, alterada ou excluída. Seus campos foram preservados. Volte à lista ou recarregue a ficha para abrir a versão atual.", HttpStatusCode.Conflict);
+                throw new AccountException(path == "auth/me" ? "Este e-mail já está cadastrado." : path == "auth/register" ? "Este e-mail já está cadastrado. Use Entrar." : path == "enrollment" ? "Você já tem um professor vinculado. Remova o vínculo atual antes de trocar." : path.StartsWith("sessions/", StringComparison.Ordinal) ? "Este treino já foi alterado. Seus campos foram preservados. Recarregue o registro para corrigir a versão atual." : path == "sessions" ? "Esta tentativa já corresponde a outro conteúdo salvo. Consulte os treinos salvos antes de registrar novamente." : "A ficha já foi salva, alterada ou excluída. Seus campos foram preservados. Volte à lista ou recarregue a ficha para abrir a versão atual.", HttpStatusCode.Conflict);
             if (response.StatusCode == HttpStatusCode.Forbidden)
                 throw new AccountException("Seu perfil não tem permissão para esta ação. Volte à sua conta e atualize o acesso.");
+            if ((response.StatusCode is HttpStatusCode.NotFound or HttpStatusCode.MethodNotAllowed)
+                && authenticated && method != HttpMethod.Get && path.StartsWith("auth/me", StringComparison.Ordinal))
+                throw new AccountException("O serviço conectado ainda precisa ser atualizado para gerenciar contas.");
             if (response.StatusCode == HttpStatusCode.NotFound)
                 throw new AccountException("Registro não encontrado ou não disponível para sua conta. Atualize a tela.");
             if ((int)response.StatusCode == 429)
@@ -297,7 +304,7 @@ public sealed class AccountClient
                         throw new AccountException(string.Join("\n", errors.EnumerateObject().SelectMany(field => field.Value.EnumerateArray()).Select(value => value.GetString())), HttpStatusCode.BadRequest);
                 }
                 catch (JsonException) { }
-                throw new AccountException("Revise os dados informados e o endereço do serviço.", HttpStatusCode.BadRequest);
+                throw new AccountException("Revise os dados informados e tente novamente.", HttpStatusCode.BadRequest);
             }
             throw new AccountException("Serviço indisponível. Tente novamente em instantes.");
         }

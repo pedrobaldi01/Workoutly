@@ -41,11 +41,11 @@ public sealed class ExerciseService(MySqlDatabase database)
                 SELECT e.id, e.name, e.muscle_group, e.equipment, e.description,
                        e.owner_id IS NULL AS is_shared, IFNULL(e.owner_id=@owner, FALSE) AS is_owned,
                        EXISTS(SELECT 1 FROM plan_items i WHERE i.exercise_id=e.id) AS is_in_plan
-                FROM exercises e WHERE e.owner_id IS NULL OR e.owner_id=@owner
+                FROM exercises e WHERE NOT e.archived AND (e.owner_id IS NULL OR e.owner_id=@owner)
                 UNION ALL
                 SELECT i.exercise_id, i.name, i.muscle_group, i.equipment, i.description, FALSE, FALSE, TRUE
                 FROM plan_items i JOIN exercises e ON e.id=i.exercise_id
-                WHERE i.item_rank=1 AND e.owner_id IS NOT NULL AND e.owner_id<>@owner
+                WHERE i.item_rank=1 AND (e.archived OR (e.owner_id IS NOT NULL AND e.owner_id<>@owner))
             )
             SELECT * FROM catalog WHERE @id IS NULL OR id=@id
             ORDER BY name, id

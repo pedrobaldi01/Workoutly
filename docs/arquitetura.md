@@ -48,3 +48,7 @@ A migração 008 amplia o catálogo compartilhado de dez para 30 movimentos e re
 ## Revisão das descrições musculares
 
 A migração 009 inclui anatomia funcional nas descrições dos 30 exercícios compartilhados e estabelece o esquema atual 9. O marcador da migração impede reaplicação dos textos sobre edições posteriores. A atualização dos exemplos privados foi limitada ao banco de demonstração. As fichas ativas desse ambiente receberam novas revisões com os textos atuais; as revisões antigas e suas sessões não foram reescritas. A interface consome o campo `description` já existente, sem alteração do contrato HTTP ou do aplicativo.
+
+## Diagrama do banco de dados
+
+O [diagrama visual](diagramas/workoutly-banco.html) representa as 13 tabelas e 16 chaves estrangeiras do esquema 9, organizado em três áreas. O [modelo técnico com Mermaid e dicionário](diagramas/modelo-banco-workoutly.md) registra os tipos SQL, índices, FKs compostas e limites entre regras do banco e da aplicação.

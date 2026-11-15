@@ -1,0 +1,62 @@
+erDiagram
+    users {
+        char(36) id PK
+        varchar(120) name
+        varchar(254) email
+        varchar(254) normalized_email UK
+        varchar(512) password_hash
+        datetime(6) created_at
+    }
+    workout_plan_versions {
+        char(36) plan_id PK,FK
+        int version PK
+        varchar(120) name
+        varchar(1000) notes
+        char(36) author_id FK
+        datetime(6) created_at
+    }
+    workout_plan_items {
+        char(36) plan_id PK,FK
+        int version PK,FK
+        int position PK
+        char(36) exercise_id FK
+        varchar(120) name
+        varchar(60) muscle_group
+        varchar(80) equipment
+        varchar(1000) description
+        int set_count
+        int repetitions
+    }
+    workout_sessions {
+        char(36) id PK
+        char(36) student_id FK
+        char(36) plan_id FK
+        int plan_version FK
+        datetime(6) started_at
+        int duration_seconds
+        varchar(1000) notes
+        char(64) request_hash
+        datetime(6) created_at
+    }
+    workout_session_sets {
+        char(36) session_id PK,FK
+        char(36) plan_id FK
+        int plan_version FK
+        char(36) exercise_id PK,FK
+        int set_position PK
+        int repetitions
+        decimal weight_kg "decimal(6,2)"
+    }
+    workout_session_changes {
+        char(36) session_id PK,FK
+        int version PK
+        char(36) operation_id UK
+        char(64) request_hash
+        datetime(6) changed_at
+    }
+    users ||--o{ workout_sessions : "aluno"
+    workout_plan_versions ||--o{ workout_sessions : "revisão"
+    workout_sessions ||--o{ workout_session_changes : "correções"
+    workout_sessions ||--o{ workout_session_sets : "séries"
+    workout_plan_items ||--o{ workout_session_sets : "item executado"
+    workout_plan_versions ||--o{ workout_plan_items : "itens"

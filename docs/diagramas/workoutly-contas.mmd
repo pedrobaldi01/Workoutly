@@ -1,0 +1,39 @@
+erDiagram
+    users {
+        char(36) id PK
+        varchar(120) name
+        varchar(254) email
+        varchar(254) normalized_email UK
+        varchar(512) password_hash
+        datetime(6) created_at
+    }
+    user_sessions {
+        char(64) token_hash PK
+        char(36) user_id FK
+        datetime(6) created_at
+        datetime(6) expires_at
+    }
+    account_roles {
+        char(36) user_id PK,FK
+        varchar(20) role
+    }
+    teacher_invitations {
+        char(36) teacher_id PK,FK
+        char(12) code UK
+        datetime(6) expires_at
+    }
+    student_teachers {
+        char(36) student_id PK,FK
+        char(36) teacher_id FK
+        datetime(6) created_at
+    }
+    schema_migrations {
+        int version PK
+        varchar(120) name
+        datetime(6) applied_at
+    }
+    users ||--o{ user_sessions : "acessos"
+    users ||--o| account_roles : "papel"
+    users ||--o| teacher_invitations : "convite"
+    users ||--o{ student_teachers : "professor"
+    users ||--o| student_teachers : "aluno"

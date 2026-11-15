@@ -1,0 +1,50 @@
+erDiagram
+    users {
+        char(36) id PK
+        varchar(120) name
+        varchar(254) email
+        varchar(254) normalized_email UK
+        varchar(512) password_hash
+        datetime(6) created_at
+    }
+    exercises {
+        char(36) id PK
+        char(36) owner_id FK "NULL permitido"
+        varchar(120) name
+        varchar(60) muscle_group
+        varchar(80) equipment
+        varchar(1000) description
+        datetime(6) created_at
+    }
+    workout_plans {
+        char(36) id PK
+        char(36) student_id FK
+        int current_version
+        datetime(6) deleted_at "NULL permitido"
+    }
+    workout_plan_versions {
+        char(36) plan_id PK,FK
+        int version PK
+        varchar(120) name
+        varchar(1000) notes
+        char(36) author_id FK
+        datetime(6) created_at
+    }
+    workout_plan_items {
+        char(36) plan_id PK,FK
+        int version PK,FK
+        int position PK
+        char(36) exercise_id FK
+        varchar(120) name
+        varchar(60) muscle_group
+        varchar(80) equipment
+        varchar(1000) description
+        int set_count
+        int repetitions
+    }
+    users |o--o{ exercises : "proprietário"
+    users ||--o{ workout_plans : "aluno"
+    workout_plans ||--o{ workout_plan_versions : "revisões"
+    users ||--o{ workout_plan_versions : "autor"
+    workout_plan_versions ||--o{ workout_plan_items : "itens"
+    exercises ||--o{ workout_plan_items : "exercício"
