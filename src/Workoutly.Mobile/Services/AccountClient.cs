@@ -29,12 +29,13 @@ public sealed record ExerciseItem(string Id, string Name, string MuscleGroup, st
 }
 public sealed record CreateExercisePayload(string Name, string MuscleGroup, string Equipment, string Description);
 
-public sealed record PlanExerciseItem(string ExerciseId, string Name, string MuscleGroup, string Equipment, string Description, int Sets, int Repetitions);
+public sealed record PlanExerciseItem(string ExerciseId, string Name, string MuscleGroup, string Equipment, string Description, int Sets, int Repetitions,
+    decimal? SuggestedWeightKg = null, decimal? LastUsedWeightKg = null);
 public sealed record PlanItem(string Id, string StudentId, string Name, string Notes, int Version, PlanExerciseItem[] Exercises)
 {
     public string Summary => $"{Exercises.Length} exercício(s) • {Exercises.Sum(item => item.Sets)} séries previstas";
 }
-public sealed record PlanExercisePayload(string ExerciseId, int Sets, int Repetitions);
+public sealed record PlanExercisePayload(string ExerciseId, int Sets, int Repetitions, decimal? SuggestedWeightKg);
 public sealed record CreatePlanPayload(string Id, string Name, string Notes, PlanExercisePayload[] Exercises);
 public sealed record UpdatePlanPayload(int Version, string Name, string Notes, PlanExercisePayload[] Exercises);
 

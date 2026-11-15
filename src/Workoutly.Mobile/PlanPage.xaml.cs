@@ -4,7 +4,7 @@ namespace Workoutly.Mobile;
 
 public partial class PlanPage : ContentPage, IConfirmLeave
 {
-    private sealed record Row(PlanExerciseItem Item, Border View, Label Order, Entry Sets, Entry Repetitions);
+    private sealed record Row(PlanExerciseItem Item, Border View, Label Order, Entry Sets, Entry Repetitions, Entry Weight);
     private readonly AccountClient _accounts;
     private readonly string? _studentId;
     private readonly string _id;
@@ -25,7 +25,7 @@ public partial class PlanPage : ContentPage, IConfirmLeave
         _baseline = FormValues();
     }
     private string[] FormValues() => new[] { NameEntry.Text ?? "", NotesEntry.Text ?? "" }
-        .Concat(_rows.SelectMany(row => new[] { row.Item.ExerciseId, row.Sets.Text ?? "", row.Repetitions.Text ?? "" })).ToArray();
+        .Concat(_rows.SelectMany(row => new[] { row.Item.ExerciseId, row.Sets.Text ?? "", row.Repetitions.Text ?? "", row.Weight.Text ?? "" })).ToArray();
     public Task<bool> CanLeaveAsync()
     {
         if (_allowLeave) return Task.FromResult(true);
@@ -51,6 +51,14 @@ public partial class PlanPage : ContentPage, IConfirmLeave
         var order = new Label { Style = StyleFor("Eyebrow") };
         var sets = new Entry { Text = item.Sets.ToString(CultureInfo.InvariantCulture), Keyboard = Keyboard.Numeric, MaxLength = 2, AutomationId = $"plan_sets_{item.ExerciseId}" };
         var reps = new Entry { Text = item.Repetitions.ToString(CultureInfo.InvariantCulture), Keyboard = Keyboard.Numeric, MaxLength = 3, AutomationId = $"plan_reps_{item.ExerciseId}" };
+        var weight = new Entry
+        {
+            Text = item.SuggestedWeightKg?.ToString("0.##", CultureInfo.CurrentCulture),
+            Placeholder = "0 para peso corporal",
+            Keyboard = Keyboard.Numeric,
+            MaxLength = 7,
+            AutomationId = $"plan_weight_{item.ExerciseId}"
+        };
         var numbers = new Grid { ColumnDefinitions = [new ColumnDefinition(GridLength.Star), new ColumnDefinition(GridLength.Star)], ColumnSpacing = 12 };
         Border Field(string title, Entry entry) => new() { Style = StyleFor("InputBorder"), Content = new VerticalStackLayout { Children = { new Label { Text = title, Style = StyleFor("FieldLabel") }, entry } } };
         numbers.Add(Field("Séries (1–20)", sets));
@@ -62,8 +70,9 @@ public partial class PlanPage : ContentPage, IConfirmLeave
         var view = new Border { Style = StyleFor("SurfaceCard"), Content = new VerticalStackLayout { Spacing = 10, Children = {
             order, new Label { Text = item.Name, FontFamily = "InterSemiBold", FontSize = 18 },
             new Label { Text = $"{item.MuscleGroup} • {item.Equipment}", Style = StyleFor("SecondaryText") },
-            new Label { Text = item.Description, Style = StyleFor("SecondaryText"), IsVisible = !string.IsNullOrEmpty(item.Description) }, numbers, actions } } };
-        var row = new Row(item, view, order, sets, reps);
+            new Label { Text = item.Description, Style = StyleFor("SecondaryText"), IsVisible = !string.IsNullOrEmpty(item.Description) },
+            numbers, Field("Carga sugerida (kg, opcional)", weight), actions } } };
+        var row = new Row(item, view, order, sets, reps, weight);
         up.Clicked += (_, _) => Move(row, -1);
         down.Clicked += (_, _) => Move(row, 1);
         remove.Clicked += async (_, _) =>
@@ -120,7 +129,15 @@ public partial class PlanPage : ContentPage, IConfirmLeave
         {
             if (!int.TryParse(row.Sets.Text, out var sets) || sets is < 1 or > 20 || !int.TryParse(row.Repetitions.Text, out var reps) || reps is < 1 or > 200)
                 throw new AccountException($"Revise {row.Item.Name}: use de 1 a 20 séries e de 1 a 200 repetições.");
-            items.Add(new(row.Item.ExerciseId, sets, reps));
+            decimal? suggestedWeight = null;
+            if (!string.IsNullOrWhiteSpace(row.Weight.Text))
+            {
+                if (!decimal.TryParse(row.Weight.Text.Trim().Replace(',', '.'), NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var weight)
+                    || weight is < 0 or > 2000 || decimal.Round(weight, 2) != weight)
+                    throw new AccountException($"Revise a carga de {row.Item.Name}: use 0 a 2000 kg, com até duas casas decimais.");
+                suggestedWeight = weight;
+            }
+            items.Add(new(row.Item.ExerciseId, sets, reps, suggestedWeight));
         }
         await _accounts.SavePlanAsync(_studentId, _id, _version, name, NotesEntry.Text ?? string.Empty, items.ToArray());
         _allowLeave = true;

@@ -13,7 +13,7 @@
         <ScrollView Grid.Row="1" x:Name="PageScroll">
             <VerticalStackLayout Spacing="14" Padding="0,0,0,20">
                 <VerticalStackLayout x:Name="Form" Spacing="14">
-                    <Label Text="Preencha repetições e carga de cada série realizada e marque Feita. Para peso corporal, informe 0 kg. Séries vazias e não marcadas ficam de fora." Style="{StaticResource SecondaryText}" />
+                    <Label Text="Confira as repetições e a carga, ajuste se precisar e marque Feita em cada série realizada. Use 0 kg para peso corporal." Style="{StaticResource SecondaryText}" />
                     <Label x:Name="PlanNotes" Style="{StaticResource SecondaryText}" IsVisible="False" />
                     <VerticalStackLayout x:Name="ExercisesPanel" Spacing="14" />
                     <Border Style="{StaticResource InputBorder}">

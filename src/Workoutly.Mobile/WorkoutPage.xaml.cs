@@ -6,7 +6,7 @@ namespace Workoutly.Mobile;
 
 public partial class WorkoutPage : ContentPage, IConfirmLeave
 {
-    private sealed record SetRow(Grid View, Entry Repetitions, Entry Weight, CheckBox Done);
+    private sealed record SetRow(Grid View, Entry Repetitions, Entry Weight, CheckBox Done, string InitialRepetitions, string InitialWeight);
     private sealed record ExerciseRows(PlanExerciseItem Item, VerticalStackLayout SetsPanel, List<SetRow> Sets);
     private readonly AccountClient _accounts;
     private readonly PlanItem _plan;
@@ -55,7 +55,7 @@ public partial class WorkoutPage : ContentPage, IConfirmLeave
         {
             if (_busy || _submission is not null || rows.Sets.Count == 0) return;
             var row = rows.Sets[^1];
-            if ((row.Done.IsChecked || !string.IsNullOrWhiteSpace(row.Repetitions.Text) || !string.IsNullOrWhiteSpace(row.Weight.Text)) &&
+            if ((row.Done.IsChecked || (row.Repetitions.Text ?? "") != row.InitialRepetitions || (row.Weight.Text ?? "") != row.InitialWeight) &&
                 !await DisplayAlertAsync("Remover série?", "Os campos desta série serão descartados.", "Remover", "Cancelar")) return;
             rows.Sets.RemoveAt(rows.Sets.Count - 1); panel.Children.Remove(row.View); UpdateCompleted();
         };
@@ -67,8 +67,10 @@ public partial class WorkoutPage : ContentPage, IConfirmLeave
     private void AddSet(ExerciseRows exercise)
     {
         var number = exercise.Sets.Count + 1;
-        var reps = new Entry { Placeholder = $"Ex.: {exercise.Item.Repetitions}", Keyboard = Keyboard.Numeric, MaxLength = 3, AutomationId = $"workout_reps_{exercise.Item.ExerciseId}_{number}" };
-        var weight = new Entry { Placeholder = "kg", Keyboard = Keyboard.Numeric, MaxLength = 7, AutomationId = $"workout_weight_{exercise.Item.ExerciseId}_{number}" };
+        var initialReps = exercise.Item.Repetitions.ToString(CultureInfo.InvariantCulture);
+        var initialWeight = (exercise.Item.LastUsedWeightKg ?? exercise.Item.SuggestedWeightKg)?.ToString("0.##", CultureInfo.CurrentCulture) ?? "";
+        var reps = new Entry { Text = initialReps, Keyboard = Keyboard.Numeric, MaxLength = 3, AutomationId = $"workout_reps_{exercise.Item.ExerciseId}_{number}" };
+        var weight = new Entry { Text = initialWeight, Placeholder = "kg", Keyboard = Keyboard.Numeric, MaxLength = 7, AutomationId = $"workout_weight_{exercise.Item.ExerciseId}_{number}" };
         var done = new CheckBox { Color = (Color)Application.Current!.Resources["Accent"], VerticalOptions = LayoutOptions.Center, AutomationId = $"workout_done_{exercise.Item.ExerciseId}_{number}" };
         SemanticProperties.SetDescription(done, $"Série {number} feita de {exercise.Item.Name}");
         done.CheckedChanged += (_, _) => UpdateCompleted();
@@ -77,7 +79,7 @@ public partial class WorkoutPage : ContentPage, IConfirmLeave
         view.Add(new Label { Text = $"{number:00}", FontSize = 12, VerticalOptions = LayoutOptions.Center });
         view.Add(Field("Reps", reps), 1); view.Add(Field("Carga (kg)", weight), 2);
         view.Add(new VerticalStackLayout { VerticalOptions = LayoutOptions.Center, Children = { new Label { Text = "Feita", Style = StyleFor("FieldLabel"), HorizontalOptions = LayoutOptions.Center }, done } }, 3);
-        exercise.Sets.Add(new(view, reps, weight, done)); exercise.SetsPanel.Children.Add(view);
+        exercise.Sets.Add(new(view, reps, weight, done, initialReps, initialWeight)); exercise.SetsPanel.Children.Add(view);
     }
     private void UpdateCompleted()
     {
@@ -92,12 +94,7 @@ public partial class WorkoutPage : ContentPage, IConfirmLeave
             var sets = new List<WorkoutSetItem>();
             foreach (var row in exercise.Sets)
             {
-                if (!row.Done.IsChecked)
-                {
-                    if (!string.IsNullOrWhiteSpace(row.Repetitions.Text) || !string.IsNullOrWhiteSpace(row.Weight.Text))
-                        throw new AccountException($"Em {exercise.Item.Name}, marque Feita na série preenchida ou limpe seus campos.");
-                    continue;
-                }
+                if (!row.Done.IsChecked) continue;
                 if (!int.TryParse(row.Repetitions.Text, out var reps) || reps is < 1 or > 200 ||
                     !decimal.TryParse(row.Weight.Text?.Trim().Replace(',', '.'), NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var weight) ||
                     weight is < 0 or > 2000 || decimal.Round(weight, 2) != weight)
